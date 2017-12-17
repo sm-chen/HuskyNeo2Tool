@@ -106,5 +106,7 @@ private:
 	sockaddr_in servAddr;
 	sockaddr_in localAddr;
 	BOOLEAN mIsConnected;
+
+	HANDLE mMutex;
 };
 

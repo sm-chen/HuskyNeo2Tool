@@ -8,6 +8,7 @@ Husky::Husky(void)
 	mIsConnected = FALSE;
 	mServPort = 4002;
 	mServIpAddr[0] = '\0';
+	mMutex = CreateMutex(NULL, FALSE, NULL);
 }
 
 Husky::Husky(char *ipAddr)
@@ -162,6 +163,10 @@ float Husky::getTemperature(int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return 0;
+
+	WaitForSingleObject(mMutex, INFINITE);
+
+	float temperature;
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x20;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
@@ -185,7 +190,8 @@ float Husky::getTemperature(int zone)
 		unsigned char EndOfTransMsg[] = {EOT};
 		this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
 
-		return 0;
+		temperature = 0;
+		goto error;
 	}
 
 	unsigned char AckMsg[] = {DLE, ACK1};
@@ -197,7 +203,10 @@ float Husky::getTemperature(int zone)
 		Sleep(UDP_RECVFROM_TIMEOUT_TIMES);
 	}
 
-	float temperature = bytetof(temperData);
+	temperature = bytetof(temperData);
+
+error:
+	ReleaseMutex(mMutex);
 	return temperature;
 }
 
@@ -206,6 +215,9 @@ BOOLEAN Husky::setTemperature(float temperature, int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return FALSE;
+
+	WaitForSingleObject(mMutex, INFINITE);
+
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x21;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
@@ -243,16 +255,22 @@ BOOLEAN Husky::setTemperature(float temperature, int zone)
 		if (len == 2 && receivData[0] == DLE && receivData[1] == ACK1) {
 			unsigned char endTrans[] = {EOT};
 			this->sendData((char *)endTrans, sizeof(endTrans));
-			return TRUE;
+			goto ok;
 		} else
-			return FALSE;
+			goto error;
 	} else {
 		// end of transmission ???????????????
 		unsigned char EndOfTransMsg[] = {EOT};
 		this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
 
-		return FALSE;
+		goto error;
 	}
+ok:
+	ReleaseMutex(mMutex);
+	return FALSE;
+error:
+	ReleaseMutex(mMutex);
+	return FALSE;
 }
 
 BOOLEAN Husky::isConnected()
@@ -273,6 +291,10 @@ float Husky::getRealtimeTemperature(int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return 0;
+
+	WaitForSingleObject(mMutex, INFINITE);
+
+	float temperature;
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x22;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
@@ -296,7 +318,8 @@ float Husky::getRealtimeTemperature(int zone)
 		unsigned char EndOfTransMsg[] = {EOT};
 		this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
 
-		return 0;
+		temperature = 0;
+		goto error;
 	}
 
 	unsigned char AckMsg[] = {DLE, ACK1};
@@ -308,7 +331,10 @@ float Husky::getRealtimeTemperature(int zone)
 		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
 	}
 
-	float temperature = bytetof(temperData);
+	temperature = bytetof(temperData);
+
+error:
+	ReleaseMutex(mMutex);
 	return temperature;
 }
 
@@ -322,6 +348,8 @@ BOOLEAN Husky::setAllZonesTemperature(float temperature)
 
 BOOLEAN Husky::checkHuskyVersion()
 {
+	WaitForSingleObject(mMutex, INFINITE);
+
 	unsigned char CMD1 = 0x20;
 	unsigned char CMD2 = 0x22;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
@@ -348,7 +376,7 @@ BOOLEAN Husky::checkHuskyVersion()
 		unsigned char EndOfTransMsg[] = {EOT};
 		this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
 
-		return FALSE;
+		goto error;
 	}
 
 	unsigned char AckMsg[] = {DLE, ACK1};
@@ -360,7 +388,11 @@ BOOLEAN Husky::checkHuskyVersion()
 	//	Sleep(UDP_RECVFROM_TIMEOUT_TIME);
 	//}
 
+	ReleaseMutex(mMutex);
 	return TRUE;
+error:
+	ReleaseMutex(mMutex);
+	return FALSE;
 }
 
 void Husky::setIpAddr(char *ipAddr)

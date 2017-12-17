@@ -17,6 +17,7 @@ namespace HuskyNeo2Tool {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Threading;
 
 	/// <summary>
 	/// Form1 ժҪ
@@ -54,6 +55,20 @@ namespace HuskyNeo2Tool {
 			textBoxIpConfigs[10] = ipConfig->textBox11;
 			textBoxIpConfigs[11] = ipConfig->textBox12;
 
+			labelZonesRealTemp = gcnew array<System::Windows::Forms::Label^, 1>(12);
+			labelZonesRealTemp[0] = labelZone01RealTemp;
+			labelZonesRealTemp[1] = labelZone02RealTemp;
+			labelZonesRealTemp[2] = labelZone03RealTemp;
+			labelZonesRealTemp[3] = labelZone04RealTemp;
+			labelZonesRealTemp[4] = labelZone05RealTemp;
+			labelZonesRealTemp[5] = labelZone06RealTemp;
+			labelZonesRealTemp[6] = labelZone07RealTemp;
+			labelZonesRealTemp[7] = labelZone08RealTemp;
+			labelZonesRealTemp[8] = labelZone09RealTemp;
+			labelZonesRealTemp[9] = labelZone10RealTemp;
+			labelZonesRealTemp[10] = labelZone11RealTemp;
+			labelZonesRealTemp[11] = labelZone12RealTemp;
+
 			char ipconfigPathBuf[MAX_PATH];
 			_getcwd(ipconfigPathBuf, MAX_PATH ); //get current work dir
 			int len = strlen(ipconfigPathBuf);
@@ -83,6 +98,13 @@ namespace HuskyNeo2Tool {
 			}
 
 			currentHusky = NULL;
+
+			myUpdateUi = gcnew updateUi(this, &HuskyNeo2Tool::Form1::updateUiMethod);
+
+			//CreateThread(NULL, 0, &HuskyNeo2Tool::Form1::realtimeTemperatureUpdateThread, NULL, 0, NULL);
+			Thread ^t = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::realtimeTemperatureUpdateThread));
+			t->IsBackground = true;
+			t->Start();
 		}
 
 	protected:
@@ -105,7 +127,35 @@ namespace HuskyNeo2Tool {
 		//Husky *huskys[HUSKY_DEV_NUM];
 		array<Husky *,1>^ huskys;
 		array<System::Windows::Forms::TextBox^, 1>^ textBoxIpConfigs;
+		array<System::Windows::Forms::Label^, 1>^ labelZonesRealTemp;
 		Husky *currentHusky;
+
+	private:
+		delegate void updateUi(int i, float value);
+		updateUi^ myUpdateUi;
+	private:
+		void updateUiMethod(int i, float value)
+		{
+			this->labelZonesRealTemp[i]->Text = value.ToString();
+		}
+		void realtimeTemperatureUpdateThread()
+		{
+			while (1) {
+				if (currentHusky == NULL || !currentHusky->isConnected()) {
+					Sleep(3000);
+					continue;
+				}
+
+				for (int i = 0; i < 12; i++) {
+					float realtimeTemperature = currentHusky->getRealtimeTemperature(i + 1);
+					realtimeTemperature = (realtimeTemperature - 32) / 1.8;
+					int tmp = realtimeTemperature * 10 + 0.5;
+					realtimeTemperature = (float)tmp / 10;
+					this->Invoke(this->myUpdateUi, i, realtimeTemperature);
+					Sleep(1000); // 1s?
+				}
+			}
+		}
 
 	private: System::Windows::Forms::GroupBox^  groupBox1;
 	protected: 
@@ -1692,12 +1742,6 @@ private: System::Void buttonZone01TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone01Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(1);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone01RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone02TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1714,12 +1758,6 @@ private: System::Void buttonZone02TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone02Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(2);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone02RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone03TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1736,12 +1774,6 @@ private: System::Void buttonZone03TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone03Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(3);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone03RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone04TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1758,12 +1790,6 @@ private: System::Void buttonZone04TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone04Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(4);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone04RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone05TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1780,12 +1806,6 @@ private: System::Void buttonZone05TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone05Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(5);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone05RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone06TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1802,12 +1822,6 @@ private: System::Void buttonZone06TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone06Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(6);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone06RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone07TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1824,12 +1838,6 @@ private: System::Void buttonZone07TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone07Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(7);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone07RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone08TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1846,12 +1854,6 @@ private: System::Void buttonZone08TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone08Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(8);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone08RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone09TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1868,12 +1870,6 @@ private: System::Void buttonZone09TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone09Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(9);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone09RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone10TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1890,12 +1886,6 @@ private: System::Void buttonZone10TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone10Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(10);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone10RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone11TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1912,12 +1902,6 @@ private: System::Void buttonZone11TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone11Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(11);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone11RealTemp->Text = realtimeTemperature.ToString();
 	}
 private: System::Void buttonZone12TempGet_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (currentHusky == NULL) {
@@ -1934,12 +1918,6 @@ private: System::Void buttonZone12TempGet_Click(System::Object^  sender, System:
 		int tmp = temperature * 10 + 0.5;
 		temperature = (float)tmp / 10;
 		this->textBoxZone12Setpoint->Text = temperature.ToString();
-
-		float realtimeTemperature = currentHusky->getRealtimeTemperature(12);
-		realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-		tmp = realtimeTemperature * 10 + 0.5;
-		realtimeTemperature = (float)tmp / 10;
-		this->labelZone12RealTemp->Text = realtimeTemperature.ToString();
 	}
 
 private: System::Void buttonZone01TempSet_Click(System::Object^  sender, System::EventArgs^  e) {
