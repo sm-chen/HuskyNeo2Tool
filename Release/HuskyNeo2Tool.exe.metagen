@@ -40,7 +40,9 @@ Class HuskyNeo2Tool.SetAllZonesTemperatureForm: AutoLayout, AnsiClass, Class, Pu
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Fields:
-    System.Windows.Forms.TextBox textBox1 : Public
+    System.Windows.Forms.CheckBox[] checkBoxAllZonesArray : Public
+    System.Windows.Forms.CheckBox checkBoxAllZones : Public
+    System.Windows.Forms.TextBox textBoxTemperature : Public
 Class HuskyNeo2Tool.Form1: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName

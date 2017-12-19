@@ -1,7 +1,7 @@
-﻿生成启动时间为 2017/12/18 11:42:08。
+﻿生成启动时间为 2017/12/19 11:55:17。
      1>项目“D:\HUSKY\HuskyNeo2Tool_DEBUGOK\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr:pure /nologo /W3 /WX- /O2 /Oy- /GL /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /EHa /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\HuskyNeo2Tool.pch" /Fo"Release\\" /Fd"Release\vc110.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib HuskyNeo2Tool.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr:pure /nologo /W3 /WX- /O2 /Oy- /GL /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /EHa /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\HuskyNeo2Tool.pch" /Fo"Release\\" /Fd"Release\vc110.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib HuskyNeo2Tool.cpp SetAllZonesTemperatureForm.cpp
          HuskyNeo2Tool.cpp
      1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\IpConfigure.h(435): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\string.h(110) : 参见“strcpy”的声明
@@ -85,8 +85,10 @@
      1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2400): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
      1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2406): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
      1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2407): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2424): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2426): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2427): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2429): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+         SetAllZonesTemperatureForm.cpp
+         正在生成代码...
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\HUSKY\HuskyNeo2Tool_DEBUGOK\Release\HuskyNeo2Tool.exe" /INCREMENTAL:NO /NOLOGO /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.AllZonesTemperatureSetting.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.Form1.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.IpConfigure.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.SetAllZonesTemperatureForm.resources /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\HUSKY\HuskyNeo2Tool_DEBUGOK\Release\HuskyNeo2Tool.pdb" /SUBSYSTEM:WINDOWS /LTCG /TLBID:1 /ENTRY:"main" /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X86 /SAFESEH Release\AllZonesTemperatureSetting.obj
          Release\AssemblyInfo.obj
@@ -102,4 +104,4 @@
 
 生成成功。
 
-已用时间 00:00:01.21
+已用时间 00:00:01.58

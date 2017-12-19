@@ -484,7 +484,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBox1->Margin = System::Windows::Forms::Padding(4);
 			this->groupBox1->Name = L"groupBox1";
 			this->groupBox1->Padding = System::Windows::Forms::Padding(4);
-			this->groupBox1->Size = System::Drawing::Size(977, 81);
+			this->groupBox1->Size = System::Drawing::Size(926, 81);
 			this->groupBox1->TabIndex = 0;
 			this->groupBox1->TabStop = false;
 			// 
@@ -502,10 +502,10 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->button28->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
-			this->button28->Location = System::Drawing::Point(825, 23);
+			this->button28->Location = System::Drawing::Point(769, 23);
 			this->button28->Margin = System::Windows::Forms::Padding(4);
 			this->button28->Name = L"button28";
-			this->button28->Size = System::Drawing::Size(144, 32);
+			this->button28->Size = System::Drawing::Size(129, 32);
 			this->button28->TabIndex = 10;
 			this->button28->Text = L"全区域温度设置";
 			this->button28->UseVisualStyleBackColor = true;
@@ -513,10 +513,10 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// button27
 			// 
-			this->button27->Location = System::Drawing::Point(668, 23);
+			this->button27->Location = System::Drawing::Point(627, 23);
 			this->button27->Margin = System::Windows::Forms::Padding(4);
 			this->button27->Name = L"button27";
-			this->button27->Size = System::Drawing::Size(143, 31);
+			this->button27->Size = System::Drawing::Size(128, 31);
 			this->button27->TabIndex = 9;
 			this->button27->Text = L"全区域温度读取";
 			this->button27->UseVisualStyleBackColor = true;
@@ -586,7 +586,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZones->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZones->Name = L"groupBoxZones";
 			this->groupBoxZones->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZones->Size = System::Drawing::Size(977, 496);
+			this->groupBoxZones->Size = System::Drawing::Size(926, 496);
 			this->groupBoxZones->TabIndex = 1;
 			this->groupBoxZones->TabStop = false;
 			// 
@@ -601,11 +601,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone12->Controls->Add(this->buttonZone12TempGet);
 			this->groupBoxZone12->Controls->Add(this->label60);
 			this->groupBoxZone12->Controls->Add(this->label61);
-			this->groupBoxZone12->Location = System::Drawing::Point(736, 344);
+			this->groupBoxZone12->Location = System::Drawing::Point(694, 344);
 			this->groupBoxZone12->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone12->Name = L"groupBoxZone12";
 			this->groupBoxZone12->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone12->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone12->Size = System::Drawing::Size(223, 151);
 			this->groupBoxZone12->TabIndex = 0;
 			this->groupBoxZone12->TabStop = false;
 			this->groupBoxZone12->Text = L"Zone12";
@@ -662,7 +662,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone12TempGet
 			// 
-			this->buttonZone12TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone12TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone12TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone12TempGet->Name = L"buttonZone12TempGet";
 			this->buttonZone12TempGet->Size = System::Drawing::Size(88, 31);
@@ -702,11 +702,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone08->Controls->Add(this->buttonZone08TempGet);
 			this->groupBoxZone08->Controls->Add(this->label40);
 			this->groupBoxZone08->Controls->Add(this->label41);
-			this->groupBoxZone08->Location = System::Drawing::Point(736, 185);
+			this->groupBoxZone08->Location = System::Drawing::Point(694, 185);
 			this->groupBoxZone08->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone08->Name = L"groupBoxZone08";
 			this->groupBoxZone08->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone08->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone08->Size = System::Drawing::Size(223, 151);
 			this->groupBoxZone08->TabIndex = 0;
 			this->groupBoxZone08->TabStop = false;
 			this->groupBoxZone08->Text = L"Zone08";
@@ -763,7 +763,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone08TempGet
 			// 
-			this->buttonZone08TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone08TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone08TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone08TempGet->Name = L"buttonZone08TempGet";
 			this->buttonZone08TempGet->Size = System::Drawing::Size(88, 31);
@@ -803,11 +803,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone04->Controls->Add(this->buttonZone04TempGet);
 			this->groupBoxZone04->Controls->Add(this->label17);
 			this->groupBoxZone04->Controls->Add(this->label18);
-			this->groupBoxZone04->Location = System::Drawing::Point(736, 27);
+			this->groupBoxZone04->Location = System::Drawing::Point(694, 27);
 			this->groupBoxZone04->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone04->Name = L"groupBoxZone04";
 			this->groupBoxZone04->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone04->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone04->Size = System::Drawing::Size(223, 151);
 			this->groupBoxZone04->TabIndex = 0;
 			this->groupBoxZone04->TabStop = false;
 			this->groupBoxZone04->Text = L"Zone04";
@@ -864,7 +864,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone04TempGet
 			// 
-			this->buttonZone04TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone04TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone04TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone04TempGet->Name = L"buttonZone04TempGet";
 			this->buttonZone04TempGet->Size = System::Drawing::Size(88, 31);
@@ -904,11 +904,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone11->Controls->Add(this->buttonZone11TempGet);
 			this->groupBoxZone11->Controls->Add(this->label55);
 			this->groupBoxZone11->Controls->Add(this->label56);
-			this->groupBoxZone11->Location = System::Drawing::Point(492, 344);
+			this->groupBoxZone11->Location = System::Drawing::Point(466, 344);
 			this->groupBoxZone11->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone11->Name = L"groupBoxZone11";
 			this->groupBoxZone11->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone11->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone11->Size = System::Drawing::Size(220, 151);
 			this->groupBoxZone11->TabIndex = 0;
 			this->groupBoxZone11->TabStop = false;
 			this->groupBoxZone11->Text = L"Zone11";
@@ -965,7 +965,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone11TempGet
 			// 
-			this->buttonZone11TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone11TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone11TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone11TempGet->Name = L"buttonZone11TempGet";
 			this->buttonZone11TempGet->Size = System::Drawing::Size(88, 31);
@@ -1005,11 +1005,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone07->Controls->Add(this->buttonZone07TempGet);
 			this->groupBoxZone07->Controls->Add(this->label35);
 			this->groupBoxZone07->Controls->Add(this->label36);
-			this->groupBoxZone07->Location = System::Drawing::Point(492, 185);
+			this->groupBoxZone07->Location = System::Drawing::Point(466, 185);
 			this->groupBoxZone07->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone07->Name = L"groupBoxZone07";
 			this->groupBoxZone07->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone07->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone07->Size = System::Drawing::Size(220, 151);
 			this->groupBoxZone07->TabIndex = 0;
 			this->groupBoxZone07->TabStop = false;
 			this->groupBoxZone07->Text = L"Zone07";
@@ -1066,7 +1066,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone07TempGet
 			// 
-			this->buttonZone07TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone07TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone07TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone07TempGet->Name = L"buttonZone07TempGet";
 			this->buttonZone07TempGet->Size = System::Drawing::Size(88, 31);
@@ -1106,11 +1106,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone03->Controls->Add(this->buttonZone03TempGet);
 			this->groupBoxZone03->Controls->Add(this->label12);
 			this->groupBoxZone03->Controls->Add(this->label13);
-			this->groupBoxZone03->Location = System::Drawing::Point(492, 27);
+			this->groupBoxZone03->Location = System::Drawing::Point(466, 27);
 			this->groupBoxZone03->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone03->Name = L"groupBoxZone03";
 			this->groupBoxZone03->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone03->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone03->Size = System::Drawing::Size(220, 151);
 			this->groupBoxZone03->TabIndex = 0;
 			this->groupBoxZone03->TabStop = false;
 			this->groupBoxZone03->Text = L"Zone03";
@@ -1167,7 +1167,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone03TempGet
 			// 
-			this->buttonZone03TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone03TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone03TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone03TempGet->Name = L"buttonZone03TempGet";
 			this->buttonZone03TempGet->Size = System::Drawing::Size(88, 31);
@@ -1207,11 +1207,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone10->Controls->Add(this->buttonZone10TempGet);
 			this->groupBoxZone10->Controls->Add(this->label50);
 			this->groupBoxZone10->Controls->Add(this->label51);
-			this->groupBoxZone10->Location = System::Drawing::Point(251, 344);
+			this->groupBoxZone10->Location = System::Drawing::Point(238, 344);
 			this->groupBoxZone10->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone10->Name = L"groupBoxZone10";
 			this->groupBoxZone10->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone10->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone10->Size = System::Drawing::Size(220, 151);
 			this->groupBoxZone10->TabIndex = 0;
 			this->groupBoxZone10->TabStop = false;
 			this->groupBoxZone10->Text = L"Zone10";
@@ -1268,7 +1268,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone10TempGet
 			// 
-			this->buttonZone10TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone10TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone10TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone10TempGet->Name = L"buttonZone10TempGet";
 			this->buttonZone10TempGet->Size = System::Drawing::Size(88, 31);
@@ -1312,7 +1312,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone09->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone09->Name = L"groupBoxZone09";
 			this->groupBoxZone09->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone09->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone09->Size = System::Drawing::Size(221, 151);
 			this->groupBoxZone09->TabIndex = 0;
 			this->groupBoxZone09->TabStop = false;
 			this->groupBoxZone09->Text = L"Zone09";
@@ -1369,7 +1369,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone09TempGet
 			// 
-			this->buttonZone09TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone09TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone09TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone09TempGet->Name = L"buttonZone09TempGet";
 			this->buttonZone09TempGet->Size = System::Drawing::Size(88, 31);
@@ -1409,11 +1409,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone06->Controls->Add(this->buttonZone06TempGet);
 			this->groupBoxZone06->Controls->Add(this->label30);
 			this->groupBoxZone06->Controls->Add(this->label31);
-			this->groupBoxZone06->Location = System::Drawing::Point(251, 185);
+			this->groupBoxZone06->Location = System::Drawing::Point(238, 185);
 			this->groupBoxZone06->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone06->Name = L"groupBoxZone06";
 			this->groupBoxZone06->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone06->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone06->Size = System::Drawing::Size(220, 151);
 			this->groupBoxZone06->TabIndex = 0;
 			this->groupBoxZone06->TabStop = false;
 			this->groupBoxZone06->Text = L"Zone06";
@@ -1470,7 +1470,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone06TempGet
 			// 
-			this->buttonZone06TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone06TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone06TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone06TempGet->Name = L"buttonZone06TempGet";
 			this->buttonZone06TempGet->Size = System::Drawing::Size(88, 31);
@@ -1514,7 +1514,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone05->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone05->Name = L"groupBoxZone05";
 			this->groupBoxZone05->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone05->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone05->Size = System::Drawing::Size(221, 151);
 			this->groupBoxZone05->TabIndex = 0;
 			this->groupBoxZone05->TabStop = false;
 			this->groupBoxZone05->Text = L"Zone05";
@@ -1571,7 +1571,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone05TempGet
 			// 
-			this->buttonZone05TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone05TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone05TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone05TempGet->Name = L"buttonZone05TempGet";
 			this->buttonZone05TempGet->Size = System::Drawing::Size(88, 31);
@@ -1611,11 +1611,11 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone02->Controls->Add(this->buttonZone02TempGet);
 			this->groupBoxZone02->Controls->Add(this->label7);
 			this->groupBoxZone02->Controls->Add(this->label8);
-			this->groupBoxZone02->Location = System::Drawing::Point(251, 27);
+			this->groupBoxZone02->Location = System::Drawing::Point(238, 27);
 			this->groupBoxZone02->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone02->Name = L"groupBoxZone02";
 			this->groupBoxZone02->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone02->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone02->Size = System::Drawing::Size(220, 151);
 			this->groupBoxZone02->TabIndex = 0;
 			this->groupBoxZone02->TabStop = false;
 			this->groupBoxZone02->Text = L"Zone02";
@@ -1672,7 +1672,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone02TempGet
 			// 
-			this->buttonZone02TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone02TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone02TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone02TempGet->Name = L"buttonZone02TempGet";
 			this->buttonZone02TempGet->Size = System::Drawing::Size(88, 31);
@@ -1716,7 +1716,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			this->groupBoxZone01->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone01->Name = L"groupBoxZone01";
 			this->groupBoxZone01->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone01->Size = System::Drawing::Size(233, 151);
+			this->groupBoxZone01->Size = System::Drawing::Size(221, 151);
 			this->groupBoxZone01->TabIndex = 0;
 			this->groupBoxZone01->TabStop = false;
 			this->groupBoxZone01->Text = L"Zone01";
@@ -1773,7 +1773,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			// buttonZone01TempGet
 			// 
-			this->buttonZone01TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone01TempGet->Location = System::Drawing::Point(17, 104);
 			this->buttonZone01TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone01TempGet->Name = L"buttonZone01TempGet";
 			this->buttonZone01TempGet->Size = System::Drawing::Size(88, 31);
@@ -1806,7 +1806,7 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1011, 612);
+			this->ClientSize = System::Drawing::Size(957, 612);
 			this->Controls->Add(this->groupBoxZones);
 			this->Controls->Add(this->groupBox1);
 			this->Font = (gcnew System::Drawing::Font(L"宋体", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(134)));
@@ -2409,6 +2409,7 @@ private: System::Void button27_Click(System::Object^  sender, System::EventArgs^
 		this->textBoxZone12Setpoint->Text = temperature.ToString();
 	}
 private: System::Void button28_Click(System::Object^  sender, System::EventArgs^  e) {
+/*
 		if (currentHusky == NULL) {
 			MessageBox::Show("请选择机台号！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 			return;
@@ -2417,15 +2418,21 @@ private: System::Void button28_Click(System::Object^  sender, System::EventArgs^
 			MessageBox::Show("当前设备未连接！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 			return;
 		}
-
+*/
 		SetAllZonesTemperatureForm^ setAllZonesTemperatureForm = gcnew SetAllZonesTemperatureForm();
 		System::Windows::Forms::DialogResult result = setAllZonesTemperatureForm->ShowDialog();
 		if (result == ::DialogResult::OK) {
-			float temperature = Convert::ToDouble(setAllZonesTemperatureForm->textBox1->Text);
-			// F = 32 + C * 1.8;
-			temperature = 32 + temperature * 1.8;
-			if (currentHusky->setAllZonesTemperature(temperature) == FALSE)
-				MessageBox::Show("设置温度失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+			for (int i = 0; i < 12; i++) {
+				if (setAllZonesTemperatureForm->checkBoxAllZonesArray[i]->Checked) {
+					float temperature = Convert::ToDouble(setAllZonesTemperatureForm->textBoxTemperature->Text);
+					// F = 32 + C * 1.8;
+					temperature = 32 + temperature * 1.8;
+					if (currentHusky->setTemperature(temperature, i + 1) == FALSE)
+						MessageBox::Show("Zone" + (i+1) + " 设置温度失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+					else
+						; // update setpoint
+				}
+			}
 		}
 	}
 private: System::Void comboBox1_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
