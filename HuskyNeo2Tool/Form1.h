@@ -6,6 +6,7 @@
 #include "Husky.h"
 #include "IpConfigure.h"
 #include "AllZonesTemperatureSetting.h"
+#include "SetAllZonesTemperatureForm.h"
 
 #define HUSKY_DEV_NUM 12
 
@@ -116,7 +117,6 @@ namespace HuskyNeo2Tool {
 			if (components)
 				delete components;
 
-
 			for (int i = 0; i < HUSKY_DEV_NUM; i++) {
 				if (huskys[i])
 					delete huskys[i];
@@ -129,6 +129,7 @@ namespace HuskyNeo2Tool {
 		array<System::Windows::Forms::TextBox^, 1>^ textBoxIpConfigs;
 		array<System::Windows::Forms::Label^, 1>^ labelZonesRealTemp;
 		Husky *currentHusky;
+	private: System::Windows::Forms::Label^  label6;
 
 	private:
 		delegate void updateUi(int i, float value);
@@ -325,8 +326,8 @@ private: System::Windows::Forms::Button^  buttonIpConfig;
 		/// </summary>
 		System::ComponentModel::Container ^components;
 
-private: System::Windows::Forms::Label^  label1;
-private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
+
+
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -336,8 +337,7 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 		void InitializeComponent(void)
 		{
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
-			this->label1 = (gcnew System::Windows::Forms::Label());
-			this->textBoxAllZonesSetpoint = (gcnew System::Windows::Forms::TextBox());
+			this->label6 = (gcnew System::Windows::Forms::Label());
 			this->button28 = (gcnew System::Windows::Forms::Button());
 			this->button27 = (gcnew System::Windows::Forms::Button());
 			this->buttonIpConfig = (gcnew System::Windows::Forms::Button());
@@ -473,41 +473,39 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			this->groupBox1->AutoSize = true;
 			this->groupBox1->BackColor = System::Drawing::SystemColors::Window;
-			this->groupBox1->Controls->Add(this->label1);
-			this->groupBox1->Controls->Add(this->textBoxAllZonesSetpoint);
+			this->groupBox1->Controls->Add(this->label6);
 			this->groupBox1->Controls->Add(this->button28);
 			this->groupBox1->Controls->Add(this->button27);
 			this->groupBox1->Controls->Add(this->buttonIpConfig);
 			this->groupBox1->Controls->Add(this->buttonConnect);
 			this->groupBox1->Controls->Add(this->labelIpAddr);
 			this->groupBox1->Controls->Add(this->comboBox1);
-			this->groupBox1->Location = System::Drawing::Point(12, 12);
+			this->groupBox1->Location = System::Drawing::Point(16, 16);
+			this->groupBox1->Margin = System::Windows::Forms::Padding(4);
 			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Size = System::Drawing::Size(733, 60);
+			this->groupBox1->Padding = System::Windows::Forms::Padding(4);
+			this->groupBox1->Size = System::Drawing::Size(977, 81);
 			this->groupBox1->TabIndex = 0;
 			this->groupBox1->TabStop = false;
 			// 
-			// label1
+			// label6
 			// 
-			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(602, 23);
-			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(17, 12);
-			this->label1->TabIndex = 12;
-			this->label1->Text = L"℃";
-			// 
-			// textBoxAllZonesSetpoint
-			// 
-			this->textBoxAllZonesSetpoint->Location = System::Drawing::Point(559, 18);
-			this->textBoxAllZonesSetpoint->Name = L"textBoxAllZonesSetpoint";
-			this->textBoxAllZonesSetpoint->Size = System::Drawing::Size(42, 21);
-			this->textBoxAllZonesSetpoint->TabIndex = 11;
+			this->label6->AutoSize = true;
+			this->label6->Location = System::Drawing::Point(7, 31);
+			this->label6->Name = L"label6";
+			this->label6->Size = System::Drawing::Size(64, 16);
+			this->label6->TabIndex = 13;
+			this->label6->Text = L"机台号:";
 			// 
 			// button28
 			// 
-			this->button28->Location = System::Drawing::Point(619, 17);
+			this->button28->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
+				| System::Windows::Forms::AnchorStyles::Left) 
+				| System::Windows::Forms::AnchorStyles::Right));
+			this->button28->Location = System::Drawing::Point(825, 23);
+			this->button28->Margin = System::Windows::Forms::Padding(4);
 			this->button28->Name = L"button28";
-			this->button28->Size = System::Drawing::Size(108, 23);
+			this->button28->Size = System::Drawing::Size(144, 32);
 			this->button28->TabIndex = 10;
 			this->button28->Text = L"全区域温度设置";
 			this->button28->UseVisualStyleBackColor = true;
@@ -515,9 +513,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// button27
 			// 
-			this->button27->Location = System::Drawing::Point(434, 17);
+			this->button27->Location = System::Drawing::Point(668, 23);
+			this->button27->Margin = System::Windows::Forms::Padding(4);
 			this->button27->Name = L"button27";
-			this->button27->Size = System::Drawing::Size(107, 23);
+			this->button27->Size = System::Drawing::Size(143, 31);
 			this->button27->TabIndex = 9;
 			this->button27->Text = L"全区域温度读取";
 			this->button27->UseVisualStyleBackColor = true;
@@ -525,19 +524,21 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonIpConfig
 			// 
-			this->buttonIpConfig->Location = System::Drawing::Point(289, 17);
+			this->buttonIpConfig->Location = System::Drawing::Point(385, 23);
+			this->buttonIpConfig->Margin = System::Windows::Forms::Padding(4);
 			this->buttonIpConfig->Name = L"buttonIpConfig";
-			this->buttonIpConfig->Size = System::Drawing::Size(75, 23);
+			this->buttonIpConfig->Size = System::Drawing::Size(100, 31);
 			this->buttonIpConfig->TabIndex = 8;
-			this->buttonIpConfig->Text = L"IP配置";
+			this->buttonIpConfig->Text = L"机台IP配置";
 			this->buttonIpConfig->UseVisualStyleBackColor = true;
 			this->buttonIpConfig->Click += gcnew System::EventHandler(this, &Form1::buttonIpConfig_Click);
 			// 
 			// buttonConnect
 			// 
-			this->buttonConnect->Location = System::Drawing::Point(204, 17);
+			this->buttonConnect->Location = System::Drawing::Point(272, 23);
+			this->buttonConnect->Margin = System::Windows::Forms::Padding(4);
 			this->buttonConnect->Name = L"buttonConnect";
-			this->buttonConnect->Size = System::Drawing::Size(75, 23);
+			this->buttonConnect->Size = System::Drawing::Size(100, 31);
 			this->buttonConnect->TabIndex = 7;
 			this->buttonConnect->Text = L"连接";
 			this->buttonConnect->UseVisualStyleBackColor = true;
@@ -546,23 +547,25 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// labelIpAddr
 			// 
 			this->labelIpAddr->AutoSize = true;
-			this->labelIpAddr->Location = System::Drawing::Point(89, 23);
+			this->labelIpAddr->Location = System::Drawing::Point(119, 31);
+			this->labelIpAddr->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelIpAddr->Name = L"labelIpAddr";
-			this->labelIpAddr->Size = System::Drawing::Size(29, 12);
+			this->labelIpAddr->Size = System::Drawing::Size(40, 16);
 			this->labelIpAddr->TabIndex = 6;
 			this->labelIpAddr->Text = L"IP: ";
 			// 
 			// comboBox1
 			// 
+			this->comboBox1->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 			this->comboBox1->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 			this->comboBox1->FormattingEnabled = true;
-			this->comboBox1->Items->AddRange(gcnew cli::array< System::Object^  >(12) {L"机台01", L"机台02", L"机台03", L"机台04", L"机台05", L"机台06", 
-				L"机台07", L"机台08", L"机台09", L"机台10", L"机台11", L"机台12"});
-			this->comboBox1->Location = System::Drawing::Point(9, 20);
+			this->comboBox1->Items->AddRange(gcnew cli::array< System::Object^  >(12) {L"01", L"02", L"03", L"04", L"05", L"06", L"07", 
+				L"08", L"09", L"10", L"11", L"12"});
+			this->comboBox1->Location = System::Drawing::Point(70, 27);
+			this->comboBox1->Margin = System::Windows::Forms::Padding(4);
 			this->comboBox1->Name = L"comboBox1";
-			this->comboBox1->Size = System::Drawing::Size(74, 20);
+			this->comboBox1->Size = System::Drawing::Size(44, 24);
 			this->comboBox1->TabIndex = 5;
-			this->comboBox1->Text = L"选择机台";
 			this->comboBox1->SelectedIndexChanged += gcnew System::EventHandler(this, &Form1::comboBox1_SelectedIndexChanged);
 			// 
 			// groupBoxZones
@@ -579,9 +582,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZones->Controls->Add(this->groupBoxZone05);
 			this->groupBoxZones->Controls->Add(this->groupBoxZone02);
 			this->groupBoxZones->Controls->Add(this->groupBoxZone01);
-			this->groupBoxZones->Location = System::Drawing::Point(12, 69);
+			this->groupBoxZones->Location = System::Drawing::Point(16, 104);
+			this->groupBoxZones->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZones->Name = L"groupBoxZones";
-			this->groupBoxZones->Size = System::Drawing::Size(733, 381);
+			this->groupBoxZones->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZones->Size = System::Drawing::Size(977, 496);
 			this->groupBoxZones->TabIndex = 1;
 			this->groupBoxZones->TabStop = false;
 			// 
@@ -596,9 +601,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone12->Controls->Add(this->buttonZone12TempGet);
 			this->groupBoxZone12->Controls->Add(this->label60);
 			this->groupBoxZone12->Controls->Add(this->label61);
-			this->groupBoxZone12->Location = System::Drawing::Point(552, 258);
+			this->groupBoxZone12->Location = System::Drawing::Point(736, 344);
+			this->groupBoxZone12->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone12->Name = L"groupBoxZone12";
-			this->groupBoxZone12->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone12->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone12->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone12->TabIndex = 0;
 			this->groupBoxZone12->TabStop = false;
 			this->groupBoxZone12->Text = L"Zone12";
@@ -606,43 +613,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label57
 			// 
 			this->label57->AutoSize = true;
-			this->label57->Location = System::Drawing::Point(135, 49);
+			this->label57->Location = System::Drawing::Point(180, 65);
+			this->label57->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label57->Name = L"label57";
-			this->label57->Size = System::Drawing::Size(17, 12);
+			this->label57->Size = System::Drawing::Size(24, 16);
 			this->label57->TabIndex = 6;
 			this->label57->Text = L"℃";
 			// 
 			// label58
 			// 
 			this->label58->AutoSize = true;
-			this->label58->Location = System::Drawing::Point(135, 24);
+			this->label58->Location = System::Drawing::Point(180, 32);
+			this->label58->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label58->Name = L"label58";
-			this->label58->Size = System::Drawing::Size(17, 12);
+			this->label58->Size = System::Drawing::Size(24, 16);
 			this->label58->TabIndex = 6;
 			this->label58->Text = L"℃";
 			// 
 			// labelZone12RealTemp
 			// 
 			this->labelZone12RealTemp->AutoSize = true;
-			this->labelZone12RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone12RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone12RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone12RealTemp->Name = L"labelZone12RealTemp";
-			this->labelZone12RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone12RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone12RealTemp->TabIndex = 5;
 			this->labelZone12RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone12Setpoint
 			// 
-			this->textBoxZone12Setpoint->Location = System::Drawing::Point(81, 43);
+			this->textBoxZone12Setpoint->Location = System::Drawing::Point(108, 57);
+			this->textBoxZone12Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone12Setpoint->Name = L"textBoxZone12Setpoint";
-			this->textBoxZone12Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone12Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone12Setpoint->TabIndex = 4;
 			this->textBoxZone12Setpoint->Text = L"0.0";
 			// 
 			// buttonZone12TempSet
 			// 
-			this->buttonZone12TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone12TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone12TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone12TempSet->Name = L"buttonZone12TempSet";
-			this->buttonZone12TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone12TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone12TempSet->TabIndex = 3;
 			this->buttonZone12TempSet->Text = L"设置温度";
 			this->buttonZone12TempSet->UseVisualStyleBackColor = true;
@@ -650,9 +662,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone12TempGet
 			// 
-			this->buttonZone12TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone12TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone12TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone12TempGet->Name = L"buttonZone12TempGet";
-			this->buttonZone12TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone12TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone12TempGet->TabIndex = 2;
 			this->buttonZone12TempGet->Text = L"读取温度";
 			this->buttonZone12TempGet->UseVisualStyleBackColor = true;
@@ -661,18 +674,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label60
 			// 
 			this->label60->AutoSize = true;
-			this->label60->Location = System::Drawing::Point(13, 49);
+			this->label60->Location = System::Drawing::Point(17, 65);
+			this->label60->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label60->Name = L"label60";
-			this->label60->Size = System::Drawing::Size(65, 12);
+			this->label60->Size = System::Drawing::Size(88, 16);
 			this->label60->TabIndex = 1;
 			this->label60->Text = L"设定温度: ";
 			// 
 			// label61
 			// 
 			this->label61->AutoSize = true;
-			this->label61->Location = System::Drawing::Point(13, 23);
+			this->label61->Location = System::Drawing::Point(17, 31);
+			this->label61->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label61->Name = L"label61";
-			this->label61->Size = System::Drawing::Size(65, 12);
+			this->label61->Size = System::Drawing::Size(88, 16);
 			this->label61->TabIndex = 0;
 			this->label61->Text = L"实时温度: ";
 			// 
@@ -687,9 +702,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone08->Controls->Add(this->buttonZone08TempGet);
 			this->groupBoxZone08->Controls->Add(this->label40);
 			this->groupBoxZone08->Controls->Add(this->label41);
-			this->groupBoxZone08->Location = System::Drawing::Point(552, 139);
+			this->groupBoxZone08->Location = System::Drawing::Point(736, 185);
+			this->groupBoxZone08->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone08->Name = L"groupBoxZone08";
-			this->groupBoxZone08->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone08->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone08->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone08->TabIndex = 0;
 			this->groupBoxZone08->TabStop = false;
 			this->groupBoxZone08->Text = L"Zone08";
@@ -697,43 +714,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label37
 			// 
 			this->label37->AutoSize = true;
-			this->label37->Location = System::Drawing::Point(135, 49);
+			this->label37->Location = System::Drawing::Point(180, 65);
+			this->label37->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label37->Name = L"label37";
-			this->label37->Size = System::Drawing::Size(17, 12);
+			this->label37->Size = System::Drawing::Size(24, 16);
 			this->label37->TabIndex = 6;
 			this->label37->Text = L"℃";
 			// 
 			// label38
 			// 
 			this->label38->AutoSize = true;
-			this->label38->Location = System::Drawing::Point(135, 24);
+			this->label38->Location = System::Drawing::Point(180, 32);
+			this->label38->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label38->Name = L"label38";
-			this->label38->Size = System::Drawing::Size(17, 12);
+			this->label38->Size = System::Drawing::Size(24, 16);
 			this->label38->TabIndex = 6;
 			this->label38->Text = L"℃";
 			// 
 			// labelZone08RealTemp
 			// 
 			this->labelZone08RealTemp->AutoSize = true;
-			this->labelZone08RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone08RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone08RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone08RealTemp->Name = L"labelZone08RealTemp";
-			this->labelZone08RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone08RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone08RealTemp->TabIndex = 5;
 			this->labelZone08RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone08Setpoint
 			// 
-			this->textBoxZone08Setpoint->Location = System::Drawing::Point(81, 43);
+			this->textBoxZone08Setpoint->Location = System::Drawing::Point(108, 57);
+			this->textBoxZone08Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone08Setpoint->Name = L"textBoxZone08Setpoint";
-			this->textBoxZone08Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone08Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone08Setpoint->TabIndex = 4;
 			this->textBoxZone08Setpoint->Text = L"0.0";
 			// 
 			// buttonZone08TempSet
 			// 
-			this->buttonZone08TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone08TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone08TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone08TempSet->Name = L"buttonZone08TempSet";
-			this->buttonZone08TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone08TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone08TempSet->TabIndex = 3;
 			this->buttonZone08TempSet->Text = L"设置温度";
 			this->buttonZone08TempSet->UseVisualStyleBackColor = true;
@@ -741,9 +763,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone08TempGet
 			// 
-			this->buttonZone08TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone08TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone08TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone08TempGet->Name = L"buttonZone08TempGet";
-			this->buttonZone08TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone08TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone08TempGet->TabIndex = 2;
 			this->buttonZone08TempGet->Text = L"读取温度";
 			this->buttonZone08TempGet->UseVisualStyleBackColor = true;
@@ -752,18 +775,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label40
 			// 
 			this->label40->AutoSize = true;
-			this->label40->Location = System::Drawing::Point(13, 49);
+			this->label40->Location = System::Drawing::Point(17, 65);
+			this->label40->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label40->Name = L"label40";
-			this->label40->Size = System::Drawing::Size(65, 12);
+			this->label40->Size = System::Drawing::Size(88, 16);
 			this->label40->TabIndex = 1;
 			this->label40->Text = L"设定温度: ";
 			// 
 			// label41
 			// 
 			this->label41->AutoSize = true;
-			this->label41->Location = System::Drawing::Point(13, 23);
+			this->label41->Location = System::Drawing::Point(17, 31);
+			this->label41->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label41->Name = L"label41";
-			this->label41->Size = System::Drawing::Size(65, 12);
+			this->label41->Size = System::Drawing::Size(88, 16);
 			this->label41->TabIndex = 0;
 			this->label41->Text = L"实时温度: ";
 			// 
@@ -778,9 +803,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone04->Controls->Add(this->buttonZone04TempGet);
 			this->groupBoxZone04->Controls->Add(this->label17);
 			this->groupBoxZone04->Controls->Add(this->label18);
-			this->groupBoxZone04->Location = System::Drawing::Point(552, 20);
+			this->groupBoxZone04->Location = System::Drawing::Point(736, 27);
+			this->groupBoxZone04->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone04->Name = L"groupBoxZone04";
-			this->groupBoxZone04->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone04->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone04->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone04->TabIndex = 0;
 			this->groupBoxZone04->TabStop = false;
 			this->groupBoxZone04->Text = L"Zone04";
@@ -788,43 +815,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label14
 			// 
 			this->label14->AutoSize = true;
-			this->label14->Location = System::Drawing::Point(135, 49);
+			this->label14->Location = System::Drawing::Point(180, 65);
+			this->label14->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label14->Name = L"label14";
-			this->label14->Size = System::Drawing::Size(17, 12);
+			this->label14->Size = System::Drawing::Size(24, 16);
 			this->label14->TabIndex = 6;
 			this->label14->Text = L"℃";
 			// 
 			// label15
 			// 
 			this->label15->AutoSize = true;
-			this->label15->Location = System::Drawing::Point(135, 24);
+			this->label15->Location = System::Drawing::Point(180, 32);
+			this->label15->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label15->Name = L"label15";
-			this->label15->Size = System::Drawing::Size(17, 12);
+			this->label15->Size = System::Drawing::Size(24, 16);
 			this->label15->TabIndex = 6;
 			this->label15->Text = L"℃";
 			// 
 			// labelZone04RealTemp
 			// 
 			this->labelZone04RealTemp->AutoSize = true;
-			this->labelZone04RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone04RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone04RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone04RealTemp->Name = L"labelZone04RealTemp";
-			this->labelZone04RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone04RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone04RealTemp->TabIndex = 5;
 			this->labelZone04RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone04Setpoint
 			// 
-			this->textBoxZone04Setpoint->Location = System::Drawing::Point(82, 43);
+			this->textBoxZone04Setpoint->Location = System::Drawing::Point(109, 57);
+			this->textBoxZone04Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone04Setpoint->Name = L"textBoxZone04Setpoint";
-			this->textBoxZone04Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone04Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone04Setpoint->TabIndex = 4;
 			this->textBoxZone04Setpoint->Text = L"0.0";
 			// 
 			// buttonZone04TempSet
 			// 
-			this->buttonZone04TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone04TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone04TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone04TempSet->Name = L"buttonZone04TempSet";
-			this->buttonZone04TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone04TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone04TempSet->TabIndex = 3;
 			this->buttonZone04TempSet->Text = L"设置温度";
 			this->buttonZone04TempSet->UseVisualStyleBackColor = true;
@@ -832,9 +864,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone04TempGet
 			// 
-			this->buttonZone04TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone04TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone04TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone04TempGet->Name = L"buttonZone04TempGet";
-			this->buttonZone04TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone04TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone04TempGet->TabIndex = 2;
 			this->buttonZone04TempGet->Text = L"读取温度";
 			this->buttonZone04TempGet->UseVisualStyleBackColor = true;
@@ -843,18 +876,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label17
 			// 
 			this->label17->AutoSize = true;
-			this->label17->Location = System::Drawing::Point(13, 49);
+			this->label17->Location = System::Drawing::Point(17, 65);
+			this->label17->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label17->Name = L"label17";
-			this->label17->Size = System::Drawing::Size(65, 12);
+			this->label17->Size = System::Drawing::Size(88, 16);
 			this->label17->TabIndex = 1;
 			this->label17->Text = L"设定温度: ";
 			// 
 			// label18
 			// 
 			this->label18->AutoSize = true;
-			this->label18->Location = System::Drawing::Point(13, 23);
+			this->label18->Location = System::Drawing::Point(17, 31);
+			this->label18->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label18->Name = L"label18";
-			this->label18->Size = System::Drawing::Size(65, 12);
+			this->label18->Size = System::Drawing::Size(88, 16);
 			this->label18->TabIndex = 0;
 			this->label18->Text = L"实时温度: ";
 			// 
@@ -869,9 +904,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone11->Controls->Add(this->buttonZone11TempGet);
 			this->groupBoxZone11->Controls->Add(this->label55);
 			this->groupBoxZone11->Controls->Add(this->label56);
-			this->groupBoxZone11->Location = System::Drawing::Point(369, 258);
+			this->groupBoxZone11->Location = System::Drawing::Point(492, 344);
+			this->groupBoxZone11->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone11->Name = L"groupBoxZone11";
-			this->groupBoxZone11->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone11->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone11->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone11->TabIndex = 0;
 			this->groupBoxZone11->TabStop = false;
 			this->groupBoxZone11->Text = L"Zone11";
@@ -879,43 +916,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label52
 			// 
 			this->label52->AutoSize = true;
-			this->label52->Location = System::Drawing::Point(135, 49);
+			this->label52->Location = System::Drawing::Point(180, 65);
+			this->label52->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label52->Name = L"label52";
-			this->label52->Size = System::Drawing::Size(17, 12);
+			this->label52->Size = System::Drawing::Size(24, 16);
 			this->label52->TabIndex = 6;
 			this->label52->Text = L"℃";
 			// 
 			// label53
 			// 
 			this->label53->AutoSize = true;
-			this->label53->Location = System::Drawing::Point(135, 24);
+			this->label53->Location = System::Drawing::Point(180, 32);
+			this->label53->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label53->Name = L"label53";
-			this->label53->Size = System::Drawing::Size(17, 12);
+			this->label53->Size = System::Drawing::Size(24, 16);
 			this->label53->TabIndex = 6;
 			this->label53->Text = L"℃";
 			// 
 			// labelZone11RealTemp
 			// 
 			this->labelZone11RealTemp->AutoSize = true;
-			this->labelZone11RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone11RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone11RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone11RealTemp->Name = L"labelZone11RealTemp";
-			this->labelZone11RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone11RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone11RealTemp->TabIndex = 5;
 			this->labelZone11RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone11Setpoint
 			// 
-			this->textBoxZone11Setpoint->Location = System::Drawing::Point(81, 43);
+			this->textBoxZone11Setpoint->Location = System::Drawing::Point(108, 57);
+			this->textBoxZone11Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone11Setpoint->Name = L"textBoxZone11Setpoint";
-			this->textBoxZone11Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone11Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone11Setpoint->TabIndex = 4;
 			this->textBoxZone11Setpoint->Text = L"0.0";
 			// 
 			// buttonZone11TempSet
 			// 
-			this->buttonZone11TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone11TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone11TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone11TempSet->Name = L"buttonZone11TempSet";
-			this->buttonZone11TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone11TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone11TempSet->TabIndex = 3;
 			this->buttonZone11TempSet->Text = L"设置温度";
 			this->buttonZone11TempSet->UseVisualStyleBackColor = true;
@@ -923,9 +965,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone11TempGet
 			// 
-			this->buttonZone11TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone11TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone11TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone11TempGet->Name = L"buttonZone11TempGet";
-			this->buttonZone11TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone11TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone11TempGet->TabIndex = 2;
 			this->buttonZone11TempGet->Text = L"读取温度";
 			this->buttonZone11TempGet->UseVisualStyleBackColor = true;
@@ -934,18 +977,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label55
 			// 
 			this->label55->AutoSize = true;
-			this->label55->Location = System::Drawing::Point(13, 49);
+			this->label55->Location = System::Drawing::Point(17, 65);
+			this->label55->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label55->Name = L"label55";
-			this->label55->Size = System::Drawing::Size(65, 12);
+			this->label55->Size = System::Drawing::Size(88, 16);
 			this->label55->TabIndex = 1;
 			this->label55->Text = L"设定温度: ";
 			// 
 			// label56
 			// 
 			this->label56->AutoSize = true;
-			this->label56->Location = System::Drawing::Point(13, 23);
+			this->label56->Location = System::Drawing::Point(17, 31);
+			this->label56->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label56->Name = L"label56";
-			this->label56->Size = System::Drawing::Size(65, 12);
+			this->label56->Size = System::Drawing::Size(88, 16);
 			this->label56->TabIndex = 0;
 			this->label56->Text = L"实时温度: ";
 			// 
@@ -960,9 +1005,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone07->Controls->Add(this->buttonZone07TempGet);
 			this->groupBoxZone07->Controls->Add(this->label35);
 			this->groupBoxZone07->Controls->Add(this->label36);
-			this->groupBoxZone07->Location = System::Drawing::Point(369, 139);
+			this->groupBoxZone07->Location = System::Drawing::Point(492, 185);
+			this->groupBoxZone07->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone07->Name = L"groupBoxZone07";
-			this->groupBoxZone07->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone07->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone07->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone07->TabIndex = 0;
 			this->groupBoxZone07->TabStop = false;
 			this->groupBoxZone07->Text = L"Zone07";
@@ -970,43 +1017,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label32
 			// 
 			this->label32->AutoSize = true;
-			this->label32->Location = System::Drawing::Point(135, 49);
+			this->label32->Location = System::Drawing::Point(180, 65);
+			this->label32->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label32->Name = L"label32";
-			this->label32->Size = System::Drawing::Size(17, 12);
+			this->label32->Size = System::Drawing::Size(24, 16);
 			this->label32->TabIndex = 6;
 			this->label32->Text = L"℃";
 			// 
 			// label33
 			// 
 			this->label33->AutoSize = true;
-			this->label33->Location = System::Drawing::Point(135, 24);
+			this->label33->Location = System::Drawing::Point(180, 32);
+			this->label33->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label33->Name = L"label33";
-			this->label33->Size = System::Drawing::Size(17, 12);
+			this->label33->Size = System::Drawing::Size(24, 16);
 			this->label33->TabIndex = 6;
 			this->label33->Text = L"℃";
 			// 
 			// labelZone07RealTemp
 			// 
 			this->labelZone07RealTemp->AutoSize = true;
-			this->labelZone07RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone07RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone07RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone07RealTemp->Name = L"labelZone07RealTemp";
-			this->labelZone07RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone07RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone07RealTemp->TabIndex = 5;
 			this->labelZone07RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone07Setpoint
 			// 
-			this->textBoxZone07Setpoint->Location = System::Drawing::Point(81, 43);
+			this->textBoxZone07Setpoint->Location = System::Drawing::Point(108, 57);
+			this->textBoxZone07Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone07Setpoint->Name = L"textBoxZone07Setpoint";
-			this->textBoxZone07Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone07Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone07Setpoint->TabIndex = 4;
 			this->textBoxZone07Setpoint->Text = L"0.0";
 			// 
 			// buttonZone07TempSet
 			// 
-			this->buttonZone07TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone07TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone07TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone07TempSet->Name = L"buttonZone07TempSet";
-			this->buttonZone07TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone07TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone07TempSet->TabIndex = 3;
 			this->buttonZone07TempSet->Text = L"设置温度";
 			this->buttonZone07TempSet->UseVisualStyleBackColor = true;
@@ -1014,9 +1066,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone07TempGet
 			// 
-			this->buttonZone07TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone07TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone07TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone07TempGet->Name = L"buttonZone07TempGet";
-			this->buttonZone07TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone07TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone07TempGet->TabIndex = 2;
 			this->buttonZone07TempGet->Text = L"读取温度";
 			this->buttonZone07TempGet->UseVisualStyleBackColor = true;
@@ -1025,18 +1078,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label35
 			// 
 			this->label35->AutoSize = true;
-			this->label35->Location = System::Drawing::Point(13, 49);
+			this->label35->Location = System::Drawing::Point(17, 65);
+			this->label35->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label35->Name = L"label35";
-			this->label35->Size = System::Drawing::Size(65, 12);
+			this->label35->Size = System::Drawing::Size(88, 16);
 			this->label35->TabIndex = 1;
 			this->label35->Text = L"设定温度: ";
 			// 
 			// label36
 			// 
 			this->label36->AutoSize = true;
-			this->label36->Location = System::Drawing::Point(13, 23);
+			this->label36->Location = System::Drawing::Point(17, 31);
+			this->label36->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label36->Name = L"label36";
-			this->label36->Size = System::Drawing::Size(65, 12);
+			this->label36->Size = System::Drawing::Size(88, 16);
 			this->label36->TabIndex = 0;
 			this->label36->Text = L"实时温度: ";
 			// 
@@ -1051,9 +1106,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone03->Controls->Add(this->buttonZone03TempGet);
 			this->groupBoxZone03->Controls->Add(this->label12);
 			this->groupBoxZone03->Controls->Add(this->label13);
-			this->groupBoxZone03->Location = System::Drawing::Point(369, 20);
+			this->groupBoxZone03->Location = System::Drawing::Point(492, 27);
+			this->groupBoxZone03->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone03->Name = L"groupBoxZone03";
-			this->groupBoxZone03->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone03->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone03->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone03->TabIndex = 0;
 			this->groupBoxZone03->TabStop = false;
 			this->groupBoxZone03->Text = L"Zone03";
@@ -1061,43 +1118,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label9
 			// 
 			this->label9->AutoSize = true;
-			this->label9->Location = System::Drawing::Point(135, 49);
+			this->label9->Location = System::Drawing::Point(180, 65);
+			this->label9->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label9->Name = L"label9";
-			this->label9->Size = System::Drawing::Size(17, 12);
+			this->label9->Size = System::Drawing::Size(24, 16);
 			this->label9->TabIndex = 6;
 			this->label9->Text = L"℃";
 			// 
 			// label10
 			// 
 			this->label10->AutoSize = true;
-			this->label10->Location = System::Drawing::Point(135, 24);
+			this->label10->Location = System::Drawing::Point(180, 32);
+			this->label10->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label10->Name = L"label10";
-			this->label10->Size = System::Drawing::Size(17, 12);
+			this->label10->Size = System::Drawing::Size(24, 16);
 			this->label10->TabIndex = 6;
 			this->label10->Text = L"℃";
 			// 
 			// labelZone03RealTemp
 			// 
 			this->labelZone03RealTemp->AutoSize = true;
-			this->labelZone03RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone03RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone03RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone03RealTemp->Name = L"labelZone03RealTemp";
-			this->labelZone03RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone03RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone03RealTemp->TabIndex = 5;
 			this->labelZone03RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone03Setpoint
 			// 
-			this->textBoxZone03Setpoint->Location = System::Drawing::Point(82, 43);
+			this->textBoxZone03Setpoint->Location = System::Drawing::Point(109, 57);
+			this->textBoxZone03Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone03Setpoint->Name = L"textBoxZone03Setpoint";
-			this->textBoxZone03Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone03Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone03Setpoint->TabIndex = 4;
 			this->textBoxZone03Setpoint->Text = L"0.0";
 			// 
 			// buttonZone03TempSet
 			// 
-			this->buttonZone03TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone03TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone03TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone03TempSet->Name = L"buttonZone03TempSet";
-			this->buttonZone03TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone03TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone03TempSet->TabIndex = 3;
 			this->buttonZone03TempSet->Text = L"设置温度";
 			this->buttonZone03TempSet->UseVisualStyleBackColor = true;
@@ -1105,9 +1167,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone03TempGet
 			// 
-			this->buttonZone03TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone03TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone03TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone03TempGet->Name = L"buttonZone03TempGet";
-			this->buttonZone03TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone03TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone03TempGet->TabIndex = 2;
 			this->buttonZone03TempGet->Text = L"读取温度";
 			this->buttonZone03TempGet->UseVisualStyleBackColor = true;
@@ -1116,18 +1179,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label12
 			// 
 			this->label12->AutoSize = true;
-			this->label12->Location = System::Drawing::Point(13, 49);
+			this->label12->Location = System::Drawing::Point(17, 65);
+			this->label12->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label12->Name = L"label12";
-			this->label12->Size = System::Drawing::Size(65, 12);
+			this->label12->Size = System::Drawing::Size(88, 16);
 			this->label12->TabIndex = 1;
 			this->label12->Text = L"设定温度: ";
 			// 
 			// label13
 			// 
 			this->label13->AutoSize = true;
-			this->label13->Location = System::Drawing::Point(13, 23);
+			this->label13->Location = System::Drawing::Point(17, 31);
+			this->label13->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label13->Name = L"label13";
-			this->label13->Size = System::Drawing::Size(65, 12);
+			this->label13->Size = System::Drawing::Size(88, 16);
 			this->label13->TabIndex = 0;
 			this->label13->Text = L"实时温度: ";
 			// 
@@ -1142,9 +1207,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone10->Controls->Add(this->buttonZone10TempGet);
 			this->groupBoxZone10->Controls->Add(this->label50);
 			this->groupBoxZone10->Controls->Add(this->label51);
-			this->groupBoxZone10->Location = System::Drawing::Point(188, 258);
+			this->groupBoxZone10->Location = System::Drawing::Point(251, 344);
+			this->groupBoxZone10->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone10->Name = L"groupBoxZone10";
-			this->groupBoxZone10->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone10->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone10->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone10->TabIndex = 0;
 			this->groupBoxZone10->TabStop = false;
 			this->groupBoxZone10->Text = L"Zone10";
@@ -1152,43 +1219,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label47
 			// 
 			this->label47->AutoSize = true;
-			this->label47->Location = System::Drawing::Point(135, 49);
+			this->label47->Location = System::Drawing::Point(180, 65);
+			this->label47->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label47->Name = L"label47";
-			this->label47->Size = System::Drawing::Size(17, 12);
+			this->label47->Size = System::Drawing::Size(24, 16);
 			this->label47->TabIndex = 6;
 			this->label47->Text = L"℃";
 			// 
 			// label48
 			// 
 			this->label48->AutoSize = true;
-			this->label48->Location = System::Drawing::Point(135, 24);
+			this->label48->Location = System::Drawing::Point(180, 32);
+			this->label48->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label48->Name = L"label48";
-			this->label48->Size = System::Drawing::Size(17, 12);
+			this->label48->Size = System::Drawing::Size(24, 16);
 			this->label48->TabIndex = 6;
 			this->label48->Text = L"℃";
 			// 
 			// labelZone10RealTemp
 			// 
 			this->labelZone10RealTemp->AutoSize = true;
-			this->labelZone10RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone10RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone10RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone10RealTemp->Name = L"labelZone10RealTemp";
-			this->labelZone10RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone10RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone10RealTemp->TabIndex = 5;
 			this->labelZone10RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone10Setpoint
 			// 
-			this->textBoxZone10Setpoint->Location = System::Drawing::Point(81, 43);
+			this->textBoxZone10Setpoint->Location = System::Drawing::Point(108, 57);
+			this->textBoxZone10Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone10Setpoint->Name = L"textBoxZone10Setpoint";
-			this->textBoxZone10Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone10Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone10Setpoint->TabIndex = 4;
 			this->textBoxZone10Setpoint->Text = L"0.0";
 			// 
 			// buttonZone10TempSet
 			// 
-			this->buttonZone10TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone10TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone10TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone10TempSet->Name = L"buttonZone10TempSet";
-			this->buttonZone10TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone10TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone10TempSet->TabIndex = 3;
 			this->buttonZone10TempSet->Text = L"设置温度";
 			this->buttonZone10TempSet->UseVisualStyleBackColor = true;
@@ -1196,9 +1268,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone10TempGet
 			// 
-			this->buttonZone10TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone10TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone10TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone10TempGet->Name = L"buttonZone10TempGet";
-			this->buttonZone10TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone10TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone10TempGet->TabIndex = 2;
 			this->buttonZone10TempGet->Text = L"读取温度";
 			this->buttonZone10TempGet->UseVisualStyleBackColor = true;
@@ -1207,18 +1280,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label50
 			// 
 			this->label50->AutoSize = true;
-			this->label50->Location = System::Drawing::Point(13, 49);
+			this->label50->Location = System::Drawing::Point(17, 65);
+			this->label50->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label50->Name = L"label50";
-			this->label50->Size = System::Drawing::Size(65, 12);
+			this->label50->Size = System::Drawing::Size(88, 16);
 			this->label50->TabIndex = 1;
 			this->label50->Text = L"设定温度: ";
 			// 
 			// label51
 			// 
 			this->label51->AutoSize = true;
-			this->label51->Location = System::Drawing::Point(13, 23);
+			this->label51->Location = System::Drawing::Point(17, 31);
+			this->label51->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label51->Name = L"label51";
-			this->label51->Size = System::Drawing::Size(65, 12);
+			this->label51->Size = System::Drawing::Size(88, 16);
 			this->label51->TabIndex = 0;
 			this->label51->Text = L"实时温度: ";
 			// 
@@ -1233,9 +1308,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone09->Controls->Add(this->buttonZone09TempGet);
 			this->groupBoxZone09->Controls->Add(this->label45);
 			this->groupBoxZone09->Controls->Add(this->label46);
-			this->groupBoxZone09->Location = System::Drawing::Point(7, 258);
+			this->groupBoxZone09->Location = System::Drawing::Point(9, 344);
+			this->groupBoxZone09->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone09->Name = L"groupBoxZone09";
-			this->groupBoxZone09->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone09->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone09->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone09->TabIndex = 0;
 			this->groupBoxZone09->TabStop = false;
 			this->groupBoxZone09->Text = L"Zone09";
@@ -1243,43 +1320,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label42
 			// 
 			this->label42->AutoSize = true;
-			this->label42->Location = System::Drawing::Point(135, 49);
+			this->label42->Location = System::Drawing::Point(180, 65);
+			this->label42->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label42->Name = L"label42";
-			this->label42->Size = System::Drawing::Size(17, 12);
+			this->label42->Size = System::Drawing::Size(24, 16);
 			this->label42->TabIndex = 6;
 			this->label42->Text = L"℃";
 			// 
 			// label43
 			// 
 			this->label43->AutoSize = true;
-			this->label43->Location = System::Drawing::Point(135, 24);
+			this->label43->Location = System::Drawing::Point(180, 32);
+			this->label43->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label43->Name = L"label43";
-			this->label43->Size = System::Drawing::Size(17, 12);
+			this->label43->Size = System::Drawing::Size(24, 16);
 			this->label43->TabIndex = 6;
 			this->label43->Text = L"℃";
 			// 
 			// labelZone09RealTemp
 			// 
 			this->labelZone09RealTemp->AutoSize = true;
-			this->labelZone09RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone09RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone09RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone09RealTemp->Name = L"labelZone09RealTemp";
-			this->labelZone09RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone09RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone09RealTemp->TabIndex = 5;
 			this->labelZone09RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone09Setpoint
 			// 
-			this->textBoxZone09Setpoint->Location = System::Drawing::Point(81, 43);
+			this->textBoxZone09Setpoint->Location = System::Drawing::Point(108, 57);
+			this->textBoxZone09Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone09Setpoint->Name = L"textBoxZone09Setpoint";
-			this->textBoxZone09Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone09Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone09Setpoint->TabIndex = 4;
 			this->textBoxZone09Setpoint->Text = L"0.0";
 			// 
 			// buttonZone09TempSet
 			// 
-			this->buttonZone09TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone09TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone09TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone09TempSet->Name = L"buttonZone09TempSet";
-			this->buttonZone09TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone09TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone09TempSet->TabIndex = 3;
 			this->buttonZone09TempSet->Text = L"设置温度";
 			this->buttonZone09TempSet->UseVisualStyleBackColor = true;
@@ -1287,9 +1369,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone09TempGet
 			// 
-			this->buttonZone09TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone09TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone09TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone09TempGet->Name = L"buttonZone09TempGet";
-			this->buttonZone09TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone09TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone09TempGet->TabIndex = 2;
 			this->buttonZone09TempGet->Text = L"读取温度";
 			this->buttonZone09TempGet->UseVisualStyleBackColor = true;
@@ -1298,18 +1381,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label45
 			// 
 			this->label45->AutoSize = true;
-			this->label45->Location = System::Drawing::Point(13, 49);
+			this->label45->Location = System::Drawing::Point(17, 65);
+			this->label45->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label45->Name = L"label45";
-			this->label45->Size = System::Drawing::Size(65, 12);
+			this->label45->Size = System::Drawing::Size(88, 16);
 			this->label45->TabIndex = 1;
 			this->label45->Text = L"设定温度: ";
 			// 
 			// label46
 			// 
 			this->label46->AutoSize = true;
-			this->label46->Location = System::Drawing::Point(13, 23);
+			this->label46->Location = System::Drawing::Point(17, 31);
+			this->label46->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label46->Name = L"label46";
-			this->label46->Size = System::Drawing::Size(65, 12);
+			this->label46->Size = System::Drawing::Size(88, 16);
 			this->label46->TabIndex = 0;
 			this->label46->Text = L"实时温度: ";
 			// 
@@ -1324,9 +1409,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone06->Controls->Add(this->buttonZone06TempGet);
 			this->groupBoxZone06->Controls->Add(this->label30);
 			this->groupBoxZone06->Controls->Add(this->label31);
-			this->groupBoxZone06->Location = System::Drawing::Point(188, 139);
+			this->groupBoxZone06->Location = System::Drawing::Point(251, 185);
+			this->groupBoxZone06->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone06->Name = L"groupBoxZone06";
-			this->groupBoxZone06->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone06->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone06->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone06->TabIndex = 0;
 			this->groupBoxZone06->TabStop = false;
 			this->groupBoxZone06->Text = L"Zone06";
@@ -1334,43 +1421,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label24
 			// 
 			this->label24->AutoSize = true;
-			this->label24->Location = System::Drawing::Point(135, 49);
+			this->label24->Location = System::Drawing::Point(180, 65);
+			this->label24->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label24->Name = L"label24";
-			this->label24->Size = System::Drawing::Size(17, 12);
+			this->label24->Size = System::Drawing::Size(24, 16);
 			this->label24->TabIndex = 6;
 			this->label24->Text = L"℃";
 			// 
 			// label25
 			// 
 			this->label25->AutoSize = true;
-			this->label25->Location = System::Drawing::Point(135, 24);
+			this->label25->Location = System::Drawing::Point(180, 32);
+			this->label25->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label25->Name = L"label25";
-			this->label25->Size = System::Drawing::Size(17, 12);
+			this->label25->Size = System::Drawing::Size(24, 16);
 			this->label25->TabIndex = 6;
 			this->label25->Text = L"℃";
 			// 
 			// labelZone06RealTemp
 			// 
 			this->labelZone06RealTemp->AutoSize = true;
-			this->labelZone06RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone06RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone06RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone06RealTemp->Name = L"labelZone06RealTemp";
-			this->labelZone06RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone06RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone06RealTemp->TabIndex = 5;
 			this->labelZone06RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone06Setpoint
 			// 
-			this->textBoxZone06Setpoint->Location = System::Drawing::Point(81, 43);
+			this->textBoxZone06Setpoint->Location = System::Drawing::Point(108, 57);
+			this->textBoxZone06Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone06Setpoint->Name = L"textBoxZone06Setpoint";
-			this->textBoxZone06Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone06Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone06Setpoint->TabIndex = 4;
 			this->textBoxZone06Setpoint->Text = L"0.0";
 			// 
 			// buttonZone06TempSet
 			// 
-			this->buttonZone06TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone06TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone06TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone06TempSet->Name = L"buttonZone06TempSet";
-			this->buttonZone06TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone06TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone06TempSet->TabIndex = 3;
 			this->buttonZone06TempSet->Text = L"设置温度";
 			this->buttonZone06TempSet->UseVisualStyleBackColor = true;
@@ -1378,9 +1470,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone06TempGet
 			// 
-			this->buttonZone06TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone06TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone06TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone06TempGet->Name = L"buttonZone06TempGet";
-			this->buttonZone06TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone06TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone06TempGet->TabIndex = 2;
 			this->buttonZone06TempGet->Text = L"读取温度";
 			this->buttonZone06TempGet->UseVisualStyleBackColor = true;
@@ -1389,18 +1482,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label30
 			// 
 			this->label30->AutoSize = true;
-			this->label30->Location = System::Drawing::Point(13, 49);
+			this->label30->Location = System::Drawing::Point(17, 65);
+			this->label30->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label30->Name = L"label30";
-			this->label30->Size = System::Drawing::Size(65, 12);
+			this->label30->Size = System::Drawing::Size(88, 16);
 			this->label30->TabIndex = 1;
 			this->label30->Text = L"设定温度: ";
 			// 
 			// label31
 			// 
 			this->label31->AutoSize = true;
-			this->label31->Location = System::Drawing::Point(13, 23);
+			this->label31->Location = System::Drawing::Point(17, 31);
+			this->label31->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label31->Name = L"label31";
-			this->label31->Size = System::Drawing::Size(65, 12);
+			this->label31->Size = System::Drawing::Size(88, 16);
 			this->label31->TabIndex = 0;
 			this->label31->Text = L"实时温度: ";
 			// 
@@ -1415,9 +1510,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone05->Controls->Add(this->buttonZone05TempGet);
 			this->groupBoxZone05->Controls->Add(this->label22);
 			this->groupBoxZone05->Controls->Add(this->label23);
-			this->groupBoxZone05->Location = System::Drawing::Point(7, 139);
+			this->groupBoxZone05->Location = System::Drawing::Point(9, 185);
+			this->groupBoxZone05->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone05->Name = L"groupBoxZone05";
-			this->groupBoxZone05->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone05->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone05->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone05->TabIndex = 0;
 			this->groupBoxZone05->TabStop = false;
 			this->groupBoxZone05->Text = L"Zone05";
@@ -1425,43 +1522,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label19
 			// 
 			this->label19->AutoSize = true;
-			this->label19->Location = System::Drawing::Point(135, 49);
+			this->label19->Location = System::Drawing::Point(180, 65);
+			this->label19->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label19->Name = L"label19";
-			this->label19->Size = System::Drawing::Size(17, 12);
+			this->label19->Size = System::Drawing::Size(24, 16);
 			this->label19->TabIndex = 6;
 			this->label19->Text = L"℃";
 			// 
 			// label20
 			// 
 			this->label20->AutoSize = true;
-			this->label20->Location = System::Drawing::Point(135, 24);
+			this->label20->Location = System::Drawing::Point(180, 32);
+			this->label20->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label20->Name = L"label20";
-			this->label20->Size = System::Drawing::Size(17, 12);
+			this->label20->Size = System::Drawing::Size(24, 16);
 			this->label20->TabIndex = 6;
 			this->label20->Text = L"℃";
 			// 
 			// labelZone05RealTemp
 			// 
 			this->labelZone05RealTemp->AutoSize = true;
-			this->labelZone05RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone05RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone05RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone05RealTemp->Name = L"labelZone05RealTemp";
-			this->labelZone05RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone05RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone05RealTemp->TabIndex = 5;
 			this->labelZone05RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone05Setpoint
 			// 
-			this->textBoxZone05Setpoint->Location = System::Drawing::Point(81, 43);
+			this->textBoxZone05Setpoint->Location = System::Drawing::Point(108, 57);
+			this->textBoxZone05Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone05Setpoint->Name = L"textBoxZone05Setpoint";
-			this->textBoxZone05Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone05Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone05Setpoint->TabIndex = 4;
 			this->textBoxZone05Setpoint->Text = L"0.0";
 			// 
 			// buttonZone05TempSet
 			// 
-			this->buttonZone05TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone05TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone05TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone05TempSet->Name = L"buttonZone05TempSet";
-			this->buttonZone05TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone05TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone05TempSet->TabIndex = 3;
 			this->buttonZone05TempSet->Text = L"设置温度";
 			this->buttonZone05TempSet->UseVisualStyleBackColor = true;
@@ -1469,9 +1571,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone05TempGet
 			// 
-			this->buttonZone05TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone05TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone05TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone05TempGet->Name = L"buttonZone05TempGet";
-			this->buttonZone05TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone05TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone05TempGet->TabIndex = 2;
 			this->buttonZone05TempGet->Text = L"读取温度";
 			this->buttonZone05TempGet->UseVisualStyleBackColor = true;
@@ -1480,18 +1583,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label22
 			// 
 			this->label22->AutoSize = true;
-			this->label22->Location = System::Drawing::Point(13, 49);
+			this->label22->Location = System::Drawing::Point(17, 65);
+			this->label22->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label22->Name = L"label22";
-			this->label22->Size = System::Drawing::Size(65, 12);
+			this->label22->Size = System::Drawing::Size(88, 16);
 			this->label22->TabIndex = 1;
 			this->label22->Text = L"设定温度: ";
 			// 
 			// label23
 			// 
 			this->label23->AutoSize = true;
-			this->label23->Location = System::Drawing::Point(13, 23);
+			this->label23->Location = System::Drawing::Point(17, 31);
+			this->label23->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label23->Name = L"label23";
-			this->label23->Size = System::Drawing::Size(65, 12);
+			this->label23->Size = System::Drawing::Size(88, 16);
 			this->label23->TabIndex = 0;
 			this->label23->Text = L"实时温度: ";
 			// 
@@ -1506,9 +1611,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone02->Controls->Add(this->buttonZone02TempGet);
 			this->groupBoxZone02->Controls->Add(this->label7);
 			this->groupBoxZone02->Controls->Add(this->label8);
-			this->groupBoxZone02->Location = System::Drawing::Point(188, 20);
+			this->groupBoxZone02->Location = System::Drawing::Point(251, 27);
+			this->groupBoxZone02->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone02->Name = L"groupBoxZone02";
-			this->groupBoxZone02->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone02->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone02->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone02->TabIndex = 0;
 			this->groupBoxZone02->TabStop = false;
 			this->groupBoxZone02->Text = L"Zone02";
@@ -1516,43 +1623,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(135, 49);
+			this->label4->Location = System::Drawing::Point(180, 65);
+			this->label4->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label4->Name = L"label4";
-			this->label4->Size = System::Drawing::Size(17, 12);
+			this->label4->Size = System::Drawing::Size(24, 16);
 			this->label4->TabIndex = 6;
 			this->label4->Text = L"℃";
 			// 
 			// label5
 			// 
 			this->label5->AutoSize = true;
-			this->label5->Location = System::Drawing::Point(135, 24);
+			this->label5->Location = System::Drawing::Point(180, 32);
+			this->label5->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(17, 12);
+			this->label5->Size = System::Drawing::Size(24, 16);
 			this->label5->TabIndex = 6;
 			this->label5->Text = L"℃";
 			// 
 			// labelZone02RealTemp
 			// 
 			this->labelZone02RealTemp->AutoSize = true;
-			this->labelZone02RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone02RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone02RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone02RealTemp->Name = L"labelZone02RealTemp";
-			this->labelZone02RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone02RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone02RealTemp->TabIndex = 5;
 			this->labelZone02RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone02Setpoint
 			// 
-			this->textBoxZone02Setpoint->Location = System::Drawing::Point(82, 43);
+			this->textBoxZone02Setpoint->Location = System::Drawing::Point(109, 57);
+			this->textBoxZone02Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone02Setpoint->Name = L"textBoxZone02Setpoint";
-			this->textBoxZone02Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone02Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone02Setpoint->TabIndex = 4;
 			this->textBoxZone02Setpoint->Text = L"0.0";
 			// 
 			// buttonZone02TempSet
 			// 
-			this->buttonZone02TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone02TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone02TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone02TempSet->Name = L"buttonZone02TempSet";
-			this->buttonZone02TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone02TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone02TempSet->TabIndex = 3;
 			this->buttonZone02TempSet->Text = L"设置温度";
 			this->buttonZone02TempSet->UseVisualStyleBackColor = true;
@@ -1560,9 +1672,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone02TempGet
 			// 
-			this->buttonZone02TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone02TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone02TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone02TempGet->Name = L"buttonZone02TempGet";
-			this->buttonZone02TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone02TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone02TempGet->TabIndex = 2;
 			this->buttonZone02TempGet->Text = L"读取温度";
 			this->buttonZone02TempGet->UseVisualStyleBackColor = true;
@@ -1571,18 +1684,20 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label7
 			// 
 			this->label7->AutoSize = true;
-			this->label7->Location = System::Drawing::Point(13, 49);
+			this->label7->Location = System::Drawing::Point(17, 65);
+			this->label7->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label7->Name = L"label7";
-			this->label7->Size = System::Drawing::Size(65, 12);
+			this->label7->Size = System::Drawing::Size(88, 16);
 			this->label7->TabIndex = 1;
 			this->label7->Text = L"设定温度: ";
 			// 
 			// label8
 			// 
 			this->label8->AutoSize = true;
-			this->label8->Location = System::Drawing::Point(13, 23);
+			this->label8->Location = System::Drawing::Point(17, 31);
+			this->label8->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label8->Name = L"label8";
-			this->label8->Size = System::Drawing::Size(65, 12);
+			this->label8->Size = System::Drawing::Size(88, 16);
 			this->label8->TabIndex = 0;
 			this->label8->Text = L"实时温度: ";
 			// 
@@ -1597,9 +1712,11 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			this->groupBoxZone01->Controls->Add(this->buttonZone01TempGet);
 			this->groupBoxZone01->Controls->Add(this->label3);
 			this->groupBoxZone01->Controls->Add(this->label2);
-			this->groupBoxZone01->Location = System::Drawing::Point(7, 20);
+			this->groupBoxZone01->Location = System::Drawing::Point(9, 27);
+			this->groupBoxZone01->Margin = System::Windows::Forms::Padding(4);
 			this->groupBoxZone01->Name = L"groupBoxZone01";
-			this->groupBoxZone01->Size = System::Drawing::Size(175, 113);
+			this->groupBoxZone01->Padding = System::Windows::Forms::Padding(4);
+			this->groupBoxZone01->Size = System::Drawing::Size(233, 151);
 			this->groupBoxZone01->TabIndex = 0;
 			this->groupBoxZone01->TabStop = false;
 			this->groupBoxZone01->Text = L"Zone01";
@@ -1607,43 +1724,48 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label28
 			// 
 			this->label28->AutoSize = true;
-			this->label28->Location = System::Drawing::Point(135, 49);
+			this->label28->Location = System::Drawing::Point(180, 65);
+			this->label28->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label28->Name = L"label28";
-			this->label28->Size = System::Drawing::Size(17, 12);
+			this->label28->Size = System::Drawing::Size(24, 16);
 			this->label28->TabIndex = 6;
 			this->label28->Text = L"℃";
 			// 
 			// label27
 			// 
 			this->label27->AutoSize = true;
-			this->label27->Location = System::Drawing::Point(135, 24);
+			this->label27->Location = System::Drawing::Point(180, 32);
+			this->label27->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label27->Name = L"label27";
-			this->label27->Size = System::Drawing::Size(17, 12);
+			this->label27->Size = System::Drawing::Size(24, 16);
 			this->label27->TabIndex = 6;
 			this->label27->Text = L"℃";
 			// 
 			// labelZone01RealTemp
 			// 
 			this->labelZone01RealTemp->AutoSize = true;
-			this->labelZone01RealTemp->Location = System::Drawing::Point(82, 23);
+			this->labelZone01RealTemp->Location = System::Drawing::Point(109, 31);
+			this->labelZone01RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone01RealTemp->Name = L"labelZone01RealTemp";
-			this->labelZone01RealTemp->Size = System::Drawing::Size(23, 12);
+			this->labelZone01RealTemp->Size = System::Drawing::Size(32, 16);
 			this->labelZone01RealTemp->TabIndex = 5;
 			this->labelZone01RealTemp->Text = L"0.0";
 			// 
 			// textBoxZone01Setpoint
 			// 
-			this->textBoxZone01Setpoint->Location = System::Drawing::Point(82, 43);
+			this->textBoxZone01Setpoint->Location = System::Drawing::Point(109, 57);
+			this->textBoxZone01Setpoint->Margin = System::Windows::Forms::Padding(4);
 			this->textBoxZone01Setpoint->Name = L"textBoxZone01Setpoint";
-			this->textBoxZone01Setpoint->Size = System::Drawing::Size(45, 21);
+			this->textBoxZone01Setpoint->Size = System::Drawing::Size(59, 26);
 			this->textBoxZone01Setpoint->TabIndex = 4;
 			this->textBoxZone01Setpoint->Text = L"0.0";
 			// 
 			// buttonZone01TempSet
 			// 
-			this->buttonZone01TempSet->Location = System::Drawing::Point(87, 78);
+			this->buttonZone01TempSet->Location = System::Drawing::Point(116, 104);
+			this->buttonZone01TempSet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone01TempSet->Name = L"buttonZone01TempSet";
-			this->buttonZone01TempSet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone01TempSet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone01TempSet->TabIndex = 3;
 			this->buttonZone01TempSet->Text = L"设置温度";
 			this->buttonZone01TempSet->UseVisualStyleBackColor = true;
@@ -1651,9 +1773,10 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// 
 			// buttonZone01TempGet
 			// 
-			this->buttonZone01TempGet->Location = System::Drawing::Point(15, 78);
+			this->buttonZone01TempGet->Location = System::Drawing::Point(20, 104);
+			this->buttonZone01TempGet->Margin = System::Windows::Forms::Padding(4);
 			this->buttonZone01TempGet->Name = L"buttonZone01TempGet";
-			this->buttonZone01TempGet->Size = System::Drawing::Size(66, 23);
+			this->buttonZone01TempGet->Size = System::Drawing::Size(88, 31);
 			this->buttonZone01TempGet->TabIndex = 2;
 			this->buttonZone01TempGet->Text = L"读取温度";
 			this->buttonZone01TempGet->UseVisualStyleBackColor = true;
@@ -1662,29 +1785,35 @@ private: System::Windows::Forms::TextBox^  textBoxAllZonesSetpoint;
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(13, 49);
+			this->label3->Location = System::Drawing::Point(17, 65);
+			this->label3->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(65, 12);
+			this->label3->Size = System::Drawing::Size(88, 16);
 			this->label3->TabIndex = 1;
 			this->label3->Text = L"设定温度: ";
 			// 
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(13, 23);
+			this->label2->Location = System::Drawing::Point(17, 31);
+			this->label2->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(65, 12);
+			this->label2->Size = System::Drawing::Size(88, 16);
 			this->label2->TabIndex = 0;
 			this->label2->Text = L"实时温度: ";
 			// 
 			// Form1
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
+			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(760, 468);
+			this->ClientSize = System::Drawing::Size(1011, 612);
 			this->Controls->Add(this->groupBoxZones);
 			this->Controls->Add(this->groupBox1);
+			this->Font = (gcnew System::Drawing::Font(L"宋体", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(134)));
+			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
 			this->KeyPreview = true;
+			this->Margin = System::Windows::Forms::Padding(4);
+			this->MaximizeBox = false;
 			this->Name = L"Form1";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"HuskyNeo2Tool";
@@ -2288,16 +2417,16 @@ private: System::Void button28_Click(System::Object^  sender, System::EventArgs^
 			MessageBox::Show("当前设备未连接！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 			return;
 		}
-		//(gcnew AllZonesTemperatureSetting())->Show();
-		if (this->textBoxAllZonesSetpoint->Text == "") {
-			MessageBox::Show("请输入全区域温度！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
-			return;
+
+		SetAllZonesTemperatureForm^ setAllZonesTemperatureForm = gcnew SetAllZonesTemperatureForm();
+		System::Windows::Forms::DialogResult result = setAllZonesTemperatureForm->ShowDialog();
+		if (result == ::DialogResult::OK) {
+			float temperature = Convert::ToDouble(setAllZonesTemperatureForm->textBox1->Text);
+			// F = 32 + C * 1.8;
+			temperature = 32 + temperature * 1.8;
+			if (currentHusky->setAllZonesTemperature(temperature) == FALSE)
+				MessageBox::Show("设置温度失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 		}
-		float temperature = Convert::ToDouble(this->textBoxAllZonesSetpoint->Text);
-		// F = 32 + C * 1.8;
-		temperature = 32 + temperature * 1.8;
-		if (currentHusky->setAllZonesTemperature(temperature) == FALSE)
-			MessageBox::Show("设置温度失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 	}
 private: System::Void comboBox1_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
 			 currentHusky = huskys[this->comboBox1->SelectedIndex];

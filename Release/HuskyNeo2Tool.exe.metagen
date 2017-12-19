@@ -1,6 +1,7 @@
   HuskyNeo2Tool.AllZonesTemperatureSetting.resources - Embedded, ContainedInManifestFile, 
   HuskyNeo2Tool.Form1.resources - Embedded, ContainedInManifestFile, 
   HuskyNeo2Tool.IpConfigure.resources - Embedded, ContainedInManifestFile, 
+  HuskyNeo2Tool.SetAllZonesTemperatureForm.resources - Embedded, ContainedInManifestFile, 
 ImageRuntimeVersion: v4.0.30319
 Assembly HuskyNeo2Tool, Version=1.0.*, Culture=固定语言(固定国家/地区): 
 	hash=SHA1, flags=PublicKey
@@ -35,6 +36,11 @@ Class HuskyNeo2Tool.IpConfigure: AutoLayout, AnsiClass, Class, Public, BeforeFie
     System.Windows.Forms.TextBox textBox10 : Public
     System.Windows.Forms.TextBox textBox11 : Public
     System.Windows.Forms.TextBox textBox12 : Public
+Class HuskyNeo2Tool.SetAllZonesTemperatureForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    System.Windows.Forms.TextBox textBox1 : Public
 Class HuskyNeo2Tool.Form1: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName

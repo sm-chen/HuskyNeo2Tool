@@ -124,17 +124,19 @@ namespace HuskyNeo2Tool {
 			// 
 			// textBox1
 			// 
-			this->textBox1->Location = System::Drawing::Point(74, 14);
+			this->textBox1->Location = System::Drawing::Point(99, 19);
+			this->textBox1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(116, 21);
+			this->textBox1->Size = System::Drawing::Size(153, 26);
 			this->textBox1->TabIndex = 0;
 			this->textBox1->Text = L"192.168.1.1";
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(367, 174);
+			this->button1->Location = System::Drawing::Point(489, 232);
+			this->button1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->button1->Name = L"button1";
-			this->button1->Size = System::Drawing::Size(75, 23);
+			this->button1->Size = System::Drawing::Size(100, 31);
 			this->button1->TabIndex = 1;
 			this->button1->Text = L"确定";
 			this->button1->UseVisualStyleBackColor = true;
@@ -142,9 +144,10 @@ namespace HuskyNeo2Tool {
 			// 
 			// button2
 			// 
-			this->button2->Location = System::Drawing::Point(258, 174);
+			this->button2->Location = System::Drawing::Point(344, 232);
+			this->button2->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(75, 23);
+			this->button2->Size = System::Drawing::Size(100, 31);
 			this->button2->TabIndex = 2;
 			this->button2->Text = L"取消";
 			this->button2->UseVisualStyleBackColor = true;
@@ -176,216 +179,245 @@ namespace HuskyNeo2Tool {
 			this->groupBox1->Controls->Add(this->textBox7);
 			this->groupBox1->Controls->Add(this->textBox2);
 			this->groupBox1->Controls->Add(this->textBox1);
-			this->groupBox1->Location = System::Drawing::Point(12, 12);
+			this->groupBox1->Location = System::Drawing::Point(16, 16);
+			this->groupBox1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Size = System::Drawing::Size(430, 156);
+			this->groupBox1->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->groupBox1->Size = System::Drawing::Size(573, 208);
 			this->groupBox1->TabIndex = 3;
 			this->groupBox1->TabStop = false;
 			// 
 			// label12
 			// 
 			this->label12->AutoSize = true;
-			this->label12->Location = System::Drawing::Point(244, 122);
+			this->label12->Location = System::Drawing::Point(325, 163);
+			this->label12->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label12->Name = L"label12";
-			this->label12->Size = System::Drawing::Size(65, 12);
+			this->label12->Size = System::Drawing::Size(88, 16);
 			this->label12->TabIndex = 1;
 			this->label12->Text = L"机台12 IP:";
 			// 
 			// label6
 			// 
 			this->label6->AutoSize = true;
-			this->label6->Location = System::Drawing::Point(6, 122);
+			this->label6->Location = System::Drawing::Point(8, 163);
+			this->label6->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label6->Name = L"label6";
-			this->label6->Size = System::Drawing::Size(65, 12);
+			this->label6->Size = System::Drawing::Size(88, 16);
 			this->label6->TabIndex = 1;
 			this->label6->Text = L"机台06 IP:";
 			// 
 			// label11
 			// 
 			this->label11->AutoSize = true;
-			this->label11->Location = System::Drawing::Point(244, 101);
+			this->label11->Location = System::Drawing::Point(325, 135);
+			this->label11->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label11->Name = L"label11";
-			this->label11->Size = System::Drawing::Size(65, 12);
+			this->label11->Size = System::Drawing::Size(88, 16);
 			this->label11->TabIndex = 1;
 			this->label11->Text = L"机台11 IP:";
 			// 
 			// label5
 			// 
 			this->label5->AutoSize = true;
-			this->label5->Location = System::Drawing::Point(6, 101);
+			this->label5->Location = System::Drawing::Point(8, 135);
+			this->label5->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(65, 12);
+			this->label5->Size = System::Drawing::Size(88, 16);
 			this->label5->TabIndex = 1;
 			this->label5->Text = L"机台05 IP:";
 			// 
 			// textBox12
 			// 
-			this->textBox12->Location = System::Drawing::Point(312, 119);
+			this->textBox12->Location = System::Drawing::Point(416, 159);
+			this->textBox12->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox12->Name = L"textBox12";
-			this->textBox12->Size = System::Drawing::Size(116, 21);
+			this->textBox12->Size = System::Drawing::Size(153, 26);
 			this->textBox12->TabIndex = 0;
 			this->textBox12->Text = L"192.168.1.12";
 			// 
 			// textBox6
 			// 
-			this->textBox6->Location = System::Drawing::Point(74, 119);
+			this->textBox6->Location = System::Drawing::Point(99, 159);
+			this->textBox6->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox6->Name = L"textBox6";
-			this->textBox6->Size = System::Drawing::Size(116, 21);
+			this->textBox6->Size = System::Drawing::Size(153, 26);
 			this->textBox6->TabIndex = 0;
 			this->textBox6->Text = L"192.168.1.6";
 			// 
 			// label10
 			// 
 			this->label10->AutoSize = true;
-			this->label10->Location = System::Drawing::Point(244, 80);
+			this->label10->Location = System::Drawing::Point(325, 107);
+			this->label10->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label10->Name = L"label10";
-			this->label10->Size = System::Drawing::Size(65, 12);
+			this->label10->Size = System::Drawing::Size(88, 16);
 			this->label10->TabIndex = 1;
 			this->label10->Text = L"机台10 IP:";
 			// 
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(6, 80);
+			this->label4->Location = System::Drawing::Point(8, 107);
+			this->label4->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label4->Name = L"label4";
-			this->label4->Size = System::Drawing::Size(65, 12);
+			this->label4->Size = System::Drawing::Size(88, 16);
 			this->label4->TabIndex = 1;
 			this->label4->Text = L"机台04 IP:";
 			// 
 			// textBox11
 			// 
-			this->textBox11->Location = System::Drawing::Point(312, 98);
+			this->textBox11->Location = System::Drawing::Point(416, 131);
+			this->textBox11->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox11->Name = L"textBox11";
-			this->textBox11->Size = System::Drawing::Size(116, 21);
+			this->textBox11->Size = System::Drawing::Size(153, 26);
 			this->textBox11->TabIndex = 0;
 			this->textBox11->Text = L"192.168.1.11";
 			// 
 			// textBox5
 			// 
-			this->textBox5->Location = System::Drawing::Point(74, 98);
+			this->textBox5->Location = System::Drawing::Point(99, 131);
+			this->textBox5->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox5->Name = L"textBox5";
-			this->textBox5->Size = System::Drawing::Size(116, 21);
+			this->textBox5->Size = System::Drawing::Size(153, 26);
 			this->textBox5->TabIndex = 0;
 			this->textBox5->Text = L"192.168.1.5";
 			// 
 			// label9
 			// 
 			this->label9->AutoSize = true;
-			this->label9->Location = System::Drawing::Point(244, 59);
+			this->label9->Location = System::Drawing::Point(325, 79);
+			this->label9->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label9->Name = L"label9";
-			this->label9->Size = System::Drawing::Size(65, 12);
+			this->label9->Size = System::Drawing::Size(88, 16);
 			this->label9->TabIndex = 1;
 			this->label9->Text = L"机台09 IP:";
 			// 
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(6, 59);
+			this->label3->Location = System::Drawing::Point(8, 79);
+			this->label3->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(65, 12);
+			this->label3->Size = System::Drawing::Size(88, 16);
 			this->label3->TabIndex = 1;
 			this->label3->Text = L"机台03 IP:";
 			// 
 			// textBox10
 			// 
-			this->textBox10->Location = System::Drawing::Point(312, 77);
+			this->textBox10->Location = System::Drawing::Point(416, 103);
+			this->textBox10->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox10->Name = L"textBox10";
-			this->textBox10->Size = System::Drawing::Size(116, 21);
+			this->textBox10->Size = System::Drawing::Size(153, 26);
 			this->textBox10->TabIndex = 0;
 			this->textBox10->Text = L"192.168.1.10";
 			// 
 			// textBox4
 			// 
-			this->textBox4->Location = System::Drawing::Point(74, 77);
+			this->textBox4->Location = System::Drawing::Point(99, 103);
+			this->textBox4->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox4->Name = L"textBox4";
-			this->textBox4->Size = System::Drawing::Size(116, 21);
+			this->textBox4->Size = System::Drawing::Size(153, 26);
 			this->textBox4->TabIndex = 0;
 			this->textBox4->Text = L"192.168.1.4";
 			// 
 			// label8
 			// 
 			this->label8->AutoSize = true;
-			this->label8->Location = System::Drawing::Point(244, 38);
+			this->label8->Location = System::Drawing::Point(325, 51);
+			this->label8->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label8->Name = L"label8";
-			this->label8->Size = System::Drawing::Size(65, 12);
+			this->label8->Size = System::Drawing::Size(88, 16);
 			this->label8->TabIndex = 1;
 			this->label8->Text = L"机台08 IP:";
 			// 
 			// textBox9
 			// 
-			this->textBox9->Location = System::Drawing::Point(312, 56);
+			this->textBox9->Location = System::Drawing::Point(416, 75);
+			this->textBox9->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox9->Name = L"textBox9";
-			this->textBox9->Size = System::Drawing::Size(116, 21);
+			this->textBox9->Size = System::Drawing::Size(153, 26);
 			this->textBox9->TabIndex = 0;
 			this->textBox9->Text = L"192.168.1.9";
 			// 
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(6, 38);
+			this->label2->Location = System::Drawing::Point(8, 51);
+			this->label2->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(65, 12);
+			this->label2->Size = System::Drawing::Size(88, 16);
 			this->label2->TabIndex = 1;
 			this->label2->Text = L"机台02 IP:";
 			// 
 			// label7
 			// 
 			this->label7->AutoSize = true;
-			this->label7->Location = System::Drawing::Point(244, 17);
+			this->label7->Location = System::Drawing::Point(325, 23);
+			this->label7->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label7->Name = L"label7";
-			this->label7->Size = System::Drawing::Size(65, 12);
+			this->label7->Size = System::Drawing::Size(88, 16);
 			this->label7->TabIndex = 1;
 			this->label7->Text = L"机台07 IP:";
 			// 
 			// textBox3
 			// 
-			this->textBox3->Location = System::Drawing::Point(74, 56);
+			this->textBox3->Location = System::Drawing::Point(99, 75);
+			this->textBox3->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox3->Name = L"textBox3";
-			this->textBox3->Size = System::Drawing::Size(116, 21);
+			this->textBox3->Size = System::Drawing::Size(153, 26);
 			this->textBox3->TabIndex = 0;
 			this->textBox3->Text = L"192.168.1.3";
 			// 
 			// textBox8
 			// 
-			this->textBox8->Location = System::Drawing::Point(312, 35);
+			this->textBox8->Location = System::Drawing::Point(416, 47);
+			this->textBox8->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox8->Name = L"textBox8";
-			this->textBox8->Size = System::Drawing::Size(116, 21);
+			this->textBox8->Size = System::Drawing::Size(153, 26);
 			this->textBox8->TabIndex = 0;
 			this->textBox8->Text = L"192.168.1.8";
 			// 
 			// label1
 			// 
 			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(6, 17);
+			this->label1->Location = System::Drawing::Point(8, 23);
+			this->label1->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(65, 12);
+			this->label1->Size = System::Drawing::Size(88, 16);
 			this->label1->TabIndex = 1;
 			this->label1->Text = L"机台01 IP:";
 			// 
 			// textBox7
 			// 
-			this->textBox7->Location = System::Drawing::Point(312, 14);
+			this->textBox7->Location = System::Drawing::Point(416, 19);
+			this->textBox7->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox7->Name = L"textBox7";
-			this->textBox7->Size = System::Drawing::Size(116, 21);
+			this->textBox7->Size = System::Drawing::Size(153, 26);
 			this->textBox7->TabIndex = 0;
 			this->textBox7->Text = L"192.168.1.7";
 			// 
 			// textBox2
 			// 
-			this->textBox2->Location = System::Drawing::Point(74, 35);
+			this->textBox2->Location = System::Drawing::Point(99, 47);
+			this->textBox2->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->textBox2->Name = L"textBox2";
-			this->textBox2->Size = System::Drawing::Size(116, 21);
+			this->textBox2->Size = System::Drawing::Size(153, 26);
 			this->textBox2->TabIndex = 0;
 			this->textBox2->Text = L"192.168.1.2";
 			// 
 			// IpConfigure
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
+			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(459, 203);
+			this->ClientSize = System::Drawing::Size(612, 271);
 			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->button2);
 			this->Controls->Add(this->button1);
+			this->Font = (gcnew System::Drawing::Font(L"宋体", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(134)));
+			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
+			this->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->MaximizeBox = false;
 			this->Name = L"IpConfigure";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"IP配置";
@@ -423,7 +455,7 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 			fclose(fp);
 		}
 
-		this->DialogResult = (::DialogResult::OK);
+		this->DialogResult = ::DialogResult::OK;
 		this->Close();
 	}
 private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
