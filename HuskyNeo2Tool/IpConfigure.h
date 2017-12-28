@@ -125,7 +125,7 @@ namespace HuskyNeo2Tool {
 			// textBox1
 			// 
 			this->textBox1->Location = System::Drawing::Point(99, 19);
-			this->textBox1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox1->Margin = System::Windows::Forms::Padding(4);
 			this->textBox1->Name = L"textBox1";
 			this->textBox1->Size = System::Drawing::Size(153, 26);
 			this->textBox1->TabIndex = 0;
@@ -134,7 +134,7 @@ namespace HuskyNeo2Tool {
 			// button1
 			// 
 			this->button1->Location = System::Drawing::Point(489, 232);
-			this->button1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->button1->Margin = System::Windows::Forms::Padding(4);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(100, 31);
 			this->button1->TabIndex = 1;
@@ -145,7 +145,7 @@ namespace HuskyNeo2Tool {
 			// button2
 			// 
 			this->button2->Location = System::Drawing::Point(344, 232);
-			this->button2->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->button2->Margin = System::Windows::Forms::Padding(4);
 			this->button2->Name = L"button2";
 			this->button2->Size = System::Drawing::Size(100, 31);
 			this->button2->TabIndex = 2;
@@ -180,9 +180,9 @@ namespace HuskyNeo2Tool {
 			this->groupBox1->Controls->Add(this->textBox2);
 			this->groupBox1->Controls->Add(this->textBox1);
 			this->groupBox1->Location = System::Drawing::Point(16, 16);
-			this->groupBox1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->groupBox1->Margin = System::Windows::Forms::Padding(4);
 			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->groupBox1->Padding = System::Windows::Forms::Padding(4);
 			this->groupBox1->Size = System::Drawing::Size(573, 208);
 			this->groupBox1->TabIndex = 3;
 			this->groupBox1->TabStop = false;
@@ -230,7 +230,7 @@ namespace HuskyNeo2Tool {
 			// textBox12
 			// 
 			this->textBox12->Location = System::Drawing::Point(416, 159);
-			this->textBox12->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox12->Margin = System::Windows::Forms::Padding(4);
 			this->textBox12->Name = L"textBox12";
 			this->textBox12->Size = System::Drawing::Size(153, 26);
 			this->textBox12->TabIndex = 0;
@@ -239,7 +239,7 @@ namespace HuskyNeo2Tool {
 			// textBox6
 			// 
 			this->textBox6->Location = System::Drawing::Point(99, 159);
-			this->textBox6->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox6->Margin = System::Windows::Forms::Padding(4);
 			this->textBox6->Name = L"textBox6";
 			this->textBox6->Size = System::Drawing::Size(153, 26);
 			this->textBox6->TabIndex = 0;
@@ -268,7 +268,7 @@ namespace HuskyNeo2Tool {
 			// textBox11
 			// 
 			this->textBox11->Location = System::Drawing::Point(416, 131);
-			this->textBox11->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox11->Margin = System::Windows::Forms::Padding(4);
 			this->textBox11->Name = L"textBox11";
 			this->textBox11->Size = System::Drawing::Size(153, 26);
 			this->textBox11->TabIndex = 0;
@@ -277,7 +277,7 @@ namespace HuskyNeo2Tool {
 			// textBox5
 			// 
 			this->textBox5->Location = System::Drawing::Point(99, 131);
-			this->textBox5->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox5->Margin = System::Windows::Forms::Padding(4);
 			this->textBox5->Name = L"textBox5";
 			this->textBox5->Size = System::Drawing::Size(153, 26);
 			this->textBox5->TabIndex = 0;
@@ -306,7 +306,7 @@ namespace HuskyNeo2Tool {
 			// textBox10
 			// 
 			this->textBox10->Location = System::Drawing::Point(416, 103);
-			this->textBox10->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox10->Margin = System::Windows::Forms::Padding(4);
 			this->textBox10->Name = L"textBox10";
 			this->textBox10->Size = System::Drawing::Size(153, 26);
 			this->textBox10->TabIndex = 0;
@@ -315,7 +315,7 @@ namespace HuskyNeo2Tool {
 			// textBox4
 			// 
 			this->textBox4->Location = System::Drawing::Point(99, 103);
-			this->textBox4->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox4->Margin = System::Windows::Forms::Padding(4);
 			this->textBox4->Name = L"textBox4";
 			this->textBox4->Size = System::Drawing::Size(153, 26);
 			this->textBox4->TabIndex = 0;
@@ -334,7 +334,7 @@ namespace HuskyNeo2Tool {
 			// textBox9
 			// 
 			this->textBox9->Location = System::Drawing::Point(416, 75);
-			this->textBox9->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox9->Margin = System::Windows::Forms::Padding(4);
 			this->textBox9->Name = L"textBox9";
 			this->textBox9->Size = System::Drawing::Size(153, 26);
 			this->textBox9->TabIndex = 0;
@@ -363,7 +363,7 @@ namespace HuskyNeo2Tool {
 			// textBox3
 			// 
 			this->textBox3->Location = System::Drawing::Point(99, 75);
-			this->textBox3->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox3->Margin = System::Windows::Forms::Padding(4);
 			this->textBox3->Name = L"textBox3";
 			this->textBox3->Size = System::Drawing::Size(153, 26);
 			this->textBox3->TabIndex = 0;
@@ -372,7 +372,7 @@ namespace HuskyNeo2Tool {
 			// textBox8
 			// 
 			this->textBox8->Location = System::Drawing::Point(416, 47);
-			this->textBox8->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox8->Margin = System::Windows::Forms::Padding(4);
 			this->textBox8->Name = L"textBox8";
 			this->textBox8->Size = System::Drawing::Size(153, 26);
 			this->textBox8->TabIndex = 0;
@@ -391,7 +391,7 @@ namespace HuskyNeo2Tool {
 			// textBox7
 			// 
 			this->textBox7->Location = System::Drawing::Point(416, 19);
-			this->textBox7->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox7->Margin = System::Windows::Forms::Padding(4);
 			this->textBox7->Name = L"textBox7";
 			this->textBox7->Size = System::Drawing::Size(153, 26);
 			this->textBox7->TabIndex = 0;
@@ -400,7 +400,7 @@ namespace HuskyNeo2Tool {
 			// textBox2
 			// 
 			this->textBox2->Location = System::Drawing::Point(99, 47);
-			this->textBox2->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->textBox2->Margin = System::Windows::Forms::Padding(4);
 			this->textBox2->Name = L"textBox2";
 			this->textBox2->Size = System::Drawing::Size(153, 26);
 			this->textBox2->TabIndex = 0;
@@ -416,11 +416,11 @@ namespace HuskyNeo2Tool {
 			this->Controls->Add(this->button1);
 			this->Font = (gcnew System::Drawing::Font(L"ËÎÌå", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(134)));
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
-			this->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->Margin = System::Windows::Forms::Padding(4);
 			this->MaximizeBox = false;
 			this->Name = L"IpConfigure";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
-			this->Text = L"IPÅäÖÃ";
+			this->Text = L"»úÌ¨IPÅäÖÃ";
 			this->groupBox1->ResumeLayout(false);
 			this->groupBox1->PerformLayout();
 			this->ResumeLayout(false);

@@ -1,107 +1,42 @@
-﻿生成启动时间为 2017/12/19 11:55:17。
-     1>项目“D:\HUSKY\HuskyNeo2Tool_DEBUGOK\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”在节点 2 上(Build 个目标)。
+﻿生成启动时间为 2017/12/28 20:09:13。
+     1>项目“D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr:pure /nologo /W3 /WX- /O2 /Oy- /GL /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /EHa /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\HuskyNeo2Tool.pch" /Fo"Release\\" /Fd"Release\vc110.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib HuskyNeo2Tool.cpp SetAllZonesTemperatureForm.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr:pure /nologo /W3 /WX- /O2 /Oy- /GL /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /EHa /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\HuskyNeo2Tool.pch" /Fo"Release\\" /Fd"Release\vc110.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib AlarmStatusWindow.cpp HuskyNeo2Tool.cpp
+         AlarmStatusWindow.cpp
          HuskyNeo2Tool.cpp
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\IpConfigure.h(435): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\IpConfigure.h(435): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\string.h(110) : 参见“strcpy”的声明
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\IpConfigure.h(437): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\IpConfigure.h(437): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218) : 参见“fopen”的声明
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(76): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(103): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\string.h(110) : 参见“strcpy”的声明
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(77): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(104): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218) : 参见“fopen”的声明
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(152): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(153): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1870): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1871): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1886): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1887): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1902): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1903): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1918): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1919): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1934): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1935): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1950): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1951): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1966): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1967): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1982): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1983): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1998): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(1999): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2014): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2015): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2030): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2031): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2046): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2047): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2065): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2067): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2084): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2086): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2103): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2105): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2122): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2124): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2141): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2143): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2160): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2162): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2179): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2181): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2198): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2200): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2217): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2219): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2236): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2238): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2255): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2257): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2274): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2276): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2329): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2330): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2336): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2337): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2343): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2344): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2350): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2351): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2357): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2358): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2364): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2365): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2371): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2372): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2378): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2379): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2385): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2386): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2392): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2393): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2399): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2400): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2406): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2407): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2427): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool_debugok\huskyneo2tool\Form1.h(2429): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-         SetAllZonesTemperatureForm.cpp
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(207): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(208): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(216): warning C4965: 整数 0 的隐式装箱；请使用 nullptr 或显式转换
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(227): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(228): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(2008): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(2009): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(2030): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+     1>d:\husky\huskyneo2tool_debug_20171227ok\huskyneo2tool\Form1.h(2032): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
          正在生成代码...
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\HUSKY\HuskyNeo2Tool_DEBUGOK\Release\HuskyNeo2Tool.exe" /INCREMENTAL:NO /NOLOGO /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.AllZonesTemperatureSetting.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.Form1.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.IpConfigure.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.SetAllZonesTemperatureForm.resources /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\HUSKY\HuskyNeo2Tool_DEBUGOK\Release\HuskyNeo2Tool.pdb" /SUBSYSTEM:WINDOWS /LTCG /TLBID:1 /ENTRY:"main" /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X86 /SAFESEH Release\AllZonesTemperatureSetting.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\Release\HuskyNeo2Tool.exe" /INCREMENTAL:NO /NOLOGO /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.AlarmStatusWindow.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.AllZonesTemperatureSetting.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.Form1.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.IpConfigure.resources /ASSEMBLYRESOURCE:Release\HuskyNeo2Tool.SetAllZonesTemperatureForm.resources /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\Release\HuskyNeo2Tool.pdb" /SUBSYSTEM:WINDOWS /LTCG /TLBID:1 /ENTRY:"main" /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X86 /SAFESEH Release\AlarmStatusWindow.obj
+         Release\AllZonesTemperatureSetting.obj
          Release\AssemblyInfo.obj
          Release\Husky.obj
          Release\HuskyNeo2Tool.obj
          Release\IpConfigure.obj
+         Release\SerialPort.obj
          Release\SetAllZonesTemperatureForm.obj
          Release\stdafx.obj
          "Release\.NETFramework,Version=v4.0.AssemblyAttributes.obj"
          LINK : 已指定 /LTCG，但不需要生成代码；从链接命令行中移除 /LTCG 以提高链接器性能
-         HuskyNeo2Tool.vcxproj -> D:\HUSKY\HuskyNeo2Tool_DEBUGOK\Release\HuskyNeo2Tool.exe
-     1>已完成生成项目“D:\HUSKY\HuskyNeo2Tool_DEBUGOK\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”(Build 个目标)的操作。
+         HuskyNeo2Tool.vcxproj -> D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\Release\HuskyNeo2Tool.exe
+     1>已完成生成项目“D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:01.58
+已用时间 00:00:02.10

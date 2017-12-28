@@ -1,9 +1,12 @@
 
 #pragma once
 
+
 #include <stdio.h>
 #include <WinSock2.h>
 #pragma comment(lib, "ws2_32.lib")  //加载 ws2_32.dll
+#include "SerialPort.h"
+
 
 typedef unsigned short u16;
 typedef u16 uint16_t;
@@ -29,7 +32,7 @@ typedef uint32_t binfloat ;
 #define ETX 0x03 //END OF TEXT
 #define EOT 0x04 //END OF TRANSMISSION
 #define ENQ 0x05 //ENQUIRY
-#define ACK 0x06 //ACKNOWLEDGE
+//#define ACK 0x06 //ACKNOWLEDGE
 #define DLE 0x10 //DATALINK ESCAPE
 #define NAK 0x15 //NEGATIVE ACKNOWLEDGE
 #define SYN 0x16 //SYNCHRONOUS IDLE
@@ -38,6 +41,55 @@ typedef uint32_t binfloat ;
 
 #define ACK0 0x30
 #define ACK1 0x31
+
+#define AUTOMATIC_REGULATION_MODE 0x0001 //Closed-Loop
+#define MANUAL_REGULATION_MODE 0x0000 //Open-Loop
+
+/** Controller Status
+ *	bit definition
+ *	0   加热器功率非零
+ *	1   启用软启动
+ *	2   手动调节（非 Auto[ 自动]或 View[ 查看] 调节模式）
+ *	3   低于设定点温度时警报
+ *	4   高于设定点温度时警报
+ *	5   低于设定点温度时终止
+ *	6   高于设定点温度时终止
+ *	7   未找到热电偶
+ *	8   热电偶接反
+ *	9   不支持
+ *	10  保险丝熔断
+ *	11  不支持
+ *	12  不支持
+ *	13  不支持
+ *	14  不支持
+ *	15  不支持
+ *******************************/
+#define POWER_TO_HEATER_NOT_ZERO (1 << 0)
+#define ALARM_UNDER_TEMPERATURE  (1 << 3)
+#define ALARM_OVER_TEMPERATURE   (1 << 4)
+#define ABORT_UNDER_TEMPERATURE  (1 << 5)
+#define ABORT_OVER_TEMPERATURE   (1 << 6)
+#define LOST_THERMOCOUPLE        (1 << 7)
+#define REVERSED_THERMOCOUPLE    (1 << 8)
+#define FUSE_BLOWN               (1 << 10)
+
+const uint16_t controllerStatusBits[] = {POWER_TO_HEATER_NOT_ZERO,
+										 ALARM_UNDER_TEMPERATURE,
+										 ALARM_OVER_TEMPERATURE,
+										 ABORT_UNDER_TEMPERATURE,
+										 ABORT_OVER_TEMPERATURE,
+										 LOST_THERMOCOUPLE,
+										 REVERSED_THERMOCOUPLE,
+										 FUSE_BLOWN};
+// corresponding to controllerStatusBits
+const char controllerStatusString[][30] = { {"加热器功率非零"},
+											{"低于设定点温度警报"},
+											{"高于设定点温度警报"},
+											{"低于设定点温度终止"},
+											{"高于设定点温度终止"},
+											{"未找到热电偶"},
+											{"热电偶接反"},
+											{"保险丝熔断"},};
 
 const uint16_t a_crctable[] =
       {0x0000, 0xc0c1, 0xc181, 0x0140, 0xc301, 0x03c0, 0x0280, 0xc241,
@@ -99,14 +151,41 @@ public:
 
 	void setIpAddr(char *ipAddr);
 	void getIpAddr(char *ipAddr);
+
+	float getManualPercentOutput(int zone);
+	BOOLEAN setManualPercentOutput(int zone, float percent);
+
+	/** 0x0001: Closed-Loop(Automatic)
+	 *  0x0000: Open-Loop(Manual)
+	 */
+	uint16_t getRegulationMode(int zone);
+	BOOLEAN setRegulationMode(int zone, uint16_t mode);
+	
+	/** Zone off: Manual Percent output is 0% and Regulation Mode is Manual(Open-Loop)
+	 *  Zone on : Regulation Mode is Automatic(Closed-Loop) and percent output is 50%?
+	 */
+	BOOLEAN getZoneOnOff(int zone); // On: return true; Off: return false;
+	BOOLEAN setZoneOnOff(int zone, BOOLEAN on);
+
+	uint16_t getControlerStatus(int zone);
+	BOOLEAN controlerReset();
+	char *getControlerStatusString(uint16_t status);
+
+	void setSerialPortNum(int num);
+	int getSerialPortNum();
 private:
+	BOOLEAN mIsConnected;
+
 	SOCKET sock;
 	char mServIpAddr[IP_ADDRESS_STRING_LEN];
 	int mServPort;
 	sockaddr_in servAddr;
 	sockaddr_in localAddr;
-	BOOLEAN mIsConnected;
 
 	HANDLE mMutex;
+
+	int mSerialPortNum;
+public:
+	CSerialPort serialPort;
 };
 

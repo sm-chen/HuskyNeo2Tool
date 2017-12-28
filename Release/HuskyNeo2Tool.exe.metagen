@@ -1,3 +1,4 @@
+  HuskyNeo2Tool.AlarmStatusWindow.resources - Embedded, ContainedInManifestFile, 
   HuskyNeo2Tool.AllZonesTemperatureSetting.resources - Embedded, ContainedInManifestFile, 
   HuskyNeo2Tool.Form1.resources - Embedded, ContainedInManifestFile, 
   HuskyNeo2Tool.IpConfigure.resources - Embedded, ContainedInManifestFile, 
@@ -17,6 +18,11 @@ Assembly System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=
 	hash=None, flags=None
 Assembly System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
 	hash=None, flags=None
+Class HuskyNeo2Tool.AlarmStatusWindow: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    System.Windows.Forms.Label[] labelZoneAlarmMsgArray : Public
 Class HuskyNeo2Tool.AllZonesTemperatureSetting: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName

@@ -124,11 +124,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AlarmStatusWindow.cpp" />
     <ClCompile Include="AllZonesTemperatureSetting.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="Husky.cpp" />
     <ClCompile Include="HuskyNeo2Tool.cpp" />
     <ClCompile Include="IpConfigure.cpp" />
+    <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="SetAllZonesTemperatureForm.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -136,6 +138,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AlarmStatusWindow.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="AllZonesTemperatureSetting.h">
       <FileType>CppForm</FileType>
     </ClInclude>
@@ -147,6 +152,7 @@
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SerialPort.h" />
     <ClInclude Include="SetAllZonesTemperatureForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
@@ -157,6 +163,9 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AlarmStatusWindow.resx">
+      <DependentUpon>AlarmStatusWindow.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AllZonesTemperatureSetting.resx">
       <DependentUpon>AllZonesTemperatureSetting.h</DependentUpon>
     </EmbeddedResource>
