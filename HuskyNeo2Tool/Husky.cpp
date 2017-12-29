@@ -115,7 +115,7 @@ BOOLEAN Husky::connect()
 		return FALSE;
 	}
 */
-	if (this->serialPort.InitPort(getSerialPortNum())) {
+	if (this->serialPort.InitPort(getSerialPortNum()) && checkHuskyVersion()) {
 		this->setConnected();
 		mIsConnected = TRUE;
 		return TRUE;

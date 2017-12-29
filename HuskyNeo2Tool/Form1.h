@@ -250,6 +250,7 @@ namespace HuskyNeo2Tool {
 		{
 			/*
 			while (1) {
+				Sleep(3000);
 				alarmStatusWindow->labelZoneAlarmMsgArray[1]->ForeColor = System::Drawing::Color::Black;
 				this->Invoke(this->myShowAlarmMsg);
 			}
@@ -540,29 +541,30 @@ namespace HuskyNeo2Tool {
 			this->groupBox1->Controls->Add(this->button27);
 			this->groupBox1->Controls->Add(this->buttonConnect);
 			this->groupBox1->Controls->Add(this->comboBox1);
-			this->groupBox1->Location = System::Drawing::Point(16, 16);
-			this->groupBox1->Margin = System::Windows::Forms::Padding(4);
+			this->groupBox1->Location = System::Drawing::Point(10, 10);
+			this->groupBox1->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Padding = System::Windows::Forms::Padding(4);
-			this->groupBox1->Size = System::Drawing::Size(730, 86);
+			this->groupBox1->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBox1->Size = System::Drawing::Size(1005, 113);
 			this->groupBox1->TabIndex = 0;
 			this->groupBox1->TabStop = false;
 			// 
 			// label6
 			// 
 			this->label6->AutoSize = true;
-			this->label6->Location = System::Drawing::Point(3, 35);
+			this->label6->Location = System::Drawing::Point(4, 46);
+			this->label6->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label6->Name = L"label6";
-			this->label6->Size = System::Drawing::Size(96, 16);
+			this->label6->Size = System::Drawing::Size(131, 22);
 			this->label6->TabIndex = 13;
-			this->label6->Text = L"机台号端口:";
+			this->label6->Text = L"机台端口号:";
 			// 
 			// button28
 			// 
-			this->button28->Location = System::Drawing::Point(627, 28);
-			this->button28->Margin = System::Windows::Forms::Padding(4);
+			this->button28->Location = System::Drawing::Point(858, 37);
+			this->button28->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->button28->Name = L"button28";
-			this->button28->Size = System::Drawing::Size(95, 31);
+			this->button28->Size = System::Drawing::Size(131, 41);
 			this->button28->TabIndex = 10;
 			this->button28->Text = L"温度设置";
 			this->button28->UseVisualStyleBackColor = true;
@@ -570,10 +572,10 @@ namespace HuskyNeo2Tool {
 			// 
 			// button27
 			// 
-			this->button27->Location = System::Drawing::Point(511, 28);
-			this->button27->Margin = System::Windows::Forms::Padding(4);
+			this->button27->Location = System::Drawing::Point(696, 37);
+			this->button27->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->button27->Name = L"button27";
-			this->button27->Size = System::Drawing::Size(95, 31);
+			this->button27->Size = System::Drawing::Size(131, 41);
 			this->button27->TabIndex = 9;
 			this->button27->Text = L"温度读取";
 			this->button27->UseVisualStyleBackColor = true;
@@ -581,10 +583,10 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonConnect
 			// 
-			this->buttonConnect->Location = System::Drawing::Point(187, 28);
-			this->buttonConnect->Margin = System::Windows::Forms::Padding(4);
+			this->buttonConnect->Location = System::Drawing::Point(257, 37);
+			this->buttonConnect->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonConnect->Name = L"buttonConnect";
-			this->buttonConnect->Size = System::Drawing::Size(82, 31);
+			this->buttonConnect->Size = System::Drawing::Size(112, 41);
 			this->buttonConnect->TabIndex = 7;
 			this->buttonConnect->Text = L"连接";
 			this->buttonConnect->UseVisualStyleBackColor = true;
@@ -597,10 +599,10 @@ namespace HuskyNeo2Tool {
 			this->comboBox1->FormattingEnabled = true;
 			this->comboBox1->Items->AddRange(gcnew cli::array< System::Object^  >(9) {L"COM1", L"COM2", L"COM3", L"COM4", L"COM5", L"COM6", 
 				L"COM7", L"COM8", L"COM9"});
-			this->comboBox1->Location = System::Drawing::Point(97, 31);
-			this->comboBox1->Margin = System::Windows::Forms::Padding(4);
+			this->comboBox1->Location = System::Drawing::Point(133, 41);
+			this->comboBox1->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->comboBox1->Name = L"comboBox1";
-			this->comboBox1->Size = System::Drawing::Size(61, 24);
+			this->comboBox1->Size = System::Drawing::Size(82, 29);
 			this->comboBox1->TabIndex = 5;
 			this->comboBox1->SelectedIndexChanged += gcnew System::EventHandler(this, &Form1::comboBox1_SelectedIndexChanged);
 			// 
@@ -618,11 +620,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZones->Controls->Add(this->groupBoxZone05);
 			this->groupBoxZones->Controls->Add(this->groupBoxZone02);
 			this->groupBoxZones->Controls->Add(this->groupBoxZone01);
-			this->groupBoxZones->Location = System::Drawing::Point(16, 104);
-			this->groupBoxZones->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZones->Location = System::Drawing::Point(10, 130);
+			this->groupBoxZones->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZones->Name = L"groupBoxZones";
-			this->groupBoxZones->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZones->Size = System::Drawing::Size(730, 447);
+			this->groupBoxZones->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZones->Size = System::Drawing::Size(1003, 587);
 			this->groupBoxZones->TabIndex = 1;
 			this->groupBoxZones->TabStop = false;
 			// 
@@ -636,11 +638,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone12->Controls->Add(this->buttonZone12Switch);
 			this->groupBoxZone12->Controls->Add(this->label60);
 			this->groupBoxZone12->Controls->Add(this->label61);
-			this->groupBoxZone12->Location = System::Drawing::Point(545, 303);
-			this->groupBoxZone12->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone12->Location = System::Drawing::Point(749, 398);
+			this->groupBoxZone12->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone12->Name = L"groupBoxZone12";
-			this->groupBoxZone12->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone12->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone12->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone12->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone12->TabIndex = 0;
 			this->groupBoxZone12->TabStop = false;
 			this->groupBoxZone12->Text = L"Zone12";
@@ -648,48 +650,49 @@ namespace HuskyNeo2Tool {
 			// labelZone12Setpoint
 			// 
 			this->labelZone12Setpoint->AutoSize = true;
-			this->labelZone12Setpoint->Location = System::Drawing::Point(95, 65);
+			this->labelZone12Setpoint->Location = System::Drawing::Point(131, 85);
+			this->labelZone12Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone12Setpoint->Name = L"labelZone12Setpoint";
-			this->labelZone12Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone12Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone12Setpoint->TabIndex = 7;
 			this->labelZone12Setpoint->Text = L"0.0";
 			// 
 			// label57
 			// 
 			this->label57->AutoSize = true;
-			this->label57->Location = System::Drawing::Point(144, 65);
-			this->label57->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label57->Location = System::Drawing::Point(198, 85);
+			this->label57->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label57->Name = L"label57";
-			this->label57->Size = System::Drawing::Size(24, 16);
+			this->label57->Size = System::Drawing::Size(32, 22);
 			this->label57->TabIndex = 6;
 			this->label57->Text = L"℃";
 			// 
 			// label58
 			// 
 			this->label58->AutoSize = true;
-			this->label58->Location = System::Drawing::Point(144, 32);
-			this->label58->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label58->Location = System::Drawing::Point(198, 42);
+			this->label58->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label58->Name = L"label58";
-			this->label58->Size = System::Drawing::Size(24, 16);
+			this->label58->Size = System::Drawing::Size(32, 22);
 			this->label58->TabIndex = 6;
 			this->label58->Text = L"℃";
 			// 
 			// labelZone12RealTemp
 			// 
 			this->labelZone12RealTemp->AutoSize = true;
-			this->labelZone12RealTemp->Location = System::Drawing::Point(95, 31);
-			this->labelZone12RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone12RealTemp->Location = System::Drawing::Point(131, 41);
+			this->labelZone12RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone12RealTemp->Name = L"labelZone12RealTemp";
-			this->labelZone12RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone12RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone12RealTemp->TabIndex = 5;
 			this->labelZone12RealTemp->Text = L"0.0";
 			// 
 			// buttonZone12Switch
 			// 
-			this->buttonZone12Switch->Location = System::Drawing::Point(20, 96);
-			this->buttonZone12Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone12Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone12Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone12Switch->Name = L"buttonZone12Switch";
-			this->buttonZone12Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone12Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone12Switch->TabIndex = 3;
 			this->buttonZone12Switch->Text = L"打开";
 			this->buttonZone12Switch->UseVisualStyleBackColor = true;
@@ -698,20 +701,20 @@ namespace HuskyNeo2Tool {
 			// label60
 			// 
 			this->label60->AutoSize = true;
-			this->label60->Location = System::Drawing::Point(17, 65);
-			this->label60->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label60->Location = System::Drawing::Point(23, 85);
+			this->label60->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label60->Name = L"label60";
-			this->label60->Size = System::Drawing::Size(88, 16);
+			this->label60->Size = System::Drawing::Size(120, 22);
 			this->label60->TabIndex = 1;
 			this->label60->Text = L"设定温度: ";
 			// 
 			// label61
 			// 
 			this->label61->AutoSize = true;
-			this->label61->Location = System::Drawing::Point(17, 31);
-			this->label61->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label61->Location = System::Drawing::Point(23, 41);
+			this->label61->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label61->Name = L"label61";
-			this->label61->Size = System::Drawing::Size(88, 16);
+			this->label61->Size = System::Drawing::Size(120, 22);
 			this->label61->TabIndex = 0;
 			this->label61->Text = L"实时温度: ";
 			// 
@@ -725,11 +728,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone08->Controls->Add(this->buttonZone08Switch);
 			this->groupBoxZone08->Controls->Add(this->label40);
 			this->groupBoxZone08->Controls->Add(this->label41);
-			this->groupBoxZone08->Location = System::Drawing::Point(545, 160);
-			this->groupBoxZone08->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone08->Location = System::Drawing::Point(749, 210);
+			this->groupBoxZone08->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone08->Name = L"groupBoxZone08";
-			this->groupBoxZone08->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone08->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone08->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone08->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone08->TabIndex = 0;
 			this->groupBoxZone08->TabStop = false;
 			this->groupBoxZone08->Text = L"Zone08";
@@ -737,48 +740,49 @@ namespace HuskyNeo2Tool {
 			// labelZone08Setpoint
 			// 
 			this->labelZone08Setpoint->AutoSize = true;
-			this->labelZone08Setpoint->Location = System::Drawing::Point(95, 65);
+			this->labelZone08Setpoint->Location = System::Drawing::Point(131, 85);
+			this->labelZone08Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone08Setpoint->Name = L"labelZone08Setpoint";
-			this->labelZone08Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone08Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone08Setpoint->TabIndex = 7;
 			this->labelZone08Setpoint->Text = L"0.0";
 			// 
 			// label37
 			// 
 			this->label37->AutoSize = true;
-			this->label37->Location = System::Drawing::Point(144, 65);
-			this->label37->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label37->Location = System::Drawing::Point(198, 85);
+			this->label37->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label37->Name = L"label37";
-			this->label37->Size = System::Drawing::Size(24, 16);
+			this->label37->Size = System::Drawing::Size(32, 22);
 			this->label37->TabIndex = 6;
 			this->label37->Text = L"℃";
 			// 
 			// label38
 			// 
 			this->label38->AutoSize = true;
-			this->label38->Location = System::Drawing::Point(144, 32);
-			this->label38->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label38->Location = System::Drawing::Point(198, 42);
+			this->label38->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label38->Name = L"label38";
-			this->label38->Size = System::Drawing::Size(24, 16);
+			this->label38->Size = System::Drawing::Size(32, 22);
 			this->label38->TabIndex = 6;
 			this->label38->Text = L"℃";
 			// 
 			// labelZone08RealTemp
 			// 
 			this->labelZone08RealTemp->AutoSize = true;
-			this->labelZone08RealTemp->Location = System::Drawing::Point(95, 31);
-			this->labelZone08RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone08RealTemp->Location = System::Drawing::Point(131, 41);
+			this->labelZone08RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone08RealTemp->Name = L"labelZone08RealTemp";
-			this->labelZone08RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone08RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone08RealTemp->TabIndex = 5;
 			this->labelZone08RealTemp->Text = L"0.0";
 			// 
 			// buttonZone08Switch
 			// 
-			this->buttonZone08Switch->Location = System::Drawing::Point(17, 95);
-			this->buttonZone08Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone08Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone08Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone08Switch->Name = L"buttonZone08Switch";
-			this->buttonZone08Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone08Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone08Switch->TabIndex = 3;
 			this->buttonZone08Switch->Text = L"打开";
 			this->buttonZone08Switch->UseVisualStyleBackColor = true;
@@ -787,20 +791,20 @@ namespace HuskyNeo2Tool {
 			// label40
 			// 
 			this->label40->AutoSize = true;
-			this->label40->Location = System::Drawing::Point(17, 65);
-			this->label40->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label40->Location = System::Drawing::Point(23, 85);
+			this->label40->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label40->Name = L"label40";
-			this->label40->Size = System::Drawing::Size(88, 16);
+			this->label40->Size = System::Drawing::Size(120, 22);
 			this->label40->TabIndex = 1;
 			this->label40->Text = L"设定温度: ";
 			// 
 			// label41
 			// 
 			this->label41->AutoSize = true;
-			this->label41->Location = System::Drawing::Point(17, 31);
-			this->label41->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label41->Location = System::Drawing::Point(23, 41);
+			this->label41->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label41->Name = L"label41";
-			this->label41->Size = System::Drawing::Size(88, 16);
+			this->label41->Size = System::Drawing::Size(120, 22);
 			this->label41->TabIndex = 0;
 			this->label41->Text = L"实时温度: ";
 			// 
@@ -814,11 +818,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone04->Controls->Add(this->buttonZone04Switch);
 			this->groupBoxZone04->Controls->Add(this->label17);
 			this->groupBoxZone04->Controls->Add(this->label18);
-			this->groupBoxZone04->Location = System::Drawing::Point(545, 17);
-			this->groupBoxZone04->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone04->Location = System::Drawing::Point(749, 22);
+			this->groupBoxZone04->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone04->Name = L"groupBoxZone04";
-			this->groupBoxZone04->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone04->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone04->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone04->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone04->TabIndex = 0;
 			this->groupBoxZone04->TabStop = false;
 			this->groupBoxZone04->Text = L"Zone04";
@@ -826,48 +830,49 @@ namespace HuskyNeo2Tool {
 			// labelZone04Setpoint
 			// 
 			this->labelZone04Setpoint->AutoSize = true;
-			this->labelZone04Setpoint->Location = System::Drawing::Point(95, 65);
+			this->labelZone04Setpoint->Location = System::Drawing::Point(131, 85);
+			this->labelZone04Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone04Setpoint->Name = L"labelZone04Setpoint";
-			this->labelZone04Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone04Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone04Setpoint->TabIndex = 7;
 			this->labelZone04Setpoint->Text = L"0.0";
 			// 
 			// label14
 			// 
 			this->label14->AutoSize = true;
-			this->label14->Location = System::Drawing::Point(144, 65);
-			this->label14->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label14->Location = System::Drawing::Point(198, 85);
+			this->label14->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label14->Name = L"label14";
-			this->label14->Size = System::Drawing::Size(24, 16);
+			this->label14->Size = System::Drawing::Size(32, 22);
 			this->label14->TabIndex = 6;
 			this->label14->Text = L"℃";
 			// 
 			// label15
 			// 
 			this->label15->AutoSize = true;
-			this->label15->Location = System::Drawing::Point(144, 32);
-			this->label15->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label15->Location = System::Drawing::Point(198, 42);
+			this->label15->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label15->Name = L"label15";
-			this->label15->Size = System::Drawing::Size(24, 16);
+			this->label15->Size = System::Drawing::Size(32, 22);
 			this->label15->TabIndex = 6;
 			this->label15->Text = L"℃";
 			// 
 			// labelZone04RealTemp
 			// 
 			this->labelZone04RealTemp->AutoSize = true;
-			this->labelZone04RealTemp->Location = System::Drawing::Point(95, 31);
-			this->labelZone04RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone04RealTemp->Location = System::Drawing::Point(131, 41);
+			this->labelZone04RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone04RealTemp->Name = L"labelZone04RealTemp";
-			this->labelZone04RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone04RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone04RealTemp->TabIndex = 5;
 			this->labelZone04RealTemp->Text = L"0.0";
 			// 
 			// buttonZone04Switch
 			// 
-			this->buttonZone04Switch->Location = System::Drawing::Point(17, 94);
-			this->buttonZone04Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone04Switch->Location = System::Drawing::Point(29, 120);
+			this->buttonZone04Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone04Switch->Name = L"buttonZone04Switch";
-			this->buttonZone04Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone04Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone04Switch->TabIndex = 3;
 			this->buttonZone04Switch->Text = L"打开";
 			this->buttonZone04Switch->UseVisualStyleBackColor = true;
@@ -876,20 +881,20 @@ namespace HuskyNeo2Tool {
 			// label17
 			// 
 			this->label17->AutoSize = true;
-			this->label17->Location = System::Drawing::Point(17, 65);
-			this->label17->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label17->Location = System::Drawing::Point(23, 85);
+			this->label17->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label17->Name = L"label17";
-			this->label17->Size = System::Drawing::Size(88, 16);
+			this->label17->Size = System::Drawing::Size(120, 22);
 			this->label17->TabIndex = 1;
 			this->label17->Text = L"设定温度: ";
 			// 
 			// label18
 			// 
 			this->label18->AutoSize = true;
-			this->label18->Location = System::Drawing::Point(17, 31);
-			this->label18->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label18->Location = System::Drawing::Point(23, 41);
+			this->label18->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label18->Name = L"label18";
-			this->label18->Size = System::Drawing::Size(88, 16);
+			this->label18->Size = System::Drawing::Size(120, 22);
 			this->label18->TabIndex = 0;
 			this->label18->Text = L"实时温度: ";
 			// 
@@ -903,11 +908,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone11->Controls->Add(this->buttonZone11Switch);
 			this->groupBoxZone11->Controls->Add(this->label55);
 			this->groupBoxZone11->Controls->Add(this->label56);
-			this->groupBoxZone11->Location = System::Drawing::Point(366, 303);
-			this->groupBoxZone11->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone11->Location = System::Drawing::Point(504, 398);
+			this->groupBoxZone11->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone11->Name = L"groupBoxZone11";
-			this->groupBoxZone11->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone11->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone11->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone11->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone11->TabIndex = 0;
 			this->groupBoxZone11->TabStop = false;
 			this->groupBoxZone11->Text = L"Zone11";
@@ -915,48 +920,49 @@ namespace HuskyNeo2Tool {
 			// labelZone11Setpoint
 			// 
 			this->labelZone11Setpoint->AutoSize = true;
-			this->labelZone11Setpoint->Location = System::Drawing::Point(93, 66);
+			this->labelZone11Setpoint->Location = System::Drawing::Point(128, 86);
+			this->labelZone11Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone11Setpoint->Name = L"labelZone11Setpoint";
-			this->labelZone11Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone11Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone11Setpoint->TabIndex = 7;
 			this->labelZone11Setpoint->Text = L"0.0";
 			// 
 			// label52
 			// 
 			this->label52->AutoSize = true;
-			this->label52->Location = System::Drawing::Point(144, 66);
-			this->label52->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label52->Location = System::Drawing::Point(198, 86);
+			this->label52->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label52->Name = L"label52";
-			this->label52->Size = System::Drawing::Size(24, 16);
+			this->label52->Size = System::Drawing::Size(32, 22);
 			this->label52->TabIndex = 6;
 			this->label52->Text = L"℃";
 			// 
 			// label53
 			// 
 			this->label53->AutoSize = true;
-			this->label53->Location = System::Drawing::Point(144, 33);
-			this->label53->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label53->Location = System::Drawing::Point(198, 43);
+			this->label53->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label53->Name = L"label53";
-			this->label53->Size = System::Drawing::Size(24, 16);
+			this->label53->Size = System::Drawing::Size(32, 22);
 			this->label53->TabIndex = 6;
 			this->label53->Text = L"℃";
 			// 
 			// labelZone11RealTemp
 			// 
 			this->labelZone11RealTemp->AutoSize = true;
-			this->labelZone11RealTemp->Location = System::Drawing::Point(93, 32);
-			this->labelZone11RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone11RealTemp->Location = System::Drawing::Point(128, 42);
+			this->labelZone11RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone11RealTemp->Name = L"labelZone11RealTemp";
-			this->labelZone11RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone11RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone11RealTemp->TabIndex = 5;
 			this->labelZone11RealTemp->Text = L"0.0";
 			// 
 			// buttonZone11Switch
 			// 
-			this->buttonZone11Switch->Location = System::Drawing::Point(19, 96);
-			this->buttonZone11Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone11Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone11Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone11Switch->Name = L"buttonZone11Switch";
-			this->buttonZone11Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone11Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone11Switch->TabIndex = 3;
 			this->buttonZone11Switch->Text = L"打开";
 			this->buttonZone11Switch->UseVisualStyleBackColor = true;
@@ -965,20 +971,20 @@ namespace HuskyNeo2Tool {
 			// label55
 			// 
 			this->label55->AutoSize = true;
-			this->label55->Location = System::Drawing::Point(17, 65);
-			this->label55->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label55->Location = System::Drawing::Point(23, 85);
+			this->label55->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label55->Name = L"label55";
-			this->label55->Size = System::Drawing::Size(88, 16);
+			this->label55->Size = System::Drawing::Size(120, 22);
 			this->label55->TabIndex = 1;
 			this->label55->Text = L"设定温度: ";
 			// 
 			// label56
 			// 
 			this->label56->AutoSize = true;
-			this->label56->Location = System::Drawing::Point(17, 31);
-			this->label56->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label56->Location = System::Drawing::Point(23, 41);
+			this->label56->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label56->Name = L"label56";
-			this->label56->Size = System::Drawing::Size(88, 16);
+			this->label56->Size = System::Drawing::Size(120, 22);
 			this->label56->TabIndex = 0;
 			this->label56->Text = L"实时温度: ";
 			// 
@@ -992,11 +998,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone07->Controls->Add(this->buttonZone07Switch);
 			this->groupBoxZone07->Controls->Add(this->label35);
 			this->groupBoxZone07->Controls->Add(this->label36);
-			this->groupBoxZone07->Location = System::Drawing::Point(366, 160);
-			this->groupBoxZone07->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone07->Location = System::Drawing::Point(504, 210);
+			this->groupBoxZone07->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone07->Name = L"groupBoxZone07";
-			this->groupBoxZone07->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone07->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone07->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone07->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone07->TabIndex = 0;
 			this->groupBoxZone07->TabStop = false;
 			this->groupBoxZone07->Text = L"Zone07";
@@ -1004,48 +1010,49 @@ namespace HuskyNeo2Tool {
 			// labelZone07Setpoint
 			// 
 			this->labelZone07Setpoint->AutoSize = true;
-			this->labelZone07Setpoint->Location = System::Drawing::Point(93, 65);
+			this->labelZone07Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone07Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone07Setpoint->Name = L"labelZone07Setpoint";
-			this->labelZone07Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone07Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone07Setpoint->TabIndex = 7;
 			this->labelZone07Setpoint->Text = L"0.0";
 			// 
 			// label32
 			// 
 			this->label32->AutoSize = true;
-			this->label32->Location = System::Drawing::Point(142, 65);
-			this->label32->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label32->Location = System::Drawing::Point(196, 85);
+			this->label32->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label32->Name = L"label32";
-			this->label32->Size = System::Drawing::Size(24, 16);
+			this->label32->Size = System::Drawing::Size(32, 22);
 			this->label32->TabIndex = 6;
 			this->label32->Text = L"℃";
 			// 
 			// label33
 			// 
 			this->label33->AutoSize = true;
-			this->label33->Location = System::Drawing::Point(142, 32);
-			this->label33->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label33->Location = System::Drawing::Point(196, 42);
+			this->label33->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label33->Name = L"label33";
-			this->label33->Size = System::Drawing::Size(24, 16);
+			this->label33->Size = System::Drawing::Size(32, 22);
 			this->label33->TabIndex = 6;
 			this->label33->Text = L"℃";
 			// 
 			// labelZone07RealTemp
 			// 
 			this->labelZone07RealTemp->AutoSize = true;
-			this->labelZone07RealTemp->Location = System::Drawing::Point(93, 31);
-			this->labelZone07RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone07RealTemp->Location = System::Drawing::Point(128, 41);
+			this->labelZone07RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone07RealTemp->Name = L"labelZone07RealTemp";
-			this->labelZone07RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone07RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone07RealTemp->TabIndex = 5;
 			this->labelZone07RealTemp->Text = L"0.0";
 			// 
 			// buttonZone07Switch
 			// 
-			this->buttonZone07Switch->Location = System::Drawing::Point(19, 95);
-			this->buttonZone07Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone07Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone07Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone07Switch->Name = L"buttonZone07Switch";
-			this->buttonZone07Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone07Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone07Switch->TabIndex = 3;
 			this->buttonZone07Switch->Text = L"打开";
 			this->buttonZone07Switch->UseVisualStyleBackColor = true;
@@ -1054,20 +1061,20 @@ namespace HuskyNeo2Tool {
 			// label35
 			// 
 			this->label35->AutoSize = true;
-			this->label35->Location = System::Drawing::Point(17, 65);
-			this->label35->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label35->Location = System::Drawing::Point(23, 85);
+			this->label35->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label35->Name = L"label35";
-			this->label35->Size = System::Drawing::Size(88, 16);
+			this->label35->Size = System::Drawing::Size(120, 22);
 			this->label35->TabIndex = 1;
 			this->label35->Text = L"设定温度: ";
 			// 
 			// label36
 			// 
 			this->label36->AutoSize = true;
-			this->label36->Location = System::Drawing::Point(17, 31);
-			this->label36->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label36->Location = System::Drawing::Point(23, 41);
+			this->label36->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label36->Name = L"label36";
-			this->label36->Size = System::Drawing::Size(88, 16);
+			this->label36->Size = System::Drawing::Size(120, 22);
 			this->label36->TabIndex = 0;
 			this->label36->Text = L"实时温度: ";
 			// 
@@ -1081,11 +1088,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone03->Controls->Add(this->buttonZone03Switch);
 			this->groupBoxZone03->Controls->Add(this->label12);
 			this->groupBoxZone03->Controls->Add(this->label13);
-			this->groupBoxZone03->Location = System::Drawing::Point(366, 17);
-			this->groupBoxZone03->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone03->Location = System::Drawing::Point(504, 22);
+			this->groupBoxZone03->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone03->Name = L"groupBoxZone03";
-			this->groupBoxZone03->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone03->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone03->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone03->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone03->TabIndex = 0;
 			this->groupBoxZone03->TabStop = false;
 			this->groupBoxZone03->Text = L"Zone03";
@@ -1093,48 +1100,49 @@ namespace HuskyNeo2Tool {
 			// labelZone03Setpoint
 			// 
 			this->labelZone03Setpoint->AutoSize = true;
-			this->labelZone03Setpoint->Location = System::Drawing::Point(93, 65);
+			this->labelZone03Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone03Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone03Setpoint->Name = L"labelZone03Setpoint";
-			this->labelZone03Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone03Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone03Setpoint->TabIndex = 7;
 			this->labelZone03Setpoint->Text = L"0.0";
 			// 
 			// label9
 			// 
 			this->label9->AutoSize = true;
-			this->label9->Location = System::Drawing::Point(142, 65);
-			this->label9->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label9->Location = System::Drawing::Point(196, 85);
+			this->label9->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label9->Name = L"label9";
-			this->label9->Size = System::Drawing::Size(24, 16);
+			this->label9->Size = System::Drawing::Size(32, 22);
 			this->label9->TabIndex = 6;
 			this->label9->Text = L"℃";
 			// 
 			// label10
 			// 
 			this->label10->AutoSize = true;
-			this->label10->Location = System::Drawing::Point(142, 32);
-			this->label10->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label10->Location = System::Drawing::Point(196, 42);
+			this->label10->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label10->Name = L"label10";
-			this->label10->Size = System::Drawing::Size(24, 16);
+			this->label10->Size = System::Drawing::Size(32, 22);
 			this->label10->TabIndex = 6;
 			this->label10->Text = L"℃";
 			// 
 			// labelZone03RealTemp
 			// 
 			this->labelZone03RealTemp->AutoSize = true;
-			this->labelZone03RealTemp->Location = System::Drawing::Point(93, 31);
-			this->labelZone03RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone03RealTemp->Location = System::Drawing::Point(128, 41);
+			this->labelZone03RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone03RealTemp->Name = L"labelZone03RealTemp";
-			this->labelZone03RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone03RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone03RealTemp->TabIndex = 5;
 			this->labelZone03RealTemp->Text = L"0.0";
 			// 
 			// buttonZone03Switch
 			// 
-			this->buttonZone03Switch->Location = System::Drawing::Point(20, 94);
-			this->buttonZone03Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone03Switch->Location = System::Drawing::Point(29, 120);
+			this->buttonZone03Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone03Switch->Name = L"buttonZone03Switch";
-			this->buttonZone03Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone03Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone03Switch->TabIndex = 3;
 			this->buttonZone03Switch->Text = L"打开";
 			this->buttonZone03Switch->UseVisualStyleBackColor = true;
@@ -1143,20 +1151,20 @@ namespace HuskyNeo2Tool {
 			// label12
 			// 
 			this->label12->AutoSize = true;
-			this->label12->Location = System::Drawing::Point(17, 65);
-			this->label12->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label12->Location = System::Drawing::Point(23, 85);
+			this->label12->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label12->Name = L"label12";
-			this->label12->Size = System::Drawing::Size(88, 16);
+			this->label12->Size = System::Drawing::Size(120, 22);
 			this->label12->TabIndex = 1;
 			this->label12->Text = L"设定温度: ";
 			// 
 			// label13
 			// 
 			this->label13->AutoSize = true;
-			this->label13->Location = System::Drawing::Point(17, 31);
-			this->label13->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label13->Location = System::Drawing::Point(23, 41);
+			this->label13->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label13->Name = L"label13";
-			this->label13->Size = System::Drawing::Size(88, 16);
+			this->label13->Size = System::Drawing::Size(120, 22);
 			this->label13->TabIndex = 0;
 			this->label13->Text = L"实时温度: ";
 			// 
@@ -1170,11 +1178,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone10->Controls->Add(this->buttonZone10Switch);
 			this->groupBoxZone10->Controls->Add(this->label50);
 			this->groupBoxZone10->Controls->Add(this->label51);
-			this->groupBoxZone10->Location = System::Drawing::Point(188, 303);
-			this->groupBoxZone10->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone10->Location = System::Drawing::Point(259, 398);
+			this->groupBoxZone10->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone10->Name = L"groupBoxZone10";
-			this->groupBoxZone10->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone10->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone10->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone10->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone10->TabIndex = 0;
 			this->groupBoxZone10->TabStop = false;
 			this->groupBoxZone10->Text = L"Zone10";
@@ -1182,48 +1190,49 @@ namespace HuskyNeo2Tool {
 			// labelZone10Setpoint
 			// 
 			this->labelZone10Setpoint->AutoSize = true;
-			this->labelZone10Setpoint->Location = System::Drawing::Point(93, 65);
+			this->labelZone10Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone10Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone10Setpoint->Name = L"labelZone10Setpoint";
-			this->labelZone10Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone10Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone10Setpoint->TabIndex = 7;
 			this->labelZone10Setpoint->Text = L"0.0";
 			// 
 			// label47
 			// 
 			this->label47->AutoSize = true;
-			this->label47->Location = System::Drawing::Point(142, 65);
-			this->label47->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label47->Location = System::Drawing::Point(196, 85);
+			this->label47->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label47->Name = L"label47";
-			this->label47->Size = System::Drawing::Size(24, 16);
+			this->label47->Size = System::Drawing::Size(32, 22);
 			this->label47->TabIndex = 6;
 			this->label47->Text = L"℃";
 			// 
 			// label48
 			// 
 			this->label48->AutoSize = true;
-			this->label48->Location = System::Drawing::Point(142, 32);
-			this->label48->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label48->Location = System::Drawing::Point(196, 42);
+			this->label48->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label48->Name = L"label48";
-			this->label48->Size = System::Drawing::Size(24, 16);
+			this->label48->Size = System::Drawing::Size(32, 22);
 			this->label48->TabIndex = 6;
 			this->label48->Text = L"℃";
 			// 
 			// labelZone10RealTemp
 			// 
 			this->labelZone10RealTemp->AutoSize = true;
-			this->labelZone10RealTemp->Location = System::Drawing::Point(93, 31);
-			this->labelZone10RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone10RealTemp->Location = System::Drawing::Point(128, 41);
+			this->labelZone10RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone10RealTemp->Name = L"labelZone10RealTemp";
-			this->labelZone10RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone10RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone10RealTemp->TabIndex = 5;
 			this->labelZone10RealTemp->Text = L"0.0";
 			// 
 			// buttonZone10Switch
 			// 
-			this->buttonZone10Switch->Location = System::Drawing::Point(20, 96);
-			this->buttonZone10Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone10Switch->Location = System::Drawing::Point(29, 122);
+			this->buttonZone10Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone10Switch->Name = L"buttonZone10Switch";
-			this->buttonZone10Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone10Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone10Switch->TabIndex = 3;
 			this->buttonZone10Switch->Text = L"打开";
 			this->buttonZone10Switch->UseVisualStyleBackColor = true;
@@ -1232,20 +1241,20 @@ namespace HuskyNeo2Tool {
 			// label50
 			// 
 			this->label50->AutoSize = true;
-			this->label50->Location = System::Drawing::Point(17, 65);
-			this->label50->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label50->Location = System::Drawing::Point(23, 85);
+			this->label50->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label50->Name = L"label50";
-			this->label50->Size = System::Drawing::Size(88, 16);
+			this->label50->Size = System::Drawing::Size(120, 22);
 			this->label50->TabIndex = 1;
 			this->label50->Text = L"设定温度: ";
 			// 
 			// label51
 			// 
 			this->label51->AutoSize = true;
-			this->label51->Location = System::Drawing::Point(17, 31);
-			this->label51->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label51->Location = System::Drawing::Point(23, 41);
+			this->label51->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label51->Name = L"label51";
-			this->label51->Size = System::Drawing::Size(88, 16);
+			this->label51->Size = System::Drawing::Size(120, 22);
 			this->label51->TabIndex = 0;
 			this->label51->Text = L"实时温度: ";
 			// 
@@ -1259,11 +1268,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone09->Controls->Add(this->buttonZone09Switch);
 			this->groupBoxZone09->Controls->Add(this->label45);
 			this->groupBoxZone09->Controls->Add(this->label46);
-			this->groupBoxZone09->Location = System::Drawing::Point(10, 303);
-			this->groupBoxZone09->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone09->Location = System::Drawing::Point(13, 398);
+			this->groupBoxZone09->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone09->Name = L"groupBoxZone09";
-			this->groupBoxZone09->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone09->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone09->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone09->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone09->TabIndex = 0;
 			this->groupBoxZone09->TabStop = false;
 			this->groupBoxZone09->Text = L"Zone09";
@@ -1271,48 +1280,49 @@ namespace HuskyNeo2Tool {
 			// labelZone09Setpoint
 			// 
 			this->labelZone09Setpoint->AutoSize = true;
-			this->labelZone09Setpoint->Location = System::Drawing::Point(94, 65);
+			this->labelZone09Setpoint->Location = System::Drawing::Point(130, 85);
+			this->labelZone09Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone09Setpoint->Name = L"labelZone09Setpoint";
-			this->labelZone09Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone09Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone09Setpoint->TabIndex = 7;
 			this->labelZone09Setpoint->Text = L"0.0";
 			// 
 			// label42
 			// 
 			this->label42->AutoSize = true;
-			this->label42->Location = System::Drawing::Point(143, 65);
-			this->label42->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label42->Location = System::Drawing::Point(197, 85);
+			this->label42->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label42->Name = L"label42";
-			this->label42->Size = System::Drawing::Size(24, 16);
+			this->label42->Size = System::Drawing::Size(32, 22);
 			this->label42->TabIndex = 6;
 			this->label42->Text = L"℃";
 			// 
 			// label43
 			// 
 			this->label43->AutoSize = true;
-			this->label43->Location = System::Drawing::Point(143, 32);
-			this->label43->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label43->Location = System::Drawing::Point(197, 42);
+			this->label43->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label43->Name = L"label43";
-			this->label43->Size = System::Drawing::Size(24, 16);
+			this->label43->Size = System::Drawing::Size(32, 22);
 			this->label43->TabIndex = 6;
 			this->label43->Text = L"℃";
 			// 
 			// labelZone09RealTemp
 			// 
 			this->labelZone09RealTemp->AutoSize = true;
-			this->labelZone09RealTemp->Location = System::Drawing::Point(94, 31);
-			this->labelZone09RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone09RealTemp->Location = System::Drawing::Point(130, 41);
+			this->labelZone09RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone09RealTemp->Name = L"labelZone09RealTemp";
-			this->labelZone09RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone09RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone09RealTemp->TabIndex = 5;
 			this->labelZone09RealTemp->Text = L"0.0";
 			// 
 			// buttonZone09Switch
 			// 
-			this->buttonZone09Switch->Location = System::Drawing::Point(20, 96);
-			this->buttonZone09Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone09Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone09Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone09Switch->Name = L"buttonZone09Switch";
-			this->buttonZone09Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone09Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone09Switch->TabIndex = 3;
 			this->buttonZone09Switch->Text = L"打开";
 			this->buttonZone09Switch->UseVisualStyleBackColor = true;
@@ -1321,20 +1331,20 @@ namespace HuskyNeo2Tool {
 			// label45
 			// 
 			this->label45->AutoSize = true;
-			this->label45->Location = System::Drawing::Point(17, 65);
-			this->label45->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label45->Location = System::Drawing::Point(23, 85);
+			this->label45->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label45->Name = L"label45";
-			this->label45->Size = System::Drawing::Size(88, 16);
+			this->label45->Size = System::Drawing::Size(120, 22);
 			this->label45->TabIndex = 1;
 			this->label45->Text = L"设定温度: ";
 			// 
 			// label46
 			// 
 			this->label46->AutoSize = true;
-			this->label46->Location = System::Drawing::Point(17, 31);
-			this->label46->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label46->Location = System::Drawing::Point(23, 41);
+			this->label46->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label46->Name = L"label46";
-			this->label46->Size = System::Drawing::Size(88, 16);
+			this->label46->Size = System::Drawing::Size(120, 22);
 			this->label46->TabIndex = 0;
 			this->label46->Text = L"实时温度: ";
 			// 
@@ -1348,11 +1358,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone06->Controls->Add(this->buttonZone06Switch);
 			this->groupBoxZone06->Controls->Add(this->label30);
 			this->groupBoxZone06->Controls->Add(this->label31);
-			this->groupBoxZone06->Location = System::Drawing::Point(188, 160);
-			this->groupBoxZone06->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone06->Location = System::Drawing::Point(259, 210);
+			this->groupBoxZone06->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone06->Name = L"groupBoxZone06";
-			this->groupBoxZone06->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone06->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone06->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone06->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone06->TabIndex = 0;
 			this->groupBoxZone06->TabStop = false;
 			this->groupBoxZone06->Text = L"Zone06";
@@ -1360,48 +1370,49 @@ namespace HuskyNeo2Tool {
 			// labelZone06Setpoint
 			// 
 			this->labelZone06Setpoint->AutoSize = true;
-			this->labelZone06Setpoint->Location = System::Drawing::Point(93, 65);
+			this->labelZone06Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone06Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone06Setpoint->Name = L"labelZone06Setpoint";
-			this->labelZone06Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone06Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone06Setpoint->TabIndex = 7;
 			this->labelZone06Setpoint->Text = L"0.0";
 			// 
 			// label24
 			// 
 			this->label24->AutoSize = true;
-			this->label24->Location = System::Drawing::Point(142, 65);
-			this->label24->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label24->Location = System::Drawing::Point(196, 85);
+			this->label24->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label24->Name = L"label24";
-			this->label24->Size = System::Drawing::Size(24, 16);
+			this->label24->Size = System::Drawing::Size(32, 22);
 			this->label24->TabIndex = 6;
 			this->label24->Text = L"℃";
 			// 
 			// label25
 			// 
 			this->label25->AutoSize = true;
-			this->label25->Location = System::Drawing::Point(142, 32);
-			this->label25->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label25->Location = System::Drawing::Point(196, 42);
+			this->label25->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label25->Name = L"label25";
-			this->label25->Size = System::Drawing::Size(24, 16);
+			this->label25->Size = System::Drawing::Size(32, 22);
 			this->label25->TabIndex = 6;
 			this->label25->Text = L"℃";
 			// 
 			// labelZone06RealTemp
 			// 
 			this->labelZone06RealTemp->AutoSize = true;
-			this->labelZone06RealTemp->Location = System::Drawing::Point(93, 31);
-			this->labelZone06RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone06RealTemp->Location = System::Drawing::Point(128, 41);
+			this->labelZone06RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone06RealTemp->Name = L"labelZone06RealTemp";
-			this->labelZone06RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone06RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone06RealTemp->TabIndex = 5;
 			this->labelZone06RealTemp->Text = L"0.0";
 			// 
 			// buttonZone06Switch
 			// 
-			this->buttonZone06Switch->Location = System::Drawing::Point(17, 95);
-			this->buttonZone06Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone06Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone06Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone06Switch->Name = L"buttonZone06Switch";
-			this->buttonZone06Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone06Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone06Switch->TabIndex = 3;
 			this->buttonZone06Switch->Text = L"打开";
 			this->buttonZone06Switch->UseVisualStyleBackColor = true;
@@ -1410,20 +1421,20 @@ namespace HuskyNeo2Tool {
 			// label30
 			// 
 			this->label30->AutoSize = true;
-			this->label30->Location = System::Drawing::Point(17, 65);
-			this->label30->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label30->Location = System::Drawing::Point(23, 85);
+			this->label30->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label30->Name = L"label30";
-			this->label30->Size = System::Drawing::Size(88, 16);
+			this->label30->Size = System::Drawing::Size(120, 22);
 			this->label30->TabIndex = 1;
 			this->label30->Text = L"设定温度: ";
 			// 
 			// label31
 			// 
 			this->label31->AutoSize = true;
-			this->label31->Location = System::Drawing::Point(17, 31);
-			this->label31->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label31->Location = System::Drawing::Point(23, 41);
+			this->label31->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label31->Name = L"label31";
-			this->label31->Size = System::Drawing::Size(88, 16);
+			this->label31->Size = System::Drawing::Size(120, 22);
 			this->label31->TabIndex = 0;
 			this->label31->Text = L"实时温度: ";
 			// 
@@ -1437,11 +1448,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone05->Controls->Add(this->buttonZone05Switch);
 			this->groupBoxZone05->Controls->Add(this->label22);
 			this->groupBoxZone05->Controls->Add(this->label23);
-			this->groupBoxZone05->Location = System::Drawing::Point(10, 160);
-			this->groupBoxZone05->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone05->Location = System::Drawing::Point(13, 210);
+			this->groupBoxZone05->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone05->Name = L"groupBoxZone05";
-			this->groupBoxZone05->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone05->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone05->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone05->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone05->TabIndex = 0;
 			this->groupBoxZone05->TabStop = false;
 			this->groupBoxZone05->Text = L"Zone05";
@@ -1449,48 +1460,49 @@ namespace HuskyNeo2Tool {
 			// labelZone05Setpoint
 			// 
 			this->labelZone05Setpoint->AutoSize = true;
-			this->labelZone05Setpoint->Location = System::Drawing::Point(94, 65);
+			this->labelZone05Setpoint->Location = System::Drawing::Point(130, 85);
+			this->labelZone05Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone05Setpoint->Name = L"labelZone05Setpoint";
-			this->labelZone05Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone05Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone05Setpoint->TabIndex = 7;
 			this->labelZone05Setpoint->Text = L"0.0";
 			// 
 			// label19
 			// 
 			this->label19->AutoSize = true;
-			this->label19->Location = System::Drawing::Point(143, 65);
-			this->label19->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label19->Location = System::Drawing::Point(197, 85);
+			this->label19->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label19->Name = L"label19";
-			this->label19->Size = System::Drawing::Size(24, 16);
+			this->label19->Size = System::Drawing::Size(32, 22);
 			this->label19->TabIndex = 6;
 			this->label19->Text = L"℃";
 			// 
 			// label20
 			// 
 			this->label20->AutoSize = true;
-			this->label20->Location = System::Drawing::Point(143, 32);
-			this->label20->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label20->Location = System::Drawing::Point(197, 42);
+			this->label20->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label20->Name = L"label20";
-			this->label20->Size = System::Drawing::Size(24, 16);
+			this->label20->Size = System::Drawing::Size(32, 22);
 			this->label20->TabIndex = 6;
 			this->label20->Text = L"℃";
 			// 
 			// labelZone05RealTemp
 			// 
 			this->labelZone05RealTemp->AutoSize = true;
-			this->labelZone05RealTemp->Location = System::Drawing::Point(94, 31);
-			this->labelZone05RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone05RealTemp->Location = System::Drawing::Point(130, 41);
+			this->labelZone05RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone05RealTemp->Name = L"labelZone05RealTemp";
-			this->labelZone05RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone05RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone05RealTemp->TabIndex = 5;
 			this->labelZone05RealTemp->Text = L"0.0";
 			// 
 			// buttonZone05Switch
 			// 
-			this->buttonZone05Switch->Location = System::Drawing::Point(20, 95);
-			this->buttonZone05Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone05Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone05Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone05Switch->Name = L"buttonZone05Switch";
-			this->buttonZone05Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone05Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone05Switch->TabIndex = 3;
 			this->buttonZone05Switch->Text = L"打开";
 			this->buttonZone05Switch->UseVisualStyleBackColor = true;
@@ -1499,20 +1511,20 @@ namespace HuskyNeo2Tool {
 			// label22
 			// 
 			this->label22->AutoSize = true;
-			this->label22->Location = System::Drawing::Point(17, 65);
-			this->label22->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label22->Location = System::Drawing::Point(23, 85);
+			this->label22->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label22->Name = L"label22";
-			this->label22->Size = System::Drawing::Size(88, 16);
+			this->label22->Size = System::Drawing::Size(120, 22);
 			this->label22->TabIndex = 1;
 			this->label22->Text = L"设定温度: ";
 			// 
 			// label23
 			// 
 			this->label23->AutoSize = true;
-			this->label23->Location = System::Drawing::Point(17, 31);
-			this->label23->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label23->Location = System::Drawing::Point(23, 41);
+			this->label23->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label23->Name = L"label23";
-			this->label23->Size = System::Drawing::Size(88, 16);
+			this->label23->Size = System::Drawing::Size(120, 22);
 			this->label23->TabIndex = 0;
 			this->label23->Text = L"实时温度: ";
 			// 
@@ -1526,11 +1538,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone02->Controls->Add(this->buttonZone02Switch);
 			this->groupBoxZone02->Controls->Add(this->label7);
 			this->groupBoxZone02->Controls->Add(this->label8);
-			this->groupBoxZone02->Location = System::Drawing::Point(188, 17);
-			this->groupBoxZone02->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone02->Location = System::Drawing::Point(259, 22);
+			this->groupBoxZone02->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone02->Name = L"groupBoxZone02";
-			this->groupBoxZone02->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone02->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone02->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone02->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone02->TabIndex = 0;
 			this->groupBoxZone02->TabStop = false;
 			this->groupBoxZone02->Text = L"Zone02";
@@ -1538,48 +1550,49 @@ namespace HuskyNeo2Tool {
 			// labelZone02Setpoint
 			// 
 			this->labelZone02Setpoint->AutoSize = true;
-			this->labelZone02Setpoint->Location = System::Drawing::Point(93, 65);
+			this->labelZone02Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone02Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone02Setpoint->Name = L"labelZone02Setpoint";
-			this->labelZone02Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone02Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone02Setpoint->TabIndex = 7;
 			this->labelZone02Setpoint->Text = L"0.0";
 			// 
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(142, 65);
-			this->label4->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label4->Location = System::Drawing::Point(196, 85);
+			this->label4->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label4->Name = L"label4";
-			this->label4->Size = System::Drawing::Size(24, 16);
+			this->label4->Size = System::Drawing::Size(32, 22);
 			this->label4->TabIndex = 6;
 			this->label4->Text = L"℃";
 			// 
 			// label5
 			// 
 			this->label5->AutoSize = true;
-			this->label5->Location = System::Drawing::Point(142, 32);
-			this->label5->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label5->Location = System::Drawing::Point(196, 42);
+			this->label5->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(24, 16);
+			this->label5->Size = System::Drawing::Size(32, 22);
 			this->label5->TabIndex = 6;
 			this->label5->Text = L"℃";
 			// 
 			// labelZone02RealTemp
 			// 
 			this->labelZone02RealTemp->AutoSize = true;
-			this->labelZone02RealTemp->Location = System::Drawing::Point(93, 31);
-			this->labelZone02RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone02RealTemp->Location = System::Drawing::Point(128, 41);
+			this->labelZone02RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone02RealTemp->Name = L"labelZone02RealTemp";
-			this->labelZone02RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone02RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone02RealTemp->TabIndex = 5;
 			this->labelZone02RealTemp->Text = L"0.0";
 			// 
 			// buttonZone02Switch
 			// 
-			this->buttonZone02Switch->Location = System::Drawing::Point(20, 94);
-			this->buttonZone02Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone02Switch->Location = System::Drawing::Point(29, 120);
+			this->buttonZone02Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone02Switch->Name = L"buttonZone02Switch";
-			this->buttonZone02Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone02Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone02Switch->TabIndex = 3;
 			this->buttonZone02Switch->Text = L"打开";
 			this->buttonZone02Switch->UseVisualStyleBackColor = true;
@@ -1588,20 +1601,20 @@ namespace HuskyNeo2Tool {
 			// label7
 			// 
 			this->label7->AutoSize = true;
-			this->label7->Location = System::Drawing::Point(17, 65);
-			this->label7->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label7->Location = System::Drawing::Point(23, 85);
+			this->label7->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label7->Name = L"label7";
-			this->label7->Size = System::Drawing::Size(88, 16);
+			this->label7->Size = System::Drawing::Size(120, 22);
 			this->label7->TabIndex = 1;
 			this->label7->Text = L"设定温度: ";
 			// 
 			// label8
 			// 
 			this->label8->AutoSize = true;
-			this->label8->Location = System::Drawing::Point(17, 31);
-			this->label8->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label8->Location = System::Drawing::Point(23, 41);
+			this->label8->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label8->Name = L"label8";
-			this->label8->Size = System::Drawing::Size(88, 16);
+			this->label8->Size = System::Drawing::Size(120, 22);
 			this->label8->TabIndex = 0;
 			this->label8->Text = L"实时温度: ";
 			// 
@@ -1615,11 +1628,11 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone01->Controls->Add(this->buttonZone01Switch);
 			this->groupBoxZone01->Controls->Add(this->label3);
 			this->groupBoxZone01->Controls->Add(this->label2);
-			this->groupBoxZone01->Location = System::Drawing::Point(10, 17);
-			this->groupBoxZone01->Margin = System::Windows::Forms::Padding(4);
+			this->groupBoxZone01->Location = System::Drawing::Point(13, 22);
+			this->groupBoxZone01->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone01->Name = L"groupBoxZone01";
-			this->groupBoxZone01->Padding = System::Windows::Forms::Padding(4);
-			this->groupBoxZone01->Size = System::Drawing::Size(175, 135);
+			this->groupBoxZone01->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->groupBoxZone01->Size = System::Drawing::Size(241, 176);
 			this->groupBoxZone01->TabIndex = 0;
 			this->groupBoxZone01->TabStop = false;
 			this->groupBoxZone01->Text = L"Zone01";
@@ -1627,48 +1640,49 @@ namespace HuskyNeo2Tool {
 			// labelZone01Setpoint
 			// 
 			this->labelZone01Setpoint->AutoSize = true;
-			this->labelZone01Setpoint->Location = System::Drawing::Point(94, 65);
+			this->labelZone01Setpoint->Location = System::Drawing::Point(130, 85);
+			this->labelZone01Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone01Setpoint->Name = L"labelZone01Setpoint";
-			this->labelZone01Setpoint->Size = System::Drawing::Size(32, 16);
+			this->labelZone01Setpoint->Size = System::Drawing::Size(43, 22);
 			this->labelZone01Setpoint->TabIndex = 7;
 			this->labelZone01Setpoint->Text = L"0.0";
 			// 
 			// label28
 			// 
 			this->label28->AutoSize = true;
-			this->label28->Location = System::Drawing::Point(142, 65);
-			this->label28->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label28->Location = System::Drawing::Point(196, 85);
+			this->label28->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label28->Name = L"label28";
-			this->label28->Size = System::Drawing::Size(24, 16);
+			this->label28->Size = System::Drawing::Size(32, 22);
 			this->label28->TabIndex = 6;
 			this->label28->Text = L"℃";
 			// 
 			// label27
 			// 
 			this->label27->AutoSize = true;
-			this->label27->Location = System::Drawing::Point(142, 32);
-			this->label27->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label27->Location = System::Drawing::Point(196, 42);
+			this->label27->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label27->Name = L"label27";
-			this->label27->Size = System::Drawing::Size(24, 16);
+			this->label27->Size = System::Drawing::Size(32, 22);
 			this->label27->TabIndex = 6;
 			this->label27->Text = L"℃";
 			// 
 			// labelZone01RealTemp
 			// 
 			this->labelZone01RealTemp->AutoSize = true;
-			this->labelZone01RealTemp->Location = System::Drawing::Point(93, 31);
-			this->labelZone01RealTemp->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelZone01RealTemp->Location = System::Drawing::Point(128, 41);
+			this->labelZone01RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone01RealTemp->Name = L"labelZone01RealTemp";
-			this->labelZone01RealTemp->Size = System::Drawing::Size(32, 16);
+			this->labelZone01RealTemp->Size = System::Drawing::Size(43, 22);
 			this->labelZone01RealTemp->TabIndex = 5;
 			this->labelZone01RealTemp->Text = L"0.0";
 			// 
 			// buttonZone01Switch
 			// 
-			this->buttonZone01Switch->Location = System::Drawing::Point(17, 94);
-			this->buttonZone01Switch->Margin = System::Windows::Forms::Padding(4);
+			this->buttonZone01Switch->Location = System::Drawing::Point(29, 120);
+			this->buttonZone01Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone01Switch->Name = L"buttonZone01Switch";
-			this->buttonZone01Switch->Size = System::Drawing::Size(88, 31);
+			this->buttonZone01Switch->Size = System::Drawing::Size(121, 41);
 			this->buttonZone01Switch->TabIndex = 3;
 			this->buttonZone01Switch->Text = L"打开";
 			this->buttonZone01Switch->UseVisualStyleBackColor = true;
@@ -1677,34 +1691,34 @@ namespace HuskyNeo2Tool {
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(17, 65);
-			this->label3->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label3->Location = System::Drawing::Point(23, 85);
+			this->label3->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(88, 16);
+			this->label3->Size = System::Drawing::Size(120, 22);
 			this->label3->TabIndex = 1;
 			this->label3->Text = L"设定温度: ";
 			// 
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(17, 31);
-			this->label2->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->label2->Location = System::Drawing::Point(23, 41);
+			this->label2->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(88, 16);
+			this->label2->Size = System::Drawing::Size(120, 22);
 			this->label2->TabIndex = 0;
 			this->label2->Text = L"实时温度: ";
 			// 
 			// Form1
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
+			this->AutoScaleDimensions = System::Drawing::SizeF(11, 21);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(764, 560);
+			this->ClientSize = System::Drawing::Size(1026, 733);
 			this->Controls->Add(this->groupBoxZones);
 			this->Controls->Add(this->groupBox1);
-			this->Font = (gcnew System::Drawing::Font(L"宋体", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(134)));
-			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
+			this->Font = (gcnew System::Drawing::Font(L"宋体", 16, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(134)));
+			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedToolWindow;
 			this->KeyPreview = true;
-			this->Margin = System::Windows::Forms::Padding(4);
+			this->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->MaximizeBox = false;
 			this->Name = L"Form1";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
