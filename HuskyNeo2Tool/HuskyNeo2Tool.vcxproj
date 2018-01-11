@@ -132,6 +132,7 @@
     <ClCompile Include="IpConfigure.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="SetAllZonesTemperatureForm.cpp" />
+    <ClCompile Include="SetTempInProgressForm.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -154,6 +155,9 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SerialPort.h" />
     <ClInclude Include="SetAllZonesTemperatureForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="SetTempInProgressForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
@@ -179,6 +183,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SetAllZonesTemperatureForm.resx">
       <DependentUpon>SetAllZonesTemperatureForm.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetTempInProgressForm.resx">
+      <DependentUpon>SetTempInProgressForm.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

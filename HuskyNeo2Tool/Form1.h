@@ -5,7 +5,7 @@
 #pragma comment(lib, "ws2_32.lib")  //加载 ws2_32.dll
 #include "Husky.h"
 #include "IpConfigure.h"
-#include "AllZonesTemperatureSetting.h"
+#include "SetTempInProgressForm.h"
 #include "SetAllZonesTemperatureForm.h"
 #include "AlarmStatusWindow.h"
 
@@ -20,6 +20,7 @@ namespace HuskyNeo2Tool {
 	using namespace System::Data;
 	using namespace System::Drawing;
 	using namespace System::Threading;
+	using namespace System::Diagnostics;
 
 	/// <summary>
 	/// Form1 摘要
@@ -39,7 +40,6 @@ namespace HuskyNeo2Tool {
 
 			ipConfig = gcnew IpConfigure();
 			huskys = gcnew array<Husky*, 1>(HUSKY_DEV_NUM);
-
 
 			textBoxIpConfigs = gcnew array<System::Windows::Forms::TextBox^, 1>(HUSKY_DEV_NUM);
 			textBoxIpConfigs[0] = ipConfig->textBox1;
@@ -128,19 +128,22 @@ namespace HuskyNeo2Tool {
 			//currentHusky = huskys[0];
 			currentHusky = new Husky();
 			alarmStatusWindow = gcnew AlarmStatusWindow();
+			setAllZonesTemperatureForm = gcnew SetAllZonesTemperatureForm();
+			setTempInProgressForm = gcnew SetTempInProgressForm();
 
 			realtimeTemperatureUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::realtimeTemperatureUiUpdateMethod);
 			setpointUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::setpointUiUpdateMethod);
 			zoneSwitchUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::zoneSwitchUiUpdateMethod);
 			myShowAlarmMsg = gcnew showAlarmMsg(this, &HuskyNeo2Tool::Form1::showAlarmMsgMethod);
-			
-			Thread ^t1 = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::UiUpdateThread));
-			t1->IsBackground = true;
-			t1->Start();
+			setTempProgressUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::setTempProgressUiUpdateMethod);
 
-			Thread ^t2 = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::alarmStatusCheckingThread));
+			t2 = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::alarmStatusCheckingThread));
 			t2->IsBackground = true;
 			t2->Start();
+
+			t1 = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::UiUpdateThread));
+			t1->IsBackground = true;
+			t1->Start();
 		}
 
 	protected:
@@ -149,6 +152,17 @@ namespace HuskyNeo2Tool {
 		/// </summary>
 		~Form1()
 		{
+			if (currentHusky && currentHusky->isConnected())
+				currentHusky->disconnect();
+			if (t2 && t2->IsAlive)
+				t2->Abort();
+			if (t1->IsAlive)
+				t1->Abort();
+			if (readTemperatureButtonThread && readTemperatureButtonThread->IsAlive)
+				readTemperatureButtonThread->Abort();
+			if (setTemperatureButtonThread && setTemperatureButtonThread->IsAlive)
+				setTemperatureButtonThread->Abort();
+
 			if (components)
 				delete components;
 
@@ -166,12 +180,20 @@ namespace HuskyNeo2Tool {
 		array<System::Windows::Forms::Button^, 1>^ buttonZonesSwitchArray;
 		Husky *currentHusky;
 		AlarmStatusWindow^ alarmStatusWindow;
+		SetAllZonesTemperatureForm^ setAllZonesTemperatureForm;
+		SetTempInProgressForm^ setTempInProgressForm;
+		String^ failedZones;
+		Thread ^readTemperatureButtonThread;
+		Thread ^setTemperatureButtonThread;
+		Thread ^t2;
+		Thread ^t1;
 
 	private: // UI Update
 		delegate void UiUpdate(int i, float value);
 		UiUpdate^ realtimeTemperatureUiUpdate;
 		UiUpdate^ setpointUiUpdate;
 		UiUpdate^ zoneSwitchUiUpdate;
+		UiUpdate^ setTempProgressUiUpdate;
 	
 		void realtimeTemperatureUiUpdateMethod(int i, float value)
 		{
@@ -189,6 +211,15 @@ namespace HuskyNeo2Tool {
 			else
 				this->buttonZonesSwitchArray[i]->Text = L"关闭";
 		}
+		// value: 0 -> close Progress window;
+		void setTempProgressUiUpdateMethod(int i, float value)
+		{
+			if (value == 0) {
+				setTempInProgressForm->Close();
+			} else {
+				MessageBox::Show("Zones: " + failedZones + " 温度设置失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+			}
+		}
 
 		void UiUpdateThread()
 		{
@@ -199,9 +230,12 @@ namespace HuskyNeo2Tool {
 					continue;
 				}
 
-				if (tmp % 5 == 0) { // update UI every 3 * 5 = 15S
-					tmp = 0;
+				if (tmp % 10 == 0) { // update UI every 3 * 10 = 30S
+					tmp = 1;
 					for (int i = 0; i < 12; i++) {
+						if (currentHusky == NULL || !currentHusky->isConnected()) {
+							break;
+						}
 						float temperature = currentHusky->getTemperature(i + 1);
 						// C = (F - 32) / 1.8
 						temperature = (temperature - 32) / 1.8;
@@ -212,26 +246,80 @@ namespace HuskyNeo2Tool {
 					}
 
 					for (int i = 0; i < 12; i++) {
+						if (currentHusky == NULL || !currentHusky->isConnected()) {
+							break;
+						}
 						if (currentHusky->getZoneOnOff(i + 1)) {
 							this->Invoke(this->zoneSwitchUiUpdate, i, 0);
 						} else {
 							this->Invoke(this->zoneSwitchUiUpdate, i, 1);
 						}
-						//Sleep(100);
+						Sleep(100);
 					}
 				} else
 					tmp++;
 
 				for (int i = 0; i < 12; i++) {
+					if (currentHusky == NULL || !currentHusky->isConnected()) {
+						break;
+					}
 					float realtimeTemperature = currentHusky->getRealtimeTemperature(i + 1);
-					realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-					int tmp = realtimeTemperature * 10 + 0.5;
-					realtimeTemperature = (float)tmp / 10;
-					this->Invoke(this->realtimeTemperatureUiUpdate, i, realtimeTemperature);
-					Sleep(100); // 1s?
+					if (realtimeTemperature == 0) {
+						this->Invoke(this->realtimeTemperatureUiUpdate, i, 0);
+					} else {
+						realtimeTemperature = (realtimeTemperature - 32) / 1.8;
+						int tmp = realtimeTemperature * 10 + 0.5;
+						realtimeTemperature = (float)tmp / 10;
+						this->Invoke(this->realtimeTemperatureUiUpdate, i, realtimeTemperature);
+					}
+					Sleep(100);
 				}
 				Sleep(3000); // 3s?
 			} while (1);
+		}
+
+		void ReadTemperatureButtonThread()
+		{
+			if (currentHusky == NULL || !currentHusky->isConnected()) {
+				return;
+			}
+			for (int i = 0; i < 12; i++) {
+				if (currentHusky == NULL || !currentHusky->isConnected()) {
+					break;
+				}
+				float temperature = currentHusky->getTemperature(i + 1);
+				// C = (F - 32) / 1.8
+				temperature = (temperature - 32) / 1.8;
+				int tmp = temperature * 10 + 0.5;
+				temperature = (float)tmp / 10;
+				//this->labelZonesSetpoint[i]->Text = temperature.ToString();
+				this->Invoke(this->setpointUiUpdate, i, temperature);
+			}
+		}
+		void SetTemperatureButtonThread()
+		{
+			if (currentHusky == NULL || !currentHusky->isConnected()) {
+				return;
+			}
+
+			failedZones = "";
+			for (int i = 0; i < 12; i++) {
+				if (setAllZonesTemperatureForm->checkBoxAllZonesArray[i]->Checked) {
+					float temperature = Convert::ToDouble(setAllZonesTemperatureForm->textBoxTemperature->Text);
+					// F -> C: F = 32 + C * 1.8;
+					float Fahrenheit = 32 + temperature * 1.8;
+					if (currentHusky->setTemperature(Fahrenheit, i + 1) == FALSE)
+						failedZones = failedZones + (i + 1) + " ";
+						//MessageBox::Show("Zone" + (i+1) + " 设置温度失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+					else
+						this->Invoke(this->setpointUiUpdate, i, temperature);
+						//this->labelZonesSetpoint[i]->Text = setAllZonesTemperatureForm->textBoxTemperature->Text; // update setpoint
+				}
+			}
+			if (failedZones != "")
+				this->Invoke(this->setTempProgressUiUpdate, 0, 1);
+
+			this->Invoke(this->setTempProgressUiUpdate, 0, 0);
 		}
 
 	private: // ALARM
@@ -248,7 +336,7 @@ namespace HuskyNeo2Tool {
 
 		void alarmStatusCheckingThread()
 		{
-			/*
+			/* // test
 			while (1) {
 				Sleep(3000);
 				alarmStatusWindow->labelZoneAlarmMsgArray[1]->ForeColor = System::Drawing::Color::Black;
@@ -257,14 +345,20 @@ namespace HuskyNeo2Tool {
 			*/
 			while (1) {
 				if (currentHusky == NULL || !currentHusky->isConnected()) {
-					Sleep(3000);
+					Sleep(1000);
 					continue;
 				}
 				for (int i = 0; i < 12; i++) {
+					if (currentHusky == NULL || !currentHusky->isConnected()) {
+						break;
+					}
 					uint16_t status = currentHusky->getControlerStatus(i + 1);
-					char *msg = currentHusky->getControlerStatusString(status);
-					if (msg) {
+					//char *msg = currentHusky->getControlerStatusString(status);
+					if (status) {
 						for (int j = 0; j < 12; j++) {
+							if (currentHusky == NULL || !currentHusky->isConnected()) {
+								break;
+							}
 							if (currentHusky->getZoneOnOff(j + 1)) {
 								uint16_t status = currentHusky->getControlerStatus(j + 1);
 								char *msg = currentHusky->getControlerStatusString(status);
@@ -276,7 +370,8 @@ namespace HuskyNeo2Tool {
 						}
 						this->Invoke(this->myShowAlarmMsg);
 						break;
-					}
+					} else
+						Sleep(50);
 				}
 				Sleep(1000);
 			}
@@ -398,8 +493,6 @@ namespace HuskyNeo2Tool {
 	private: System::Windows::Forms::Label^  label8;
 	private: System::Windows::Forms::Button^  button28;
 	private: System::Windows::Forms::Button^  button27;
-
-
 	private:
 		/// <summary>
 		/// 必需的设计器变量。
@@ -568,7 +661,7 @@ namespace HuskyNeo2Tool {
 			this->button28->TabIndex = 10;
 			this->button28->Text = L"温度设置";
 			this->button28->UseVisualStyleBackColor = true;
-			this->button28->Click += gcnew System::EventHandler(this, &Form1::button28_Click);
+			this->button28->Click += gcnew System::EventHandler(this, &Form1::buttonSetTemp_Click);
 			// 
 			// button27
 			// 
@@ -579,7 +672,7 @@ namespace HuskyNeo2Tool {
 			this->button27->TabIndex = 9;
 			this->button27->Text = L"温度读取";
 			this->button27->UseVisualStyleBackColor = true;
-			this->button27->Click += gcnew System::EventHandler(this, &Form1::button27_Click);
+			this->button27->Click += gcnew System::EventHandler(this, &Form1::buttonGetTemp_Click);
 			// 
 			// buttonConnect
 			// 
@@ -653,9 +746,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone12Setpoint->Location = System::Drawing::Point(131, 85);
 			this->labelZone12Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone12Setpoint->Name = L"labelZone12Setpoint";
-			this->labelZone12Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone12Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone12Setpoint->TabIndex = 7;
-			this->labelZone12Setpoint->Text = L"0.0";
+			this->labelZone12Setpoint->Text = L"0";
 			// 
 			// label57
 			// 
@@ -683,9 +776,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone12RealTemp->Location = System::Drawing::Point(131, 41);
 			this->labelZone12RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone12RealTemp->Name = L"labelZone12RealTemp";
-			this->labelZone12RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone12RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone12RealTemp->TabIndex = 5;
-			this->labelZone12RealTemp->Text = L"0.0";
+			this->labelZone12RealTemp->Text = L"0";
 			// 
 			// buttonZone12Switch
 			// 
@@ -743,9 +836,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone08Setpoint->Location = System::Drawing::Point(131, 85);
 			this->labelZone08Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone08Setpoint->Name = L"labelZone08Setpoint";
-			this->labelZone08Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone08Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone08Setpoint->TabIndex = 7;
-			this->labelZone08Setpoint->Text = L"0.0";
+			this->labelZone08Setpoint->Text = L"0";
 			// 
 			// label37
 			// 
@@ -773,9 +866,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone08RealTemp->Location = System::Drawing::Point(131, 41);
 			this->labelZone08RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone08RealTemp->Name = L"labelZone08RealTemp";
-			this->labelZone08RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone08RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone08RealTemp->TabIndex = 5;
-			this->labelZone08RealTemp->Text = L"0.0";
+			this->labelZone08RealTemp->Text = L"0";
 			// 
 			// buttonZone08Switch
 			// 
@@ -833,9 +926,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone04Setpoint->Location = System::Drawing::Point(131, 85);
 			this->labelZone04Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone04Setpoint->Name = L"labelZone04Setpoint";
-			this->labelZone04Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone04Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone04Setpoint->TabIndex = 7;
-			this->labelZone04Setpoint->Text = L"0.0";
+			this->labelZone04Setpoint->Text = L"0";
 			// 
 			// label14
 			// 
@@ -863,9 +956,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone04RealTemp->Location = System::Drawing::Point(131, 41);
 			this->labelZone04RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone04RealTemp->Name = L"labelZone04RealTemp";
-			this->labelZone04RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone04RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone04RealTemp->TabIndex = 5;
-			this->labelZone04RealTemp->Text = L"0.0";
+			this->labelZone04RealTemp->Text = L"0";
 			// 
 			// buttonZone04Switch
 			// 
@@ -923,9 +1016,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone11Setpoint->Location = System::Drawing::Point(128, 86);
 			this->labelZone11Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone11Setpoint->Name = L"labelZone11Setpoint";
-			this->labelZone11Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone11Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone11Setpoint->TabIndex = 7;
-			this->labelZone11Setpoint->Text = L"0.0";
+			this->labelZone11Setpoint->Text = L"0";
 			// 
 			// label52
 			// 
@@ -953,9 +1046,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone11RealTemp->Location = System::Drawing::Point(128, 42);
 			this->labelZone11RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone11RealTemp->Name = L"labelZone11RealTemp";
-			this->labelZone11RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone11RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone11RealTemp->TabIndex = 5;
-			this->labelZone11RealTemp->Text = L"0.0";
+			this->labelZone11RealTemp->Text = L"0";
 			// 
 			// buttonZone11Switch
 			// 
@@ -1013,9 +1106,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone07Setpoint->Location = System::Drawing::Point(128, 85);
 			this->labelZone07Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone07Setpoint->Name = L"labelZone07Setpoint";
-			this->labelZone07Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone07Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone07Setpoint->TabIndex = 7;
-			this->labelZone07Setpoint->Text = L"0.0";
+			this->labelZone07Setpoint->Text = L"0";
 			// 
 			// label32
 			// 
@@ -1043,9 +1136,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone07RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone07RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone07RealTemp->Name = L"labelZone07RealTemp";
-			this->labelZone07RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone07RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone07RealTemp->TabIndex = 5;
-			this->labelZone07RealTemp->Text = L"0.0";
+			this->labelZone07RealTemp->Text = L"0";
 			// 
 			// buttonZone07Switch
 			// 
@@ -1103,9 +1196,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone03Setpoint->Location = System::Drawing::Point(128, 85);
 			this->labelZone03Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone03Setpoint->Name = L"labelZone03Setpoint";
-			this->labelZone03Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone03Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone03Setpoint->TabIndex = 7;
-			this->labelZone03Setpoint->Text = L"0.0";
+			this->labelZone03Setpoint->Text = L"0";
 			// 
 			// label9
 			// 
@@ -1133,9 +1226,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone03RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone03RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone03RealTemp->Name = L"labelZone03RealTemp";
-			this->labelZone03RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone03RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone03RealTemp->TabIndex = 5;
-			this->labelZone03RealTemp->Text = L"0.0";
+			this->labelZone03RealTemp->Text = L"0";
 			// 
 			// buttonZone03Switch
 			// 
@@ -1193,9 +1286,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone10Setpoint->Location = System::Drawing::Point(128, 85);
 			this->labelZone10Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone10Setpoint->Name = L"labelZone10Setpoint";
-			this->labelZone10Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone10Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone10Setpoint->TabIndex = 7;
-			this->labelZone10Setpoint->Text = L"0.0";
+			this->labelZone10Setpoint->Text = L"0";
 			// 
 			// label47
 			// 
@@ -1223,9 +1316,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone10RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone10RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone10RealTemp->Name = L"labelZone10RealTemp";
-			this->labelZone10RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone10RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone10RealTemp->TabIndex = 5;
-			this->labelZone10RealTemp->Text = L"0.0";
+			this->labelZone10RealTemp->Text = L"0";
 			// 
 			// buttonZone10Switch
 			// 
@@ -1283,9 +1376,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone09Setpoint->Location = System::Drawing::Point(130, 85);
 			this->labelZone09Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone09Setpoint->Name = L"labelZone09Setpoint";
-			this->labelZone09Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone09Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone09Setpoint->TabIndex = 7;
-			this->labelZone09Setpoint->Text = L"0.0";
+			this->labelZone09Setpoint->Text = L"0";
 			// 
 			// label42
 			// 
@@ -1313,9 +1406,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone09RealTemp->Location = System::Drawing::Point(130, 41);
 			this->labelZone09RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone09RealTemp->Name = L"labelZone09RealTemp";
-			this->labelZone09RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone09RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone09RealTemp->TabIndex = 5;
-			this->labelZone09RealTemp->Text = L"0.0";
+			this->labelZone09RealTemp->Text = L"0";
 			// 
 			// buttonZone09Switch
 			// 
@@ -1373,9 +1466,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone06Setpoint->Location = System::Drawing::Point(128, 85);
 			this->labelZone06Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone06Setpoint->Name = L"labelZone06Setpoint";
-			this->labelZone06Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone06Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone06Setpoint->TabIndex = 7;
-			this->labelZone06Setpoint->Text = L"0.0";
+			this->labelZone06Setpoint->Text = L"0";
 			// 
 			// label24
 			// 
@@ -1403,9 +1496,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone06RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone06RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone06RealTemp->Name = L"labelZone06RealTemp";
-			this->labelZone06RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone06RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone06RealTemp->TabIndex = 5;
-			this->labelZone06RealTemp->Text = L"0.0";
+			this->labelZone06RealTemp->Text = L"0";
 			// 
 			// buttonZone06Switch
 			// 
@@ -1463,9 +1556,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone05Setpoint->Location = System::Drawing::Point(130, 85);
 			this->labelZone05Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone05Setpoint->Name = L"labelZone05Setpoint";
-			this->labelZone05Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone05Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone05Setpoint->TabIndex = 7;
-			this->labelZone05Setpoint->Text = L"0.0";
+			this->labelZone05Setpoint->Text = L"0";
 			// 
 			// label19
 			// 
@@ -1493,9 +1586,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone05RealTemp->Location = System::Drawing::Point(130, 41);
 			this->labelZone05RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone05RealTemp->Name = L"labelZone05RealTemp";
-			this->labelZone05RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone05RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone05RealTemp->TabIndex = 5;
-			this->labelZone05RealTemp->Text = L"0.0";
+			this->labelZone05RealTemp->Text = L"0";
 			// 
 			// buttonZone05Switch
 			// 
@@ -1553,9 +1646,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone02Setpoint->Location = System::Drawing::Point(128, 85);
 			this->labelZone02Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone02Setpoint->Name = L"labelZone02Setpoint";
-			this->labelZone02Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone02Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone02Setpoint->TabIndex = 7;
-			this->labelZone02Setpoint->Text = L"0.0";
+			this->labelZone02Setpoint->Text = L"0";
 			// 
 			// label4
 			// 
@@ -1583,9 +1676,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone02RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone02RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone02RealTemp->Name = L"labelZone02RealTemp";
-			this->labelZone02RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone02RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone02RealTemp->TabIndex = 5;
-			this->labelZone02RealTemp->Text = L"0.0";
+			this->labelZone02RealTemp->Text = L"0";
 			// 
 			// buttonZone02Switch
 			// 
@@ -1643,9 +1736,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone01Setpoint->Location = System::Drawing::Point(130, 85);
 			this->labelZone01Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone01Setpoint->Name = L"labelZone01Setpoint";
-			this->labelZone01Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone01Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone01Setpoint->TabIndex = 7;
-			this->labelZone01Setpoint->Text = L"0.0";
+			this->labelZone01Setpoint->Text = L"0";
 			// 
 			// label28
 			// 
@@ -1673,9 +1766,9 @@ namespace HuskyNeo2Tool {
 			this->labelZone01RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone01RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone01RealTemp->Name = L"labelZone01RealTemp";
-			this->labelZone01RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone01RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone01RealTemp->TabIndex = 5;
-			this->labelZone01RealTemp->Text = L"0.0";
+			this->labelZone01RealTemp->Text = L"0";
 			// 
 			// buttonZone01Switch
 			// 
@@ -2006,7 +2099,8 @@ private: System::Void buttonIpConfig_Click(System::Object^  sender, System::Even
 		return;
 	}
 */
-private: System::Void button27_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void buttonGetTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+
 		if (currentHusky == NULL) {
 			MessageBox::Show("请选择机台号！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 			return;
@@ -2015,7 +2109,12 @@ private: System::Void button27_Click(System::Object^  sender, System::EventArgs^
 			MessageBox::Show("当前设备未连接！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 			return;
 		}
-
+		if (!readTemperatureButtonThread || !readTemperatureButtonThread->IsAlive) {
+			readTemperatureButtonThread = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::ReadTemperatureButtonThread));
+			readTemperatureButtonThread->IsBackground = true;
+			readTemperatureButtonThread->Start();
+		}
+/*
 		for (int i = 0; i < 12; i++) {
 			float temperature = currentHusky->getTemperature(i + 1);
 			// C = (F - 32) / 1.8
@@ -2024,8 +2123,9 @@ private: System::Void button27_Click(System::Object^  sender, System::EventArgs^
 			temperature = (float)tmp / 10;
 			this->labelZonesSetpoint[i]->Text = temperature.ToString();
 		}
+*/
 	}
-private: System::Void button28_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void buttonSetTemp_Click(System::Object^  sender, System::EventArgs^  e) {
 
 		if (currentHusky == NULL) {
 			MessageBox::Show("请选择机台号！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
@@ -2036,6 +2136,19 @@ private: System::Void button28_Click(System::Object^  sender, System::EventArgs^
 			return;
 		}
 
+		System::Windows::Forms::DialogResult result = setAllZonesTemperatureForm->ShowDialog();
+		if (result == ::DialogResult::OK) {
+			if (setTemperatureButtonThread && setTemperatureButtonThread->IsAlive) {
+				setTemperatureButtonThread->Abort();
+				//setTemperatureButtonThread = (Thread ^)NULL;
+			}
+			setTemperatureButtonThread = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::SetTemperatureButtonThread));
+			setTemperatureButtonThread->IsBackground = true;
+			setTemperatureButtonThread->Start();
+			setTempInProgressForm->ShowDialog();
+		}
+
+/*
 		SetAllZonesTemperatureForm^ setAllZonesTemperatureForm = gcnew SetAllZonesTemperatureForm();
 		System::Windows::Forms::DialogResult result = setAllZonesTemperatureForm->ShowDialog();
 		if (result == ::DialogResult::OK) {
@@ -2051,6 +2164,7 @@ private: System::Void button28_Click(System::Object^  sender, System::EventArgs^
 				}
 			}
 		}
+*/
 	}
 private: System::Void comboBox1_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
 /*

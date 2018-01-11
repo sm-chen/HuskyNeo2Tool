@@ -17,12 +17,14 @@ typedef unsigned long  u32;
 typedef  u32 uint32_t;
 typedef uint32_t binfloat ;
 
+
 #define BUF_SIZE 100
 #define LINE_LEN_MAX 1000
 #define IP_ADDRESS_STRING_LEN 20
 
 #define UDP_RECVFROM_TIMEOUT_TIMES 60 // 60 * 20 = 1200ms/1.2s
 #define UDP_RECVFROM_TIMEOUT_TIME  20 // ms
+#define TRY_TIMES 1 //
 
 #define DEVID 0x26 //DEVICE ID
 #define ADD   0X20 //ADDRESS
@@ -173,6 +175,8 @@ public:
 
 	void setSerialPortNum(int num);
 	int getSerialPortNum();
+
+	int readBytes(unsigned char *receivDataBuf, int bytes);
 private:
 	BOOLEAN mIsConnected;
 
@@ -182,7 +186,7 @@ private:
 	sockaddr_in servAddr;
 	sockaddr_in localAddr;
 
-	HANDLE mMutex;
+	CRITICAL_SECTION mCommunicationSync;
 
 	int mSerialPortNum;
 public:

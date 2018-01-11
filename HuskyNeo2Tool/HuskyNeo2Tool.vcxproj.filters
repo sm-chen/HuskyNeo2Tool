@@ -42,6 +42,9 @@
     <ClCompile Include="AlarmStatusWindow.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="SetTempInProgressForm.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Form1.h">
@@ -71,6 +74,9 @@
     <ClInclude Include="AlarmStatusWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SetTempInProgressForm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.ico">
@@ -89,6 +95,9 @@
       <Filter>资源文件</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="SetAllZonesTemperatureForm.resx">
+      <Filter>资源文件</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AlarmStatusWindow.resx">
       <Filter>资源文件</Filter>
     </EmbeddedResource>
   </ItemGroup>
