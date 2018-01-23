@@ -17,12 +17,14 @@ typedef unsigned long  u32;
 typedef  u32 uint32_t;
 typedef uint32_t binfloat ;
 
+
 #define BUF_SIZE 100
 #define LINE_LEN_MAX 1000
 #define IP_ADDRESS_STRING_LEN 20
 
 #define UDP_RECVFROM_TIMEOUT_TIMES 60 // 60 * 20 = 1200ms/1.2s
 #define UDP_RECVFROM_TIMEOUT_TIME  20 // ms
+#define TRY_TIMES 3 //
 
 #define DEVID 0x26 //DEVICE ID
 #define ADD   0X20 //ADDRESS
@@ -65,6 +67,7 @@ typedef uint32_t binfloat ;
  *	15  不支持
  *******************************/
 #define POWER_TO_HEATER_NOT_ZERO (1 << 0)
+#define MANUAL_REGULATION        (1 << 2)
 #define ALARM_UNDER_TEMPERATURE  (1 << 3)
 #define ALARM_OVER_TEMPERATURE   (1 << 4)
 #define ABORT_UNDER_TEMPERATURE  (1 << 5)
@@ -74,6 +77,7 @@ typedef uint32_t binfloat ;
 #define FUSE_BLOWN               (1 << 10)
 
 const uint16_t controllerStatusBits[] = {POWER_TO_HEATER_NOT_ZERO,
+										 MANUAL_REGULATION,
 										 ALARM_UNDER_TEMPERATURE,
 										 ALARM_OVER_TEMPERATURE,
 										 ABORT_UNDER_TEMPERATURE,
@@ -83,6 +87,7 @@ const uint16_t controllerStatusBits[] = {POWER_TO_HEATER_NOT_ZERO,
 										 FUSE_BLOWN};
 // corresponding to controllerStatusBits
 const char controllerStatusString[][30] = { {"加热器功率非零"},
+											{"确定"},
 											{"低于设定点温度警报"},
 											{"高于设定点温度警报"},
 											{"低于设定点温度终止"},
@@ -173,6 +178,11 @@ public:
 
 	void setSerialPortNum(int num);
 	int getSerialPortNum();
+
+	int readBytes(unsigned char *receivDataBuf, int bytes);
+
+	BOOLEAN isCommunicationErr();
+	void restoreCommunicationErr();
 private:
 	BOOLEAN mIsConnected;
 
@@ -185,6 +195,8 @@ private:
 	HANDLE mMutex;
 
 	int mSerialPortNum;
+
+	BOOLEAN mCommunicationErr;
 public:
 	CSerialPort serialPort;
 };

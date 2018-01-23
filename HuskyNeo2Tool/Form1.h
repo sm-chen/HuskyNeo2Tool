@@ -5,9 +5,10 @@
 #pragma comment(lib, "ws2_32.lib")  //加载 ws2_32.dll
 #include "Husky.h"
 #include "IpConfigure.h"
-#include "AllZonesTemperatureSetting.h"
+#include "SetOneZoneTemperatureForm.h"
 #include "SetAllZonesTemperatureForm.h"
 #include "AlarmStatusWindow.h"
+#include "SetTempInProgressForm.h"
 
 #define HUSKY_DEV_NUM 12
 
@@ -39,7 +40,6 @@ namespace HuskyNeo2Tool {
 
 			ipConfig = gcnew IpConfigure();
 			huskys = gcnew array<Husky*, 1>(HUSKY_DEV_NUM);
-
 
 			textBoxIpConfigs = gcnew array<System::Windows::Forms::TextBox^, 1>(HUSKY_DEV_NUM);
 			textBoxIpConfigs[0] = ipConfig->textBox1;
@@ -127,20 +127,34 @@ namespace HuskyNeo2Tool {
 
 			//currentHusky = huskys[0];
 			currentHusky = new Husky();
-			alarmStatusWindow = gcnew AlarmStatusWindow();
+			//alarmStatusWindow = gcnew AlarmStatusWindow();
+
+			setAllZonesTemperatureForm = gcnew SetAllZonesTemperatureForm();
+			setTempInProgressForm = gcnew SetTempInProgressForm();
 
 			realtimeTemperatureUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::realtimeTemperatureUiUpdateMethod);
 			setpointUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::setpointUiUpdateMethod);
 			zoneSwitchUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::zoneSwitchUiUpdateMethod);
 			myShowAlarmMsg = gcnew showAlarmMsg(this, &HuskyNeo2Tool::Form1::showAlarmMsgMethod);
-			
-			Thread ^t1 = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::UiUpdateThread));
+			setTempProgressUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::setTempProgressUiUpdateMethod);
+			showCommunicationErrUiUpdate = gcnew UiUpdate(this, &HuskyNeo2Tool::Form1::showCommunicationErrUiUpdateMethod);
+			opLock = FALSE;
+
+			t2 = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::alarmStatusCheckingThread));
+			t2->IsBackground = true;
+			t2->Start();
+
+			t1 = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::UiUpdateThread));
 			t1->IsBackground = true;
 			t1->Start();
 
-			Thread ^t2 = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::alarmStatusCheckingThread));
-			t2->IsBackground = true;
-			t2->Start();
+			this->comboBox1->SelectedIndex = 0;
+			if (currentHusky->connect())
+				this->buttonConnect->Text = L"断开";
+
+			communicationErrDetectThreadHandle = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::communicationErrDetectThread));
+			communicationErrDetectThreadHandle->IsBackground = true;
+			communicationErrDetectThreadHandle->Start();
 		}
 
 	protected:
@@ -149,6 +163,15 @@ namespace HuskyNeo2Tool {
 		/// </summary>
 		~Form1()
 		{
+			if (currentHusky && currentHusky->isConnected())
+				currentHusky->disconnect();
+			if (t2 && t2->IsAlive)
+				t2->Abort();
+			if (t1 &&t1->IsAlive)
+				t1->Abort();
+			if (readTemperatureButtonThread && readTemperatureButtonThread->IsAlive)
+				readTemperatureButtonThread->Abort();
+
 			if (components)
 				delete components;
 
@@ -166,12 +189,39 @@ namespace HuskyNeo2Tool {
 		array<System::Windows::Forms::Button^, 1>^ buttonZonesSwitchArray;
 		Husky *currentHusky;
 		AlarmStatusWindow^ alarmStatusWindow;
+		BOOLEAN opLock;
+
+		SetAllZonesTemperatureForm^ setAllZonesTemperatureForm;
+		SetTempInProgressForm^ setTempInProgressForm;
+		String^ failedZones;
+		Thread ^setTemperatureButtonThread;
+
+		Thread ^readTemperatureButtonThread;
+		Thread ^t2;
+		Thread ^t1;
+		Thread ^communicationErrDetectThreadHandle;
 
 	private: // UI Update
 		delegate void UiUpdate(int i, float value);
 		UiUpdate^ realtimeTemperatureUiUpdate;
 		UiUpdate^ setpointUiUpdate;
 		UiUpdate^ zoneSwitchUiUpdate;
+		UiUpdate^ setTempProgressUiUpdate;
+private: System::Windows::Forms::Button^  buttonLock;
+
+
+
+
+
+
+
+
+
+
+
+
+
+		 UiUpdate^ showCommunicationErrUiUpdate;
 	
 		void realtimeTemperatureUiUpdateMethod(int i, float value)
 		{
@@ -189,6 +239,20 @@ namespace HuskyNeo2Tool {
 			else
 				this->buttonZonesSwitchArray[i]->Text = L"关闭";
 		}
+		// value: 0 -> close Progress window;
+		void setTempProgressUiUpdateMethod(int i, float value)
+		{
+			if (value == 0) {
+				setTempInProgressForm->Close();
+			} else {
+				MessageBox::Show("Zones: " + failedZones + " 温度设置失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+			}
+		}
+		void showCommunicationErrUiUpdateMethod(int i, float value)
+		{
+			MessageBox::Show("通讯故障！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+			//currentHusky->restoreCommunicationErr();
+		}
 
 		void UiUpdateThread()
 		{
@@ -199,41 +263,113 @@ namespace HuskyNeo2Tool {
 					continue;
 				}
 
-				if (tmp % 5 == 0) { // update UI every 3 * 5 = 15S
-					tmp = 0;
+				if (tmp % 5 == 0) { // update UI every 2 * 5 = 10S
+					tmp = 1;
 					for (int i = 0; i < 12; i++) {
+						if (currentHusky == NULL || !currentHusky->isConnected()) {
+							break;
+						}
 						float temperature = currentHusky->getTemperature(i + 1);
 						// C = (F - 32) / 1.8
-						temperature = (temperature - 32) / 1.8;
-						int tmp = temperature * 10 + 0.5;
-						temperature = (float)tmp / 10;
-						this->Invoke(this->setpointUiUpdate, i, temperature);
-						Sleep(100);
+						temperature = (temperature - 32) / (float)1.8;
+						//int tmp = temperature * 10 + 0.5;
+						//temperature = (float)tmp / 10;
+						int tmp = (int)(temperature + 0.5);
+						this->Invoke(this->setpointUiUpdate, i, tmp);
+						Sleep(50);
 					}
 
 					for (int i = 0; i < 12; i++) {
+						if (currentHusky == NULL || !currentHusky->isConnected()) {
+							break;
+						}
 						if (currentHusky->getZoneOnOff(i + 1)) {
-							this->Invoke(this->zoneSwitchUiUpdate, i, 0);
+							this->Invoke(this->zoneSwitchUiUpdate, i, (float)0);
 						} else {
 							this->Invoke(this->zoneSwitchUiUpdate, i, 1);
 						}
-						//Sleep(100);
+						Sleep(50);
 					}
 				} else
 					tmp++;
 
 				for (int i = 0; i < 12; i++) {
+					if (currentHusky == NULL || !currentHusky->isConnected()) {
+						break;
+					}
 					float realtimeTemperature = currentHusky->getRealtimeTemperature(i + 1);
-					realtimeTemperature = (realtimeTemperature - 32) / 1.8;
-					int tmp = realtimeTemperature * 10 + 0.5;
-					realtimeTemperature = (float)tmp / 10;
-					this->Invoke(this->realtimeTemperatureUiUpdate, i, realtimeTemperature);
-					Sleep(100); // 1s?
-				}
-				Sleep(3000); // 3s?
+					if (realtimeTemperature == 0) {
+						this->Invoke(this->realtimeTemperatureUiUpdate, i, (float)0);
+					} else {
+						realtimeTemperature = (realtimeTemperature - 32) / (float)1.8;
+						//int tmp = realtimeTemperature * 10 + 0.5;
+						//realtimeTemperature = (float)tmp / 10;
+						int tmp = (int)(realtimeTemperature + 0.5);
+						this->Invoke(this->realtimeTemperatureUiUpdate, i, tmp);
+					}
+					Sleep(50);
+				} 
+				Sleep(2000);
 			} while (1);
 		}
 
+		void ReadTemperatureButtonThread()
+		{
+			if (currentHusky == NULL || !currentHusky->isConnected()) {
+				return;
+			}
+			for (int i = 0; i < 12; i++) {
+				if (currentHusky == NULL || !currentHusky->isConnected()) {
+					break;
+				}
+				float temperature = currentHusky->getTemperature(i + 1);
+				// C = (F - 32) / 1.8
+				temperature = (temperature - 32) / (float)1.8;
+				//int tmp = temperature * 10 + 0.5;
+				//temperature = (float)tmp / 10;
+				int tmp = (int)(temperature + 0.5);
+				//this->labelZonesSetpoint[i]->Text = temperature.ToString();
+				this->Invoke(this->setpointUiUpdate, i, tmp);
+			}
+		}
+		void SetTemperatureButtonThread()
+		{
+			if (currentHusky == NULL || !currentHusky->isConnected()) {
+				return;
+			}
+
+			failedZones = "";
+			for (int i = 0; i < 12; i++) {
+				if (setAllZonesTemperatureForm->checkBoxAllZonesArray[i]->Checked) {
+					float temperature = (float)Convert::ToDouble(setAllZonesTemperatureForm->textBoxTemperature->Text);
+					// F -> C: F = 32 + C * 1.8;
+					float Fahrenheit = 32 + temperature * (float)1.8;
+					if (currentHusky->setTemperature(Fahrenheit, i + 1) == FALSE)
+						failedZones = failedZones + (i + 1) + " ";
+						//MessageBox::Show("Zone" + (i+1) + " 设置温度失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+					//else
+						//this->Invoke(this->setpointUiUpdate, i, temperature);
+						//this->labelZonesSetpoint[i]->Text = setAllZonesTemperatureForm->textBoxTemperature->Text; // update setpoint
+				}
+			}
+			ReadTemperatureButtonThread(); // update set point.
+			if (failedZones != "")
+				this->Invoke(this->setTempProgressUiUpdate, 0, 1);
+
+			this->Invoke(this->setTempProgressUiUpdate, 0, 0);
+		}
+
+		void communicationErrDetectThread()
+		{
+			Sleep(5000);
+			while (1) {
+				if (currentHusky != NULL && currentHusky->isConnected() && currentHusky->isCommunicationErr()) {
+					this->Invoke(this->showCommunicationErrUiUpdate, 0, 0);
+					currentHusky->restoreCommunicationErr();
+				}
+				Sleep(1000);
+			}
+		}
 	private: // ALARM
 		delegate void showAlarmMsg();
 		showAlarmMsg^ myShowAlarmMsg;
@@ -248,7 +384,7 @@ namespace HuskyNeo2Tool {
 
 		void alarmStatusCheckingThread()
 		{
-			/*
+			/* // test
 			while (1) {
 				Sleep(3000);
 				alarmStatusWindow->labelZoneAlarmMsgArray[1]->ForeColor = System::Drawing::Color::Black;
@@ -257,32 +393,72 @@ namespace HuskyNeo2Tool {
 			*/
 			while (1) {
 				if (currentHusky == NULL || !currentHusky->isConnected()) {
-					Sleep(3000);
+					Sleep(1000);
 					continue;
 				}
 				for (int i = 0; i < 12; i++) {
-					uint16_t status = currentHusky->getControlerStatus(i + 1);
-					char *msg = currentHusky->getControlerStatusString(status);
-					if (msg) {
-						for (int j = 0; j < 12; j++) {
-							if (currentHusky->getZoneOnOff(j + 1)) {
-								uint16_t status = currentHusky->getControlerStatus(j + 1);
-								char *msg = currentHusky->getControlerStatusString(status);
-								alarmStatusWindow->labelZoneAlarmMsgArray[j]->Text = gcnew String(msg);
-							} else {
-								alarmStatusWindow->labelZoneAlarmMsgArray[j]->Text = L"确定";
-								alarmStatusWindow->labelZoneAlarmMsgArray[j]->ForeColor = System::Drawing::Color::Black;
-							}
-						}
-						this->Invoke(this->myShowAlarmMsg);
+					if (currentHusky == NULL || !currentHusky->isConnected()) {
 						break;
 					}
+					uint16_t status = currentHusky->getControlerStatus(i + 1);
+					if (status && status != MANUAL_REGULATION) {
+						if (currentHusky == NULL || !currentHusky->isConnected())
+							break;
+
+						uint16_t status1 = currentHusky->getControlerStatus(1);
+						uint16_t status2 = currentHusky->getControlerStatus(2);
+						uint16_t status3 = currentHusky->getControlerStatus(3);
+						uint16_t status4 = currentHusky->getControlerStatus(4);
+						uint16_t status5 = currentHusky->getControlerStatus(5);
+						uint16_t status6 = currentHusky->getControlerStatus(6);
+						uint16_t status7 = currentHusky->getControlerStatus(7);
+						uint16_t status8 = currentHusky->getControlerStatus(8);
+						uint16_t status9 = currentHusky->getControlerStatus(9);
+						uint16_t status10 = currentHusky->getControlerStatus(10);
+						uint16_t status11 = currentHusky->getControlerStatus(11);
+						uint16_t status12 = currentHusky->getControlerStatus(12);
+
+						char *msg1 = currentHusky->getControlerStatusString(status1);
+						char *msg2 = currentHusky->getControlerStatusString(status2);
+						char *msg3 = currentHusky->getControlerStatusString(status3);
+						char *msg4 = currentHusky->getControlerStatusString(status4);
+						char *msg5 = currentHusky->getControlerStatusString(status5);
+						char *msg6 = currentHusky->getControlerStatusString(status6);
+						char *msg7 = currentHusky->getControlerStatusString(status7);
+						char *msg8 = currentHusky->getControlerStatusString(status8);
+						char *msg9 = currentHusky->getControlerStatusString(status9);
+						char *msg10 = currentHusky->getControlerStatusString(status10);
+						char *msg11 = currentHusky->getControlerStatusString(status11);
+						char *msg12 = currentHusky->getControlerStatusString(status12);
+
+						alarmStatusWindow = gcnew AlarmStatusWindow();
+
+						alarmStatusWindow->labelZoneAlarmMsgArray[0]->Text = gcnew String(msg1);
+						alarmStatusWindow->labelZoneAlarmMsgArray[1]->Text = gcnew String(msg2);
+						alarmStatusWindow->labelZoneAlarmMsgArray[2]->Text = gcnew String(msg3);
+						alarmStatusWindow->labelZoneAlarmMsgArray[3]->Text = gcnew String(msg4);
+						alarmStatusWindow->labelZoneAlarmMsgArray[4]->Text = gcnew String(msg5);
+						alarmStatusWindow->labelZoneAlarmMsgArray[5]->Text = gcnew String(msg6);
+						alarmStatusWindow->labelZoneAlarmMsgArray[6]->Text = gcnew String(msg7);
+						alarmStatusWindow->labelZoneAlarmMsgArray[7]->Text = gcnew String(msg8);
+						alarmStatusWindow->labelZoneAlarmMsgArray[8]->Text = gcnew String(msg9);
+						alarmStatusWindow->labelZoneAlarmMsgArray[9]->Text = gcnew String(msg10);
+						alarmStatusWindow->labelZoneAlarmMsgArray[10]->Text = gcnew String(msg11);
+						alarmStatusWindow->labelZoneAlarmMsgArray[11]->Text = gcnew String(msg12);
+
+						this->Invoke(this->myShowAlarmMsg);
+						Sleep(2000);
+						break;
+					}
+					Sleep(1000);
 				}
 				Sleep(1000);
 			}
 		}
+private: System::Windows::Forms::Label^  labelComNumPrompt;
 
-	private: System::Windows::Forms::Label^  label6;
+
+
 	private: System::Windows::Forms::Label^  labelZone12Setpoint;
 	private: System::Windows::Forms::Label^  labelZone08Setpoint;
 	private: System::Windows::Forms::Label^  labelZone04Setpoint;
@@ -300,106 +476,152 @@ namespace HuskyNeo2Tool {
 	private: System::Windows::Forms::Button^  buttonConnect;
 	private: System::Windows::Forms::GroupBox^  groupBoxZones;
 	private: System::Windows::Forms::GroupBox^  groupBoxZone01;
-	private: System::Windows::Forms::Label^  label2;
-	private: System::Windows::Forms::Label^  label3;
+private: System::Windows::Forms::Label^  labelRealTempPrompt01;
+private: System::Windows::Forms::Label^  labelSetpointPrompt01;
+
+
 	private: System::Windows::Forms::Button^  buttonZone01Switch;
 	private: System::Windows::Forms::Label^  labelZone01RealTemp;
-	private: System::Windows::Forms::Label^  label28;
-	private: System::Windows::Forms::Label^  label27;
+private: System::Windows::Forms::Label^  labelSetpointUnits01;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits01;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone12;
-	private: System::Windows::Forms::Label^  label57;
-	private: System::Windows::Forms::Label^  label58;
+private: System::Windows::Forms::Label^  labelSetpointUnits12;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits12;
+
 	private: System::Windows::Forms::Label^  labelZone12RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone12Switch;
-	private: System::Windows::Forms::Label^  label60;
-	private: System::Windows::Forms::Label^  label61;
+private: System::Windows::Forms::Label^  labelSetpointPrompt12;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt12;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone08;
-	private: System::Windows::Forms::Label^  label37;
-	private: System::Windows::Forms::Label^  label38;
+private: System::Windows::Forms::Label^  labelSetpointUnits08;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits08;
+
 	private: System::Windows::Forms::Label^  labelZone08RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone08Switch;
-	private: System::Windows::Forms::Label^  label40;
-	private: System::Windows::Forms::Label^  label41;
+private: System::Windows::Forms::Label^  labelSetpointPrompt08;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt08;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone04;
-	private: System::Windows::Forms::Label^  label14;
-	private: System::Windows::Forms::Label^  label15;
+private: System::Windows::Forms::Label^  labelSetpointUnits04;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits04;
+
 	private: System::Windows::Forms::Label^  labelZone04RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone04Switch;
-	private: System::Windows::Forms::Label^  label17;
-	private: System::Windows::Forms::Label^  label18;
+private: System::Windows::Forms::Label^  labelSetpointPrompt04;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt04;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone11;
-	private: System::Windows::Forms::Label^  label52;
-	private: System::Windows::Forms::Label^  label53;
+private: System::Windows::Forms::Label^  labelSetpointUnits11;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits11;
+
 	private: System::Windows::Forms::Label^  labelZone11RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone11Switch;
-	private: System::Windows::Forms::Label^  label55;
-	private: System::Windows::Forms::Label^  label56;
+private: System::Windows::Forms::Label^  labelSetpointPrompt11;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt11;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone07;
-	private: System::Windows::Forms::Label^  label32;
-	private: System::Windows::Forms::Label^  label33;
+private: System::Windows::Forms::Label^  labelSetpointUnits07;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits07;
+
 	private: System::Windows::Forms::Label^  labelZone07RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone07Switch;
+private: System::Windows::Forms::Label^  labelSetpointPrompt07;
 
-	private: System::Windows::Forms::Label^  label35;
-	private: System::Windows::Forms::Label^  label36;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt07;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone03;
+private: System::Windows::Forms::Label^  labelSetpointUnits03;
 
-	private: System::Windows::Forms::Label^  label9;
-	private: System::Windows::Forms::Label^  label10;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits03;
+
 	private: System::Windows::Forms::Label^  labelZone03RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone03Switch;
+private: System::Windows::Forms::Label^  labelSetpointPrompt03;
 
-	private: System::Windows::Forms::Label^  label12;
-	private: System::Windows::Forms::Label^  label13;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt03;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone10;
+private: System::Windows::Forms::Label^  labelSetpointUnits10;
 
-	private: System::Windows::Forms::Label^  label47;
-	private: System::Windows::Forms::Label^  label48;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits10;
+
 	private: System::Windows::Forms::Label^  labelZone10RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone10Switch;
+private: System::Windows::Forms::Label^  labelSetpointPrompt10;
 
-	private: System::Windows::Forms::Label^  label50;
-	private: System::Windows::Forms::Label^  label51;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt10;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone09;
+private: System::Windows::Forms::Label^  labelSetpointUnits09;
 
-	private: System::Windows::Forms::Label^  label42;
-	private: System::Windows::Forms::Label^  label43;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits09;
+
 	private: System::Windows::Forms::Label^  labelZone09RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone09Switch;
+private: System::Windows::Forms::Label^  labelSetpointPrompt09;
 
-	private: System::Windows::Forms::Label^  label45;
-	private: System::Windows::Forms::Label^  label46;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt09;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone06;
+private: System::Windows::Forms::Label^  labelSetpointUnits06;
 
-	private: System::Windows::Forms::Label^  label24;
-	private: System::Windows::Forms::Label^  label25;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits06;
+
 	private: System::Windows::Forms::Label^  labelZone06RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone06Switch;
+private: System::Windows::Forms::Label^  labelSetpointPrompt06;
 
-	private: System::Windows::Forms::Label^  label30;
-	private: System::Windows::Forms::Label^  label31;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt06;
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone05;
+private: System::Windows::Forms::Label^  labelSetpointUnits05;
 
-	private: System::Windows::Forms::Label^  label19;
-	private: System::Windows::Forms::Label^  label20;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits05;
+
 	private: System::Windows::Forms::Label^  labelZone05RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone05Switch;
+private: System::Windows::Forms::Label^  labelSetpointPrompt05;
+private: System::Windows::Forms::Label^  labelRealTempPrompt05;
 
-	private: System::Windows::Forms::Label^  label22;
-	private: System::Windows::Forms::Label^  label23;
+
+
 	private: System::Windows::Forms::GroupBox^  groupBoxZone02;
+private: System::Windows::Forms::Label^  labelSetpointUnits02;
 
-	private: System::Windows::Forms::Label^  label4;
-	private: System::Windows::Forms::Label^  label5;
+
+private: System::Windows::Forms::Label^  labelRealTempUnits02;
+
 	private: System::Windows::Forms::Label^  labelZone02RealTemp;
 	private: System::Windows::Forms::Button^  buttonZone02Switch;
+private: System::Windows::Forms::Label^  labelSetpointPrompt02;
 
-	private: System::Windows::Forms::Label^  label7;
-	private: System::Windows::Forms::Label^  label8;
+
+private: System::Windows::Forms::Label^  labelRealTempPrompt02;
+
 	private: System::Windows::Forms::Button^  button28;
 	private: System::Windows::Forms::Button^  button27;
-
-
 	private:
 		/// <summary>
 		/// 必需的设计器变量。
@@ -414,7 +636,8 @@ namespace HuskyNeo2Tool {
 		void InitializeComponent(void)
 		{
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
-			this->label6 = (gcnew System::Windows::Forms::Label());
+			this->buttonLock = (gcnew System::Windows::Forms::Button());
+			this->labelComNumPrompt = (gcnew System::Windows::Forms::Label());
 			this->button28 = (gcnew System::Windows::Forms::Button());
 			this->button27 = (gcnew System::Windows::Forms::Button());
 			this->buttonConnect = (gcnew System::Windows::Forms::Button());
@@ -422,100 +645,100 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZones = (gcnew System::Windows::Forms::GroupBox());
 			this->groupBoxZone12 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone12Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label57 = (gcnew System::Windows::Forms::Label());
-			this->label58 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits12 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits12 = (gcnew System::Windows::Forms::Label());
 			this->labelZone12RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone12Switch = (gcnew System::Windows::Forms::Button());
-			this->label60 = (gcnew System::Windows::Forms::Label());
-			this->label61 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt12 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt12 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone08 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone08Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label37 = (gcnew System::Windows::Forms::Label());
-			this->label38 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits08 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits08 = (gcnew System::Windows::Forms::Label());
 			this->labelZone08RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone08Switch = (gcnew System::Windows::Forms::Button());
-			this->label40 = (gcnew System::Windows::Forms::Label());
-			this->label41 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt08 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt08 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone04 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone04Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label14 = (gcnew System::Windows::Forms::Label());
-			this->label15 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits04 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits04 = (gcnew System::Windows::Forms::Label());
 			this->labelZone04RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone04Switch = (gcnew System::Windows::Forms::Button());
-			this->label17 = (gcnew System::Windows::Forms::Label());
-			this->label18 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt04 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt04 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone11 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone11Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label52 = (gcnew System::Windows::Forms::Label());
-			this->label53 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits11 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits11 = (gcnew System::Windows::Forms::Label());
 			this->labelZone11RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone11Switch = (gcnew System::Windows::Forms::Button());
-			this->label55 = (gcnew System::Windows::Forms::Label());
-			this->label56 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt11 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt11 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone07 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone07Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label32 = (gcnew System::Windows::Forms::Label());
-			this->label33 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits07 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits07 = (gcnew System::Windows::Forms::Label());
 			this->labelZone07RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone07Switch = (gcnew System::Windows::Forms::Button());
-			this->label35 = (gcnew System::Windows::Forms::Label());
-			this->label36 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt07 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt07 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone03 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone03Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label9 = (gcnew System::Windows::Forms::Label());
-			this->label10 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits03 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits03 = (gcnew System::Windows::Forms::Label());
 			this->labelZone03RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone03Switch = (gcnew System::Windows::Forms::Button());
-			this->label12 = (gcnew System::Windows::Forms::Label());
-			this->label13 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt03 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt03 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone10 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone10Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label47 = (gcnew System::Windows::Forms::Label());
-			this->label48 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits10 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits10 = (gcnew System::Windows::Forms::Label());
 			this->labelZone10RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone10Switch = (gcnew System::Windows::Forms::Button());
-			this->label50 = (gcnew System::Windows::Forms::Label());
-			this->label51 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt10 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt10 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone09 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone09Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label42 = (gcnew System::Windows::Forms::Label());
-			this->label43 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits09 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits09 = (gcnew System::Windows::Forms::Label());
 			this->labelZone09RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone09Switch = (gcnew System::Windows::Forms::Button());
-			this->label45 = (gcnew System::Windows::Forms::Label());
-			this->label46 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt09 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt09 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone06 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone06Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label24 = (gcnew System::Windows::Forms::Label());
-			this->label25 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits06 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits06 = (gcnew System::Windows::Forms::Label());
 			this->labelZone06RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone06Switch = (gcnew System::Windows::Forms::Button());
-			this->label30 = (gcnew System::Windows::Forms::Label());
-			this->label31 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt06 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt06 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone05 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone05Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label19 = (gcnew System::Windows::Forms::Label());
-			this->label20 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits05 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits05 = (gcnew System::Windows::Forms::Label());
 			this->labelZone05RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone05Switch = (gcnew System::Windows::Forms::Button());
-			this->label22 = (gcnew System::Windows::Forms::Label());
-			this->label23 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt05 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt05 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone02 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone02Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label4 = (gcnew System::Windows::Forms::Label());
-			this->label5 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits02 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits02 = (gcnew System::Windows::Forms::Label());
 			this->labelZone02RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone02Switch = (gcnew System::Windows::Forms::Button());
-			this->label7 = (gcnew System::Windows::Forms::Label());
-			this->label8 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt02 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt02 = (gcnew System::Windows::Forms::Label());
 			this->groupBoxZone01 = (gcnew System::Windows::Forms::GroupBox());
 			this->labelZone01Setpoint = (gcnew System::Windows::Forms::Label());
-			this->label28 = (gcnew System::Windows::Forms::Label());
-			this->label27 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointUnits01 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempUnits01 = (gcnew System::Windows::Forms::Label());
 			this->labelZone01RealTemp = (gcnew System::Windows::Forms::Label());
 			this->buttonZone01Switch = (gcnew System::Windows::Forms::Button());
-			this->label3 = (gcnew System::Windows::Forms::Label());
-			this->label2 = (gcnew System::Windows::Forms::Label());
+			this->labelSetpointPrompt01 = (gcnew System::Windows::Forms::Label());
+			this->labelRealTempPrompt01 = (gcnew System::Windows::Forms::Label());
 			this->groupBox1->SuspendLayout();
 			this->groupBoxZones->SuspendLayout();
 			this->groupBoxZone12->SuspendLayout();
@@ -536,12 +759,13 @@ namespace HuskyNeo2Tool {
 			// 
 			this->groupBox1->AutoSize = true;
 			this->groupBox1->BackColor = System::Drawing::SystemColors::Window;
-			this->groupBox1->Controls->Add(this->label6);
+			this->groupBox1->Controls->Add(this->buttonLock);
+			this->groupBox1->Controls->Add(this->labelComNumPrompt);
 			this->groupBox1->Controls->Add(this->button28);
 			this->groupBox1->Controls->Add(this->button27);
 			this->groupBox1->Controls->Add(this->buttonConnect);
 			this->groupBox1->Controls->Add(this->comboBox1);
-			this->groupBox1->Location = System::Drawing::Point(10, 10);
+			this->groupBox1->Location = System::Drawing::Point(10, 6);
 			this->groupBox1->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBox1->Name = L"groupBox1";
 			this->groupBox1->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
@@ -549,19 +773,29 @@ namespace HuskyNeo2Tool {
 			this->groupBox1->TabIndex = 0;
 			this->groupBox1->TabStop = false;
 			// 
-			// label6
+			// buttonLock
 			// 
-			this->label6->AutoSize = true;
-			this->label6->Location = System::Drawing::Point(4, 46);
-			this->label6->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
-			this->label6->Name = L"label6";
-			this->label6->Size = System::Drawing::Size(131, 22);
-			this->label6->TabIndex = 13;
-			this->label6->Text = L"机台端口号:";
+			this->buttonLock->Location = System::Drawing::Point(402, 37);
+			this->buttonLock->Name = L"buttonLock";
+			this->buttonLock->Size = System::Drawing::Size(112, 41);
+			this->buttonLock->TabIndex = 14;
+			this->buttonLock->Text = L"锁定";
+			this->buttonLock->UseVisualStyleBackColor = true;
+			this->buttonLock->Click += gcnew System::EventHandler(this, &Form1::buttonLock_Click);
+			// 
+			// labelComNumPrompt
+			// 
+			this->labelComNumPrompt->AutoSize = true;
+			this->labelComNumPrompt->Location = System::Drawing::Point(4, 46);
+			this->labelComNumPrompt->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelComNumPrompt->Name = L"labelComNumPrompt";
+			this->labelComNumPrompt->Size = System::Drawing::Size(131, 22);
+			this->labelComNumPrompt->TabIndex = 13;
+			this->labelComNumPrompt->Text = L"机台端口号:";
 			// 
 			// button28
 			// 
-			this->button28->Location = System::Drawing::Point(858, 37);
+			this->button28->Location = System::Drawing::Point(857, 37);
 			this->button28->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->button28->Name = L"button28";
 			this->button28->Size = System::Drawing::Size(131, 41);
@@ -599,7 +833,7 @@ namespace HuskyNeo2Tool {
 			this->comboBox1->FormattingEnabled = true;
 			this->comboBox1->Items->AddRange(gcnew cli::array< System::Object^  >(9) {L"COM1", L"COM2", L"COM3", L"COM4", L"COM5", L"COM6", 
 				L"COM7", L"COM8", L"COM9"});
-			this->comboBox1->Location = System::Drawing::Point(133, 41);
+			this->comboBox1->Location = System::Drawing::Point(133, 42);
 			this->comboBox1->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->comboBox1->Name = L"comboBox1";
 			this->comboBox1->Size = System::Drawing::Size(82, 29);
@@ -620,7 +854,7 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZones->Controls->Add(this->groupBoxZone05);
 			this->groupBoxZones->Controls->Add(this->groupBoxZone02);
 			this->groupBoxZones->Controls->Add(this->groupBoxZone01);
-			this->groupBoxZones->Location = System::Drawing::Point(10, 130);
+			this->groupBoxZones->Location = System::Drawing::Point(10, 122);
 			this->groupBoxZones->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZones->Name = L"groupBoxZones";
 			this->groupBoxZones->Padding = System::Windows::Forms::Padding(6, 5, 6, 5);
@@ -632,12 +866,12 @@ namespace HuskyNeo2Tool {
 			// 
 			this->groupBoxZone12->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone12->Controls->Add(this->labelZone12Setpoint);
-			this->groupBoxZone12->Controls->Add(this->label57);
-			this->groupBoxZone12->Controls->Add(this->label58);
+			this->groupBoxZone12->Controls->Add(this->labelSetpointUnits12);
+			this->groupBoxZone12->Controls->Add(this->labelRealTempUnits12);
 			this->groupBoxZone12->Controls->Add(this->labelZone12RealTemp);
 			this->groupBoxZone12->Controls->Add(this->buttonZone12Switch);
-			this->groupBoxZone12->Controls->Add(this->label60);
-			this->groupBoxZone12->Controls->Add(this->label61);
+			this->groupBoxZone12->Controls->Add(this->labelSetpointPrompt12);
+			this->groupBoxZone12->Controls->Add(this->labelRealTempPrompt12);
 			this->groupBoxZone12->Location = System::Drawing::Point(749, 398);
 			this->groupBoxZone12->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone12->Name = L"groupBoxZone12";
@@ -646,36 +880,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone12->TabIndex = 0;
 			this->groupBoxZone12->TabStop = false;
 			this->groupBoxZone12->Text = L"Zone12";
+			this->groupBoxZone12->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone12_Click);
 			// 
 			// labelZone12Setpoint
 			// 
 			this->labelZone12Setpoint->AutoSize = true;
-			this->labelZone12Setpoint->Location = System::Drawing::Point(131, 85);
+			this->labelZone12Setpoint->Location = System::Drawing::Point(131, 82);
 			this->labelZone12Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone12Setpoint->Name = L"labelZone12Setpoint";
-			this->labelZone12Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone12Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone12Setpoint->TabIndex = 7;
-			this->labelZone12Setpoint->Text = L"0.0";
+			this->labelZone12Setpoint->Text = L"0";
+			this->labelZone12Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone12Setpoint_Click);
 			// 
-			// label57
+			// labelSetpointUnits12
 			// 
-			this->label57->AutoSize = true;
-			this->label57->Location = System::Drawing::Point(198, 85);
-			this->label57->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label57->Name = L"label57";
-			this->label57->Size = System::Drawing::Size(32, 22);
-			this->label57->TabIndex = 6;
-			this->label57->Text = L"℃";
+			this->labelSetpointUnits12->AutoSize = true;
+			this->labelSetpointUnits12->Location = System::Drawing::Point(190, 82);
+			this->labelSetpointUnits12->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits12->Name = L"labelSetpointUnits12";
+			this->labelSetpointUnits12->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits12->TabIndex = 6;
+			this->labelSetpointUnits12->Text = L"℃";
+			this->labelSetpointUnits12->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits12_Click);
 			// 
-			// label58
+			// labelRealTempUnits12
 			// 
-			this->label58->AutoSize = true;
-			this->label58->Location = System::Drawing::Point(198, 42);
-			this->label58->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label58->Name = L"label58";
-			this->label58->Size = System::Drawing::Size(32, 22);
-			this->label58->TabIndex = 6;
-			this->label58->Text = L"℃";
+			this->labelRealTempUnits12->AutoSize = true;
+			this->labelRealTempUnits12->Location = System::Drawing::Point(190, 42);
+			this->labelRealTempUnits12->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits12->Name = L"labelRealTempUnits12";
+			this->labelRealTempUnits12->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits12->TabIndex = 6;
+			this->labelRealTempUnits12->Text = L"℃";
+			this->labelRealTempUnits12->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits12_Click);
 			// 
 			// labelZone12RealTemp
 			// 
@@ -683,51 +921,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone12RealTemp->Location = System::Drawing::Point(131, 41);
 			this->labelZone12RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone12RealTemp->Name = L"labelZone12RealTemp";
-			this->labelZone12RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone12RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone12RealTemp->TabIndex = 5;
-			this->labelZone12RealTemp->Text = L"0.0";
+			this->labelZone12RealTemp->Text = L"0";
+			this->labelZone12RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone12RealTemp_Click);
 			// 
 			// buttonZone12Switch
 			// 
-			this->buttonZone12Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone12Switch->Location = System::Drawing::Point(28, 123);
 			this->buttonZone12Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone12Switch->Name = L"buttonZone12Switch";
-			this->buttonZone12Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone12Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone12Switch->TabIndex = 3;
 			this->buttonZone12Switch->Text = L"打开";
 			this->buttonZone12Switch->UseVisualStyleBackColor = true;
 			this->buttonZone12Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone12TempSet_Click);
 			// 
-			// label60
+			// labelSetpointPrompt12
 			// 
-			this->label60->AutoSize = true;
-			this->label60->Location = System::Drawing::Point(23, 85);
-			this->label60->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label60->Name = L"label60";
-			this->label60->Size = System::Drawing::Size(120, 22);
-			this->label60->TabIndex = 1;
-			this->label60->Text = L"设定温度: ";
+			this->labelSetpointPrompt12->AutoSize = true;
+			this->labelSetpointPrompt12->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt12->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt12->Name = L"labelSetpointPrompt12";
+			this->labelSetpointPrompt12->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt12->TabIndex = 1;
+			this->labelSetpointPrompt12->Text = L"设定温度: ";
+			this->labelSetpointPrompt12->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt12_Click);
 			// 
-			// label61
+			// labelRealTempPrompt12
 			// 
-			this->label61->AutoSize = true;
-			this->label61->Location = System::Drawing::Point(23, 41);
-			this->label61->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label61->Name = L"label61";
-			this->label61->Size = System::Drawing::Size(120, 22);
-			this->label61->TabIndex = 0;
-			this->label61->Text = L"实时温度: ";
+			this->labelRealTempPrompt12->AutoSize = true;
+			this->labelRealTempPrompt12->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt12->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt12->Name = L"labelRealTempPrompt12";
+			this->labelRealTempPrompt12->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt12->TabIndex = 0;
+			this->labelRealTempPrompt12->Text = L"实时温度: ";
+			this->labelRealTempPrompt12->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt12_Click);
 			// 
 			// groupBoxZone08
 			// 
 			this->groupBoxZone08->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone08->Controls->Add(this->labelZone08Setpoint);
-			this->groupBoxZone08->Controls->Add(this->label37);
-			this->groupBoxZone08->Controls->Add(this->label38);
+			this->groupBoxZone08->Controls->Add(this->labelSetpointUnits08);
+			this->groupBoxZone08->Controls->Add(this->labelRealTempUnits08);
 			this->groupBoxZone08->Controls->Add(this->labelZone08RealTemp);
 			this->groupBoxZone08->Controls->Add(this->buttonZone08Switch);
-			this->groupBoxZone08->Controls->Add(this->label40);
-			this->groupBoxZone08->Controls->Add(this->label41);
+			this->groupBoxZone08->Controls->Add(this->labelSetpointPrompt08);
+			this->groupBoxZone08->Controls->Add(this->labelRealTempPrompt08);
 			this->groupBoxZone08->Location = System::Drawing::Point(749, 210);
 			this->groupBoxZone08->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone08->Name = L"groupBoxZone08";
@@ -736,36 +977,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone08->TabIndex = 0;
 			this->groupBoxZone08->TabStop = false;
 			this->groupBoxZone08->Text = L"Zone08";
+			this->groupBoxZone08->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone08_Click);
 			// 
 			// labelZone08Setpoint
 			// 
 			this->labelZone08Setpoint->AutoSize = true;
-			this->labelZone08Setpoint->Location = System::Drawing::Point(131, 85);
+			this->labelZone08Setpoint->Location = System::Drawing::Point(131, 82);
 			this->labelZone08Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone08Setpoint->Name = L"labelZone08Setpoint";
-			this->labelZone08Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone08Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone08Setpoint->TabIndex = 7;
-			this->labelZone08Setpoint->Text = L"0.0";
+			this->labelZone08Setpoint->Text = L"0";
+			this->labelZone08Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone08Setpoint_Click);
 			// 
-			// label37
+			// labelSetpointUnits08
 			// 
-			this->label37->AutoSize = true;
-			this->label37->Location = System::Drawing::Point(198, 85);
-			this->label37->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label37->Name = L"label37";
-			this->label37->Size = System::Drawing::Size(32, 22);
-			this->label37->TabIndex = 6;
-			this->label37->Text = L"℃";
+			this->labelSetpointUnits08->AutoSize = true;
+			this->labelSetpointUnits08->Location = System::Drawing::Point(190, 82);
+			this->labelSetpointUnits08->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits08->Name = L"labelSetpointUnits08";
+			this->labelSetpointUnits08->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits08->TabIndex = 6;
+			this->labelSetpointUnits08->Text = L"℃";
+			this->labelSetpointUnits08->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits08_Click);
 			// 
-			// label38
+			// labelRealTempUnits08
 			// 
-			this->label38->AutoSize = true;
-			this->label38->Location = System::Drawing::Point(198, 42);
-			this->label38->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label38->Name = L"label38";
-			this->label38->Size = System::Drawing::Size(32, 22);
-			this->label38->TabIndex = 6;
-			this->label38->Text = L"℃";
+			this->labelRealTempUnits08->AutoSize = true;
+			this->labelRealTempUnits08->Location = System::Drawing::Point(190, 42);
+			this->labelRealTempUnits08->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits08->Name = L"labelRealTempUnits08";
+			this->labelRealTempUnits08->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits08->TabIndex = 6;
+			this->labelRealTempUnits08->Text = L"℃";
+			this->labelRealTempUnits08->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits08_Click);
 			// 
 			// labelZone08RealTemp
 			// 
@@ -773,51 +1018,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone08RealTemp->Location = System::Drawing::Point(131, 41);
 			this->labelZone08RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone08RealTemp->Name = L"labelZone08RealTemp";
-			this->labelZone08RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone08RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone08RealTemp->TabIndex = 5;
-			this->labelZone08RealTemp->Text = L"0.0";
+			this->labelZone08RealTemp->Text = L"0";
+			this->labelZone08RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone08RealTemp_Click);
 			// 
 			// buttonZone08Switch
 			// 
-			this->buttonZone08Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone08Switch->Location = System::Drawing::Point(28, 123);
 			this->buttonZone08Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone08Switch->Name = L"buttonZone08Switch";
-			this->buttonZone08Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone08Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone08Switch->TabIndex = 3;
 			this->buttonZone08Switch->Text = L"打开";
 			this->buttonZone08Switch->UseVisualStyleBackColor = true;
 			this->buttonZone08Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone08TempSet_Click);
 			// 
-			// label40
+			// labelSetpointPrompt08
 			// 
-			this->label40->AutoSize = true;
-			this->label40->Location = System::Drawing::Point(23, 85);
-			this->label40->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label40->Name = L"label40";
-			this->label40->Size = System::Drawing::Size(120, 22);
-			this->label40->TabIndex = 1;
-			this->label40->Text = L"设定温度: ";
+			this->labelSetpointPrompt08->AutoSize = true;
+			this->labelSetpointPrompt08->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt08->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt08->Name = L"labelSetpointPrompt08";
+			this->labelSetpointPrompt08->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt08->TabIndex = 1;
+			this->labelSetpointPrompt08->Text = L"设定温度: ";
+			this->labelSetpointPrompt08->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt08_Click);
 			// 
-			// label41
+			// labelRealTempPrompt08
 			// 
-			this->label41->AutoSize = true;
-			this->label41->Location = System::Drawing::Point(23, 41);
-			this->label41->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label41->Name = L"label41";
-			this->label41->Size = System::Drawing::Size(120, 22);
-			this->label41->TabIndex = 0;
-			this->label41->Text = L"实时温度: ";
+			this->labelRealTempPrompt08->AutoSize = true;
+			this->labelRealTempPrompt08->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt08->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt08->Name = L"labelRealTempPrompt08";
+			this->labelRealTempPrompt08->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt08->TabIndex = 0;
+			this->labelRealTempPrompt08->Text = L"实时温度: ";
+			this->labelRealTempPrompt08->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt08_Click);
 			// 
 			// groupBoxZone04
 			// 
 			this->groupBoxZone04->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone04->Controls->Add(this->labelZone04Setpoint);
-			this->groupBoxZone04->Controls->Add(this->label14);
-			this->groupBoxZone04->Controls->Add(this->label15);
+			this->groupBoxZone04->Controls->Add(this->labelSetpointUnits04);
+			this->groupBoxZone04->Controls->Add(this->labelRealTempUnits04);
 			this->groupBoxZone04->Controls->Add(this->labelZone04RealTemp);
 			this->groupBoxZone04->Controls->Add(this->buttonZone04Switch);
-			this->groupBoxZone04->Controls->Add(this->label17);
-			this->groupBoxZone04->Controls->Add(this->label18);
+			this->groupBoxZone04->Controls->Add(this->labelSetpointPrompt04);
+			this->groupBoxZone04->Controls->Add(this->labelRealTempPrompt04);
 			this->groupBoxZone04->Location = System::Drawing::Point(749, 22);
 			this->groupBoxZone04->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone04->Name = L"groupBoxZone04";
@@ -826,36 +1074,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone04->TabIndex = 0;
 			this->groupBoxZone04->TabStop = false;
 			this->groupBoxZone04->Text = L"Zone04";
+			this->groupBoxZone04->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone04_Click);
 			// 
 			// labelZone04Setpoint
 			// 
 			this->labelZone04Setpoint->AutoSize = true;
-			this->labelZone04Setpoint->Location = System::Drawing::Point(131, 85);
+			this->labelZone04Setpoint->Location = System::Drawing::Point(131, 82);
 			this->labelZone04Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone04Setpoint->Name = L"labelZone04Setpoint";
-			this->labelZone04Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone04Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone04Setpoint->TabIndex = 7;
-			this->labelZone04Setpoint->Text = L"0.0";
+			this->labelZone04Setpoint->Text = L"0";
+			this->labelZone04Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone04Setpoint_Click);
 			// 
-			// label14
+			// labelSetpointUnits04
 			// 
-			this->label14->AutoSize = true;
-			this->label14->Location = System::Drawing::Point(198, 85);
-			this->label14->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label14->Name = L"label14";
-			this->label14->Size = System::Drawing::Size(32, 22);
-			this->label14->TabIndex = 6;
-			this->label14->Text = L"℃";
+			this->labelSetpointUnits04->AutoSize = true;
+			this->labelSetpointUnits04->Location = System::Drawing::Point(190, 82);
+			this->labelSetpointUnits04->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits04->Name = L"labelSetpointUnits04";
+			this->labelSetpointUnits04->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits04->TabIndex = 6;
+			this->labelSetpointUnits04->Text = L"℃";
+			this->labelSetpointUnits04->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits04_Click);
 			// 
-			// label15
+			// labelRealTempUnits04
 			// 
-			this->label15->AutoSize = true;
-			this->label15->Location = System::Drawing::Point(198, 42);
-			this->label15->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label15->Name = L"label15";
-			this->label15->Size = System::Drawing::Size(32, 22);
-			this->label15->TabIndex = 6;
-			this->label15->Text = L"℃";
+			this->labelRealTempUnits04->AutoSize = true;
+			this->labelRealTempUnits04->Location = System::Drawing::Point(190, 42);
+			this->labelRealTempUnits04->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits04->Name = L"labelRealTempUnits04";
+			this->labelRealTempUnits04->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits04->TabIndex = 6;
+			this->labelRealTempUnits04->Text = L"℃";
+			this->labelRealTempUnits04->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits04_Click);
 			// 
 			// labelZone04RealTemp
 			// 
@@ -863,51 +1115,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone04RealTemp->Location = System::Drawing::Point(131, 41);
 			this->labelZone04RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone04RealTemp->Name = L"labelZone04RealTemp";
-			this->labelZone04RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone04RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone04RealTemp->TabIndex = 5;
-			this->labelZone04RealTemp->Text = L"0.0";
+			this->labelZone04RealTemp->Text = L"0";
+			this->labelZone04RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone04RealTemp_Click);
 			// 
 			// buttonZone04Switch
 			// 
-			this->buttonZone04Switch->Location = System::Drawing::Point(29, 120);
+			this->buttonZone04Switch->Location = System::Drawing::Point(28, 122);
 			this->buttonZone04Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone04Switch->Name = L"buttonZone04Switch";
-			this->buttonZone04Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone04Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone04Switch->TabIndex = 3;
 			this->buttonZone04Switch->Text = L"打开";
 			this->buttonZone04Switch->UseVisualStyleBackColor = true;
 			this->buttonZone04Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone04TempSet_Click);
 			// 
-			// label17
+			// labelSetpointPrompt04
 			// 
-			this->label17->AutoSize = true;
-			this->label17->Location = System::Drawing::Point(23, 85);
-			this->label17->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label17->Name = L"label17";
-			this->label17->Size = System::Drawing::Size(120, 22);
-			this->label17->TabIndex = 1;
-			this->label17->Text = L"设定温度: ";
+			this->labelSetpointPrompt04->AutoSize = true;
+			this->labelSetpointPrompt04->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt04->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt04->Name = L"labelSetpointPrompt04";
+			this->labelSetpointPrompt04->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt04->TabIndex = 1;
+			this->labelSetpointPrompt04->Text = L"设定温度: ";
+			this->labelSetpointPrompt04->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt04_Click);
 			// 
-			// label18
+			// labelRealTempPrompt04
 			// 
-			this->label18->AutoSize = true;
-			this->label18->Location = System::Drawing::Point(23, 41);
-			this->label18->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label18->Name = L"label18";
-			this->label18->Size = System::Drawing::Size(120, 22);
-			this->label18->TabIndex = 0;
-			this->label18->Text = L"实时温度: ";
+			this->labelRealTempPrompt04->AutoSize = true;
+			this->labelRealTempPrompt04->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt04->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt04->Name = L"labelRealTempPrompt04";
+			this->labelRealTempPrompt04->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt04->TabIndex = 0;
+			this->labelRealTempPrompt04->Text = L"实时温度: ";
+			this->labelRealTempPrompt04->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt04_Click);
 			// 
 			// groupBoxZone11
 			// 
 			this->groupBoxZone11->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone11->Controls->Add(this->labelZone11Setpoint);
-			this->groupBoxZone11->Controls->Add(this->label52);
-			this->groupBoxZone11->Controls->Add(this->label53);
+			this->groupBoxZone11->Controls->Add(this->labelSetpointUnits11);
+			this->groupBoxZone11->Controls->Add(this->labelRealTempUnits11);
 			this->groupBoxZone11->Controls->Add(this->labelZone11RealTemp);
 			this->groupBoxZone11->Controls->Add(this->buttonZone11Switch);
-			this->groupBoxZone11->Controls->Add(this->label55);
-			this->groupBoxZone11->Controls->Add(this->label56);
+			this->groupBoxZone11->Controls->Add(this->labelSetpointPrompt11);
+			this->groupBoxZone11->Controls->Add(this->labelRealTempPrompt11);
 			this->groupBoxZone11->Location = System::Drawing::Point(504, 398);
 			this->groupBoxZone11->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone11->Name = L"groupBoxZone11";
@@ -916,36 +1171,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone11->TabIndex = 0;
 			this->groupBoxZone11->TabStop = false;
 			this->groupBoxZone11->Text = L"Zone11";
+			this->groupBoxZone11->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone11_Click);
 			// 
 			// labelZone11Setpoint
 			// 
 			this->labelZone11Setpoint->AutoSize = true;
-			this->labelZone11Setpoint->Location = System::Drawing::Point(128, 86);
+			this->labelZone11Setpoint->Location = System::Drawing::Point(128, 83);
 			this->labelZone11Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone11Setpoint->Name = L"labelZone11Setpoint";
-			this->labelZone11Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone11Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone11Setpoint->TabIndex = 7;
-			this->labelZone11Setpoint->Text = L"0.0";
+			this->labelZone11Setpoint->Text = L"0";
+			this->labelZone11Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone11Setpoint_Click);
 			// 
-			// label52
+			// labelSetpointUnits11
 			// 
-			this->label52->AutoSize = true;
-			this->label52->Location = System::Drawing::Point(198, 86);
-			this->label52->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label52->Name = L"label52";
-			this->label52->Size = System::Drawing::Size(32, 22);
-			this->label52->TabIndex = 6;
-			this->label52->Text = L"℃";
+			this->labelSetpointUnits11->AutoSize = true;
+			this->labelSetpointUnits11->Location = System::Drawing::Point(190, 83);
+			this->labelSetpointUnits11->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits11->Name = L"labelSetpointUnits11";
+			this->labelSetpointUnits11->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits11->TabIndex = 6;
+			this->labelSetpointUnits11->Text = L"℃";
+			this->labelSetpointUnits11->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits11_Click);
 			// 
-			// label53
+			// labelRealTempUnits11
 			// 
-			this->label53->AutoSize = true;
-			this->label53->Location = System::Drawing::Point(198, 43);
-			this->label53->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label53->Name = L"label53";
-			this->label53->Size = System::Drawing::Size(32, 22);
-			this->label53->TabIndex = 6;
-			this->label53->Text = L"℃";
+			this->labelRealTempUnits11->AutoSize = true;
+			this->labelRealTempUnits11->Location = System::Drawing::Point(190, 43);
+			this->labelRealTempUnits11->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits11->Name = L"labelRealTempUnits11";
+			this->labelRealTempUnits11->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits11->TabIndex = 6;
+			this->labelRealTempUnits11->Text = L"℃";
+			this->labelRealTempUnits11->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits11_Click);
 			// 
 			// labelZone11RealTemp
 			// 
@@ -953,51 +1212,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone11RealTemp->Location = System::Drawing::Point(128, 42);
 			this->labelZone11RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone11RealTemp->Name = L"labelZone11RealTemp";
-			this->labelZone11RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone11RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone11RealTemp->TabIndex = 5;
-			this->labelZone11RealTemp->Text = L"0.0";
+			this->labelZone11RealTemp->Text = L"0";
+			this->labelZone11RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone11RealTemp_Click);
 			// 
 			// buttonZone11Switch
 			// 
-			this->buttonZone11Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone11Switch->Location = System::Drawing::Point(28, 123);
 			this->buttonZone11Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone11Switch->Name = L"buttonZone11Switch";
-			this->buttonZone11Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone11Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone11Switch->TabIndex = 3;
 			this->buttonZone11Switch->Text = L"打开";
 			this->buttonZone11Switch->UseVisualStyleBackColor = true;
 			this->buttonZone11Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone11TempSet_Click);
 			// 
-			// label55
+			// labelSetpointPrompt11
 			// 
-			this->label55->AutoSize = true;
-			this->label55->Location = System::Drawing::Point(23, 85);
-			this->label55->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label55->Name = L"label55";
-			this->label55->Size = System::Drawing::Size(120, 22);
-			this->label55->TabIndex = 1;
-			this->label55->Text = L"设定温度: ";
+			this->labelSetpointPrompt11->AutoSize = true;
+			this->labelSetpointPrompt11->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt11->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt11->Name = L"labelSetpointPrompt11";
+			this->labelSetpointPrompt11->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt11->TabIndex = 1;
+			this->labelSetpointPrompt11->Text = L"设定温度: ";
+			this->labelSetpointPrompt11->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt11_Click);
 			// 
-			// label56
+			// labelRealTempPrompt11
 			// 
-			this->label56->AutoSize = true;
-			this->label56->Location = System::Drawing::Point(23, 41);
-			this->label56->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label56->Name = L"label56";
-			this->label56->Size = System::Drawing::Size(120, 22);
-			this->label56->TabIndex = 0;
-			this->label56->Text = L"实时温度: ";
+			this->labelRealTempPrompt11->AutoSize = true;
+			this->labelRealTempPrompt11->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt11->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt11->Name = L"labelRealTempPrompt11";
+			this->labelRealTempPrompt11->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt11->TabIndex = 0;
+			this->labelRealTempPrompt11->Text = L"实时温度: ";
+			this->labelRealTempPrompt11->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt11_Click);
 			// 
 			// groupBoxZone07
 			// 
 			this->groupBoxZone07->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone07->Controls->Add(this->labelZone07Setpoint);
-			this->groupBoxZone07->Controls->Add(this->label32);
-			this->groupBoxZone07->Controls->Add(this->label33);
+			this->groupBoxZone07->Controls->Add(this->labelSetpointUnits07);
+			this->groupBoxZone07->Controls->Add(this->labelRealTempUnits07);
 			this->groupBoxZone07->Controls->Add(this->labelZone07RealTemp);
 			this->groupBoxZone07->Controls->Add(this->buttonZone07Switch);
-			this->groupBoxZone07->Controls->Add(this->label35);
-			this->groupBoxZone07->Controls->Add(this->label36);
+			this->groupBoxZone07->Controls->Add(this->labelSetpointPrompt07);
+			this->groupBoxZone07->Controls->Add(this->labelRealTempPrompt07);
 			this->groupBoxZone07->Location = System::Drawing::Point(504, 210);
 			this->groupBoxZone07->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone07->Name = L"groupBoxZone07";
@@ -1006,36 +1268,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone07->TabIndex = 0;
 			this->groupBoxZone07->TabStop = false;
 			this->groupBoxZone07->Text = L"Zone07";
+			this->groupBoxZone07->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone07_Click);
 			// 
 			// labelZone07Setpoint
 			// 
 			this->labelZone07Setpoint->AutoSize = true;
-			this->labelZone07Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone07Setpoint->Location = System::Drawing::Point(128, 82);
 			this->labelZone07Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone07Setpoint->Name = L"labelZone07Setpoint";
-			this->labelZone07Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone07Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone07Setpoint->TabIndex = 7;
-			this->labelZone07Setpoint->Text = L"0.0";
+			this->labelZone07Setpoint->Text = L"0";
+			this->labelZone07Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone07Setpoint_Click);
 			// 
-			// label32
+			// labelSetpointUnits07
 			// 
-			this->label32->AutoSize = true;
-			this->label32->Location = System::Drawing::Point(196, 85);
-			this->label32->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label32->Name = L"label32";
-			this->label32->Size = System::Drawing::Size(32, 22);
-			this->label32->TabIndex = 6;
-			this->label32->Text = L"℃";
+			this->labelSetpointUnits07->AutoSize = true;
+			this->labelSetpointUnits07->Location = System::Drawing::Point(188, 82);
+			this->labelSetpointUnits07->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits07->Name = L"labelSetpointUnits07";
+			this->labelSetpointUnits07->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits07->TabIndex = 6;
+			this->labelSetpointUnits07->Text = L"℃";
+			this->labelSetpointUnits07->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits07_Click);
 			// 
-			// label33
+			// labelRealTempUnits07
 			// 
-			this->label33->AutoSize = true;
-			this->label33->Location = System::Drawing::Point(196, 42);
-			this->label33->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label33->Name = L"label33";
-			this->label33->Size = System::Drawing::Size(32, 22);
-			this->label33->TabIndex = 6;
-			this->label33->Text = L"℃";
+			this->labelRealTempUnits07->AutoSize = true;
+			this->labelRealTempUnits07->Location = System::Drawing::Point(188, 42);
+			this->labelRealTempUnits07->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits07->Name = L"labelRealTempUnits07";
+			this->labelRealTempUnits07->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits07->TabIndex = 6;
+			this->labelRealTempUnits07->Text = L"℃";
+			this->labelRealTempUnits07->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits07_Click);
 			// 
 			// labelZone07RealTemp
 			// 
@@ -1043,51 +1309,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone07RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone07RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone07RealTemp->Name = L"labelZone07RealTemp";
-			this->labelZone07RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone07RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone07RealTemp->TabIndex = 5;
-			this->labelZone07RealTemp->Text = L"0.0";
+			this->labelZone07RealTemp->Text = L"0";
+			this->labelZone07RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone07RealTemp_Click);
 			// 
 			// buttonZone07Switch
 			// 
-			this->buttonZone07Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone07Switch->Location = System::Drawing::Point(28, 123);
 			this->buttonZone07Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone07Switch->Name = L"buttonZone07Switch";
-			this->buttonZone07Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone07Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone07Switch->TabIndex = 3;
 			this->buttonZone07Switch->Text = L"打开";
 			this->buttonZone07Switch->UseVisualStyleBackColor = true;
 			this->buttonZone07Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone07TempSet_Click);
 			// 
-			// label35
+			// labelSetpointPrompt07
 			// 
-			this->label35->AutoSize = true;
-			this->label35->Location = System::Drawing::Point(23, 85);
-			this->label35->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label35->Name = L"label35";
-			this->label35->Size = System::Drawing::Size(120, 22);
-			this->label35->TabIndex = 1;
-			this->label35->Text = L"设定温度: ";
+			this->labelSetpointPrompt07->AutoSize = true;
+			this->labelSetpointPrompt07->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt07->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt07->Name = L"labelSetpointPrompt07";
+			this->labelSetpointPrompt07->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt07->TabIndex = 1;
+			this->labelSetpointPrompt07->Text = L"设定温度: ";
+			this->labelSetpointPrompt07->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt07_Click);
 			// 
-			// label36
+			// labelRealTempPrompt07
 			// 
-			this->label36->AutoSize = true;
-			this->label36->Location = System::Drawing::Point(23, 41);
-			this->label36->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label36->Name = L"label36";
-			this->label36->Size = System::Drawing::Size(120, 22);
-			this->label36->TabIndex = 0;
-			this->label36->Text = L"实时温度: ";
+			this->labelRealTempPrompt07->AutoSize = true;
+			this->labelRealTempPrompt07->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt07->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt07->Name = L"labelRealTempPrompt07";
+			this->labelRealTempPrompt07->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt07->TabIndex = 0;
+			this->labelRealTempPrompt07->Text = L"实时温度: ";
+			this->labelRealTempPrompt07->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt07_Click);
 			// 
 			// groupBoxZone03
 			// 
 			this->groupBoxZone03->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone03->Controls->Add(this->labelZone03Setpoint);
-			this->groupBoxZone03->Controls->Add(this->label9);
-			this->groupBoxZone03->Controls->Add(this->label10);
+			this->groupBoxZone03->Controls->Add(this->labelSetpointUnits03);
+			this->groupBoxZone03->Controls->Add(this->labelRealTempUnits03);
 			this->groupBoxZone03->Controls->Add(this->labelZone03RealTemp);
 			this->groupBoxZone03->Controls->Add(this->buttonZone03Switch);
-			this->groupBoxZone03->Controls->Add(this->label12);
-			this->groupBoxZone03->Controls->Add(this->label13);
+			this->groupBoxZone03->Controls->Add(this->labelSetpointPrompt03);
+			this->groupBoxZone03->Controls->Add(this->labelRealTempPrompt03);
 			this->groupBoxZone03->Location = System::Drawing::Point(504, 22);
 			this->groupBoxZone03->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone03->Name = L"groupBoxZone03";
@@ -1096,36 +1365,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone03->TabIndex = 0;
 			this->groupBoxZone03->TabStop = false;
 			this->groupBoxZone03->Text = L"Zone03";
+			this->groupBoxZone03->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone03_Click);
 			// 
 			// labelZone03Setpoint
 			// 
 			this->labelZone03Setpoint->AutoSize = true;
-			this->labelZone03Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone03Setpoint->Location = System::Drawing::Point(128, 82);
 			this->labelZone03Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone03Setpoint->Name = L"labelZone03Setpoint";
-			this->labelZone03Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone03Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone03Setpoint->TabIndex = 7;
-			this->labelZone03Setpoint->Text = L"0.0";
+			this->labelZone03Setpoint->Text = L"0";
+			this->labelZone03Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone03Setpoint_Click);
 			// 
-			// label9
+			// labelSetpointUnits03
 			// 
-			this->label9->AutoSize = true;
-			this->label9->Location = System::Drawing::Point(196, 85);
-			this->label9->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label9->Name = L"label9";
-			this->label9->Size = System::Drawing::Size(32, 22);
-			this->label9->TabIndex = 6;
-			this->label9->Text = L"℃";
+			this->labelSetpointUnits03->AutoSize = true;
+			this->labelSetpointUnits03->Location = System::Drawing::Point(188, 82);
+			this->labelSetpointUnits03->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits03->Name = L"labelSetpointUnits03";
+			this->labelSetpointUnits03->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits03->TabIndex = 6;
+			this->labelSetpointUnits03->Text = L"℃";
+			this->labelSetpointUnits03->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits03_Click);
 			// 
-			// label10
+			// labelRealTempUnits03
 			// 
-			this->label10->AutoSize = true;
-			this->label10->Location = System::Drawing::Point(196, 42);
-			this->label10->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label10->Name = L"label10";
-			this->label10->Size = System::Drawing::Size(32, 22);
-			this->label10->TabIndex = 6;
-			this->label10->Text = L"℃";
+			this->labelRealTempUnits03->AutoSize = true;
+			this->labelRealTempUnits03->Location = System::Drawing::Point(188, 42);
+			this->labelRealTempUnits03->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits03->Name = L"labelRealTempUnits03";
+			this->labelRealTempUnits03->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits03->TabIndex = 6;
+			this->labelRealTempUnits03->Text = L"℃";
+			this->labelRealTempUnits03->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits03_Click);
 			// 
 			// labelZone03RealTemp
 			// 
@@ -1133,51 +1406,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone03RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone03RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone03RealTemp->Name = L"labelZone03RealTemp";
-			this->labelZone03RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone03RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone03RealTemp->TabIndex = 5;
-			this->labelZone03RealTemp->Text = L"0.0";
+			this->labelZone03RealTemp->Text = L"0";
+			this->labelZone03RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone03RealTemp_Click);
 			// 
 			// buttonZone03Switch
 			// 
-			this->buttonZone03Switch->Location = System::Drawing::Point(29, 120);
+			this->buttonZone03Switch->Location = System::Drawing::Point(28, 122);
 			this->buttonZone03Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone03Switch->Name = L"buttonZone03Switch";
-			this->buttonZone03Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone03Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone03Switch->TabIndex = 3;
 			this->buttonZone03Switch->Text = L"打开";
 			this->buttonZone03Switch->UseVisualStyleBackColor = true;
 			this->buttonZone03Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone03TempSet_Click);
 			// 
-			// label12
+			// labelSetpointPrompt03
 			// 
-			this->label12->AutoSize = true;
-			this->label12->Location = System::Drawing::Point(23, 85);
-			this->label12->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label12->Name = L"label12";
-			this->label12->Size = System::Drawing::Size(120, 22);
-			this->label12->TabIndex = 1;
-			this->label12->Text = L"设定温度: ";
+			this->labelSetpointPrompt03->AutoSize = true;
+			this->labelSetpointPrompt03->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt03->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt03->Name = L"labelSetpointPrompt03";
+			this->labelSetpointPrompt03->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt03->TabIndex = 1;
+			this->labelSetpointPrompt03->Text = L"设定温度: ";
+			this->labelSetpointPrompt03->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt03_Click);
 			// 
-			// label13
+			// labelRealTempPrompt03
 			// 
-			this->label13->AutoSize = true;
-			this->label13->Location = System::Drawing::Point(23, 41);
-			this->label13->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label13->Name = L"label13";
-			this->label13->Size = System::Drawing::Size(120, 22);
-			this->label13->TabIndex = 0;
-			this->label13->Text = L"实时温度: ";
+			this->labelRealTempPrompt03->AutoSize = true;
+			this->labelRealTempPrompt03->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt03->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt03->Name = L"labelRealTempPrompt03";
+			this->labelRealTempPrompt03->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt03->TabIndex = 0;
+			this->labelRealTempPrompt03->Text = L"实时温度: ";
+			this->labelRealTempPrompt03->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt03_Click);
 			// 
 			// groupBoxZone10
 			// 
 			this->groupBoxZone10->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone10->Controls->Add(this->labelZone10Setpoint);
-			this->groupBoxZone10->Controls->Add(this->label47);
-			this->groupBoxZone10->Controls->Add(this->label48);
+			this->groupBoxZone10->Controls->Add(this->labelSetpointUnits10);
+			this->groupBoxZone10->Controls->Add(this->labelRealTempUnits10);
 			this->groupBoxZone10->Controls->Add(this->labelZone10RealTemp);
 			this->groupBoxZone10->Controls->Add(this->buttonZone10Switch);
-			this->groupBoxZone10->Controls->Add(this->label50);
-			this->groupBoxZone10->Controls->Add(this->label51);
+			this->groupBoxZone10->Controls->Add(this->labelSetpointPrompt10);
+			this->groupBoxZone10->Controls->Add(this->labelRealTempPrompt10);
 			this->groupBoxZone10->Location = System::Drawing::Point(259, 398);
 			this->groupBoxZone10->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone10->Name = L"groupBoxZone10";
@@ -1186,36 +1462,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone10->TabIndex = 0;
 			this->groupBoxZone10->TabStop = false;
 			this->groupBoxZone10->Text = L"Zone10";
+			this->groupBoxZone10->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone10_Click);
 			// 
 			// labelZone10Setpoint
 			// 
 			this->labelZone10Setpoint->AutoSize = true;
-			this->labelZone10Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone10Setpoint->Location = System::Drawing::Point(128, 82);
 			this->labelZone10Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone10Setpoint->Name = L"labelZone10Setpoint";
-			this->labelZone10Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone10Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone10Setpoint->TabIndex = 7;
-			this->labelZone10Setpoint->Text = L"0.0";
+			this->labelZone10Setpoint->Text = L"0";
+			this->labelZone10Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone10Setpoint_Click);
 			// 
-			// label47
+			// labelSetpointUnits10
 			// 
-			this->label47->AutoSize = true;
-			this->label47->Location = System::Drawing::Point(196, 85);
-			this->label47->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label47->Name = L"label47";
-			this->label47->Size = System::Drawing::Size(32, 22);
-			this->label47->TabIndex = 6;
-			this->label47->Text = L"℃";
+			this->labelSetpointUnits10->AutoSize = true;
+			this->labelSetpointUnits10->Location = System::Drawing::Point(188, 82);
+			this->labelSetpointUnits10->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits10->Name = L"labelSetpointUnits10";
+			this->labelSetpointUnits10->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits10->TabIndex = 6;
+			this->labelSetpointUnits10->Text = L"℃";
+			this->labelSetpointUnits10->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits10_Click);
 			// 
-			// label48
+			// labelRealTempUnits10
 			// 
-			this->label48->AutoSize = true;
-			this->label48->Location = System::Drawing::Point(196, 42);
-			this->label48->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label48->Name = L"label48";
-			this->label48->Size = System::Drawing::Size(32, 22);
-			this->label48->TabIndex = 6;
-			this->label48->Text = L"℃";
+			this->labelRealTempUnits10->AutoSize = true;
+			this->labelRealTempUnits10->Location = System::Drawing::Point(188, 42);
+			this->labelRealTempUnits10->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits10->Name = L"labelRealTempUnits10";
+			this->labelRealTempUnits10->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits10->TabIndex = 6;
+			this->labelRealTempUnits10->Text = L"℃";
+			this->labelRealTempUnits10->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits10_Click);
 			// 
 			// labelZone10RealTemp
 			// 
@@ -1223,51 +1503,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone10RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone10RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone10RealTemp->Name = L"labelZone10RealTemp";
-			this->labelZone10RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone10RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone10RealTemp->TabIndex = 5;
-			this->labelZone10RealTemp->Text = L"0.0";
+			this->labelZone10RealTemp->Text = L"0";
+			this->labelZone10RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone10RealTemp_Click);
 			// 
 			// buttonZone10Switch
 			// 
-			this->buttonZone10Switch->Location = System::Drawing::Point(29, 122);
+			this->buttonZone10Switch->Location = System::Drawing::Point(28, 124);
 			this->buttonZone10Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone10Switch->Name = L"buttonZone10Switch";
-			this->buttonZone10Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone10Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone10Switch->TabIndex = 3;
 			this->buttonZone10Switch->Text = L"打开";
 			this->buttonZone10Switch->UseVisualStyleBackColor = true;
 			this->buttonZone10Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone10TempSet_Click);
 			// 
-			// label50
+			// labelSetpointPrompt10
 			// 
-			this->label50->AutoSize = true;
-			this->label50->Location = System::Drawing::Point(23, 85);
-			this->label50->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label50->Name = L"label50";
-			this->label50->Size = System::Drawing::Size(120, 22);
-			this->label50->TabIndex = 1;
-			this->label50->Text = L"设定温度: ";
+			this->labelSetpointPrompt10->AutoSize = true;
+			this->labelSetpointPrompt10->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt10->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt10->Name = L"labelSetpointPrompt10";
+			this->labelSetpointPrompt10->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt10->TabIndex = 1;
+			this->labelSetpointPrompt10->Text = L"设定温度: ";
+			this->labelSetpointPrompt10->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt10_Click);
 			// 
-			// label51
+			// labelRealTempPrompt10
 			// 
-			this->label51->AutoSize = true;
-			this->label51->Location = System::Drawing::Point(23, 41);
-			this->label51->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label51->Name = L"label51";
-			this->label51->Size = System::Drawing::Size(120, 22);
-			this->label51->TabIndex = 0;
-			this->label51->Text = L"实时温度: ";
+			this->labelRealTempPrompt10->AutoSize = true;
+			this->labelRealTempPrompt10->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt10->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt10->Name = L"labelRealTempPrompt10";
+			this->labelRealTempPrompt10->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt10->TabIndex = 0;
+			this->labelRealTempPrompt10->Text = L"实时温度: ";
+			this->labelRealTempPrompt10->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt10_Click);
 			// 
 			// groupBoxZone09
 			// 
 			this->groupBoxZone09->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone09->Controls->Add(this->labelZone09Setpoint);
-			this->groupBoxZone09->Controls->Add(this->label42);
-			this->groupBoxZone09->Controls->Add(this->label43);
+			this->groupBoxZone09->Controls->Add(this->labelSetpointUnits09);
+			this->groupBoxZone09->Controls->Add(this->labelRealTempUnits09);
 			this->groupBoxZone09->Controls->Add(this->labelZone09RealTemp);
 			this->groupBoxZone09->Controls->Add(this->buttonZone09Switch);
-			this->groupBoxZone09->Controls->Add(this->label45);
-			this->groupBoxZone09->Controls->Add(this->label46);
+			this->groupBoxZone09->Controls->Add(this->labelSetpointPrompt09);
+			this->groupBoxZone09->Controls->Add(this->labelRealTempPrompt09);
 			this->groupBoxZone09->Location = System::Drawing::Point(13, 398);
 			this->groupBoxZone09->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone09->Name = L"groupBoxZone09";
@@ -1276,36 +1559,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone09->TabIndex = 0;
 			this->groupBoxZone09->TabStop = false;
 			this->groupBoxZone09->Text = L"Zone09";
+			this->groupBoxZone09->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone09_Click);
 			// 
 			// labelZone09Setpoint
 			// 
 			this->labelZone09Setpoint->AutoSize = true;
-			this->labelZone09Setpoint->Location = System::Drawing::Point(130, 85);
+			this->labelZone09Setpoint->Location = System::Drawing::Point(130, 82);
 			this->labelZone09Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone09Setpoint->Name = L"labelZone09Setpoint";
-			this->labelZone09Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone09Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone09Setpoint->TabIndex = 7;
-			this->labelZone09Setpoint->Text = L"0.0";
+			this->labelZone09Setpoint->Text = L"0";
+			this->labelZone09Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone09Setpoint_Click);
 			// 
-			// label42
+			// labelSetpointUnits09
 			// 
-			this->label42->AutoSize = true;
-			this->label42->Location = System::Drawing::Point(197, 85);
-			this->label42->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label42->Name = L"label42";
-			this->label42->Size = System::Drawing::Size(32, 22);
-			this->label42->TabIndex = 6;
-			this->label42->Text = L"℃";
+			this->labelSetpointUnits09->AutoSize = true;
+			this->labelSetpointUnits09->Location = System::Drawing::Point(189, 82);
+			this->labelSetpointUnits09->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits09->Name = L"labelSetpointUnits09";
+			this->labelSetpointUnits09->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits09->TabIndex = 6;
+			this->labelSetpointUnits09->Text = L"℃";
+			this->labelSetpointUnits09->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits09_Click);
 			// 
-			// label43
+			// labelRealTempUnits09
 			// 
-			this->label43->AutoSize = true;
-			this->label43->Location = System::Drawing::Point(197, 42);
-			this->label43->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label43->Name = L"label43";
-			this->label43->Size = System::Drawing::Size(32, 22);
-			this->label43->TabIndex = 6;
-			this->label43->Text = L"℃";
+			this->labelRealTempUnits09->AutoSize = true;
+			this->labelRealTempUnits09->Location = System::Drawing::Point(189, 42);
+			this->labelRealTempUnits09->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits09->Name = L"labelRealTempUnits09";
+			this->labelRealTempUnits09->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits09->TabIndex = 6;
+			this->labelRealTempUnits09->Text = L"℃";
+			this->labelRealTempUnits09->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits09_Click);
 			// 
 			// labelZone09RealTemp
 			// 
@@ -1313,51 +1600,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone09RealTemp->Location = System::Drawing::Point(130, 41);
 			this->labelZone09RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone09RealTemp->Name = L"labelZone09RealTemp";
-			this->labelZone09RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone09RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone09RealTemp->TabIndex = 5;
-			this->labelZone09RealTemp->Text = L"0.0";
+			this->labelZone09RealTemp->Text = L"0";
+			this->labelZone09RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone09RealTemp_Click);
 			// 
 			// buttonZone09Switch
 			// 
-			this->buttonZone09Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone09Switch->Location = System::Drawing::Point(28, 123);
 			this->buttonZone09Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone09Switch->Name = L"buttonZone09Switch";
-			this->buttonZone09Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone09Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone09Switch->TabIndex = 3;
 			this->buttonZone09Switch->Text = L"打开";
 			this->buttonZone09Switch->UseVisualStyleBackColor = true;
 			this->buttonZone09Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone09TempSet_Click);
 			// 
-			// label45
+			// labelSetpointPrompt09
 			// 
-			this->label45->AutoSize = true;
-			this->label45->Location = System::Drawing::Point(23, 85);
-			this->label45->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label45->Name = L"label45";
-			this->label45->Size = System::Drawing::Size(120, 22);
-			this->label45->TabIndex = 1;
-			this->label45->Text = L"设定温度: ";
+			this->labelSetpointPrompt09->AutoSize = true;
+			this->labelSetpointPrompt09->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt09->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt09->Name = L"labelSetpointPrompt09";
+			this->labelSetpointPrompt09->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt09->TabIndex = 1;
+			this->labelSetpointPrompt09->Text = L"设定温度: ";
+			this->labelSetpointPrompt09->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt09_Click);
 			// 
-			// label46
+			// labelRealTempPrompt09
 			// 
-			this->label46->AutoSize = true;
-			this->label46->Location = System::Drawing::Point(23, 41);
-			this->label46->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label46->Name = L"label46";
-			this->label46->Size = System::Drawing::Size(120, 22);
-			this->label46->TabIndex = 0;
-			this->label46->Text = L"实时温度: ";
+			this->labelRealTempPrompt09->AutoSize = true;
+			this->labelRealTempPrompt09->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt09->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt09->Name = L"labelRealTempPrompt09";
+			this->labelRealTempPrompt09->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt09->TabIndex = 0;
+			this->labelRealTempPrompt09->Text = L"实时温度: ";
+			this->labelRealTempPrompt09->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt09_Click);
 			// 
 			// groupBoxZone06
 			// 
 			this->groupBoxZone06->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone06->Controls->Add(this->labelZone06Setpoint);
-			this->groupBoxZone06->Controls->Add(this->label24);
-			this->groupBoxZone06->Controls->Add(this->label25);
+			this->groupBoxZone06->Controls->Add(this->labelSetpointUnits06);
+			this->groupBoxZone06->Controls->Add(this->labelRealTempUnits06);
 			this->groupBoxZone06->Controls->Add(this->labelZone06RealTemp);
 			this->groupBoxZone06->Controls->Add(this->buttonZone06Switch);
-			this->groupBoxZone06->Controls->Add(this->label30);
-			this->groupBoxZone06->Controls->Add(this->label31);
+			this->groupBoxZone06->Controls->Add(this->labelSetpointPrompt06);
+			this->groupBoxZone06->Controls->Add(this->labelRealTempPrompt06);
 			this->groupBoxZone06->Location = System::Drawing::Point(259, 210);
 			this->groupBoxZone06->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone06->Name = L"groupBoxZone06";
@@ -1366,36 +1656,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone06->TabIndex = 0;
 			this->groupBoxZone06->TabStop = false;
 			this->groupBoxZone06->Text = L"Zone06";
+			this->groupBoxZone06->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone06_Click);
 			// 
 			// labelZone06Setpoint
 			// 
 			this->labelZone06Setpoint->AutoSize = true;
-			this->labelZone06Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone06Setpoint->Location = System::Drawing::Point(128, 82);
 			this->labelZone06Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone06Setpoint->Name = L"labelZone06Setpoint";
-			this->labelZone06Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone06Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone06Setpoint->TabIndex = 7;
-			this->labelZone06Setpoint->Text = L"0.0";
+			this->labelZone06Setpoint->Text = L"0";
+			this->labelZone06Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone06Setpoint_Click);
 			// 
-			// label24
+			// labelSetpointUnits06
 			// 
-			this->label24->AutoSize = true;
-			this->label24->Location = System::Drawing::Point(196, 85);
-			this->label24->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label24->Name = L"label24";
-			this->label24->Size = System::Drawing::Size(32, 22);
-			this->label24->TabIndex = 6;
-			this->label24->Text = L"℃";
+			this->labelSetpointUnits06->AutoSize = true;
+			this->labelSetpointUnits06->Location = System::Drawing::Point(188, 82);
+			this->labelSetpointUnits06->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits06->Name = L"labelSetpointUnits06";
+			this->labelSetpointUnits06->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits06->TabIndex = 6;
+			this->labelSetpointUnits06->Text = L"℃";
+			this->labelSetpointUnits06->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits06_Click);
 			// 
-			// label25
+			// labelRealTempUnits06
 			// 
-			this->label25->AutoSize = true;
-			this->label25->Location = System::Drawing::Point(196, 42);
-			this->label25->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label25->Name = L"label25";
-			this->label25->Size = System::Drawing::Size(32, 22);
-			this->label25->TabIndex = 6;
-			this->label25->Text = L"℃";
+			this->labelRealTempUnits06->AutoSize = true;
+			this->labelRealTempUnits06->Location = System::Drawing::Point(188, 42);
+			this->labelRealTempUnits06->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits06->Name = L"labelRealTempUnits06";
+			this->labelRealTempUnits06->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits06->TabIndex = 6;
+			this->labelRealTempUnits06->Text = L"℃";
+			this->labelRealTempUnits06->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits06_Click);
 			// 
 			// labelZone06RealTemp
 			// 
@@ -1403,51 +1697,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone06RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone06RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone06RealTemp->Name = L"labelZone06RealTemp";
-			this->labelZone06RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone06RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone06RealTemp->TabIndex = 5;
-			this->labelZone06RealTemp->Text = L"0.0";
+			this->labelZone06RealTemp->Text = L"0";
+			this->labelZone06RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone06RealTemp_Click);
 			// 
 			// buttonZone06Switch
 			// 
-			this->buttonZone06Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone06Switch->Location = System::Drawing::Point(28, 123);
 			this->buttonZone06Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone06Switch->Name = L"buttonZone06Switch";
-			this->buttonZone06Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone06Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone06Switch->TabIndex = 3;
 			this->buttonZone06Switch->Text = L"打开";
 			this->buttonZone06Switch->UseVisualStyleBackColor = true;
 			this->buttonZone06Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone06TempSet_Click);
 			// 
-			// label30
+			// labelSetpointPrompt06
 			// 
-			this->label30->AutoSize = true;
-			this->label30->Location = System::Drawing::Point(23, 85);
-			this->label30->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label30->Name = L"label30";
-			this->label30->Size = System::Drawing::Size(120, 22);
-			this->label30->TabIndex = 1;
-			this->label30->Text = L"设定温度: ";
+			this->labelSetpointPrompt06->AutoSize = true;
+			this->labelSetpointPrompt06->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt06->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt06->Name = L"labelSetpointPrompt06";
+			this->labelSetpointPrompt06->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt06->TabIndex = 1;
+			this->labelSetpointPrompt06->Text = L"设定温度: ";
+			this->labelSetpointPrompt06->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt06_Click);
 			// 
-			// label31
+			// labelRealTempPrompt06
 			// 
-			this->label31->AutoSize = true;
-			this->label31->Location = System::Drawing::Point(23, 41);
-			this->label31->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label31->Name = L"label31";
-			this->label31->Size = System::Drawing::Size(120, 22);
-			this->label31->TabIndex = 0;
-			this->label31->Text = L"实时温度: ";
+			this->labelRealTempPrompt06->AutoSize = true;
+			this->labelRealTempPrompt06->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt06->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt06->Name = L"labelRealTempPrompt06";
+			this->labelRealTempPrompt06->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt06->TabIndex = 0;
+			this->labelRealTempPrompt06->Text = L"实时温度: ";
+			this->labelRealTempPrompt06->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt06_Click);
 			// 
 			// groupBoxZone05
 			// 
 			this->groupBoxZone05->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone05->Controls->Add(this->labelZone05Setpoint);
-			this->groupBoxZone05->Controls->Add(this->label19);
-			this->groupBoxZone05->Controls->Add(this->label20);
+			this->groupBoxZone05->Controls->Add(this->labelSetpointUnits05);
+			this->groupBoxZone05->Controls->Add(this->labelRealTempUnits05);
 			this->groupBoxZone05->Controls->Add(this->labelZone05RealTemp);
 			this->groupBoxZone05->Controls->Add(this->buttonZone05Switch);
-			this->groupBoxZone05->Controls->Add(this->label22);
-			this->groupBoxZone05->Controls->Add(this->label23);
+			this->groupBoxZone05->Controls->Add(this->labelSetpointPrompt05);
+			this->groupBoxZone05->Controls->Add(this->labelRealTempPrompt05);
 			this->groupBoxZone05->Location = System::Drawing::Point(13, 210);
 			this->groupBoxZone05->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone05->Name = L"groupBoxZone05";
@@ -1456,36 +1753,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone05->TabIndex = 0;
 			this->groupBoxZone05->TabStop = false;
 			this->groupBoxZone05->Text = L"Zone05";
+			this->groupBoxZone05->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone05_Click);
 			// 
 			// labelZone05Setpoint
 			// 
 			this->labelZone05Setpoint->AutoSize = true;
-			this->labelZone05Setpoint->Location = System::Drawing::Point(130, 85);
+			this->labelZone05Setpoint->Location = System::Drawing::Point(130, 82);
 			this->labelZone05Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone05Setpoint->Name = L"labelZone05Setpoint";
-			this->labelZone05Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone05Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone05Setpoint->TabIndex = 7;
-			this->labelZone05Setpoint->Text = L"0.0";
+			this->labelZone05Setpoint->Text = L"0";
+			this->labelZone05Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone05Setpoint_Click);
 			// 
-			// label19
+			// labelSetpointUnits05
 			// 
-			this->label19->AutoSize = true;
-			this->label19->Location = System::Drawing::Point(197, 85);
-			this->label19->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label19->Name = L"label19";
-			this->label19->Size = System::Drawing::Size(32, 22);
-			this->label19->TabIndex = 6;
-			this->label19->Text = L"℃";
+			this->labelSetpointUnits05->AutoSize = true;
+			this->labelSetpointUnits05->Location = System::Drawing::Point(197, 82);
+			this->labelSetpointUnits05->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits05->Name = L"labelSetpointUnits05";
+			this->labelSetpointUnits05->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits05->TabIndex = 6;
+			this->labelSetpointUnits05->Text = L"℃";
+			this->labelSetpointUnits05->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits05_Click);
 			// 
-			// label20
+			// labelRealTempUnits05
 			// 
-			this->label20->AutoSize = true;
-			this->label20->Location = System::Drawing::Point(197, 42);
-			this->label20->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label20->Name = L"label20";
-			this->label20->Size = System::Drawing::Size(32, 22);
-			this->label20->TabIndex = 6;
-			this->label20->Text = L"℃";
+			this->labelRealTempUnits05->AutoSize = true;
+			this->labelRealTempUnits05->Location = System::Drawing::Point(197, 42);
+			this->labelRealTempUnits05->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits05->Name = L"labelRealTempUnits05";
+			this->labelRealTempUnits05->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits05->TabIndex = 6;
+			this->labelRealTempUnits05->Text = L"℃";
+			this->labelRealTempUnits05->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits05_Click);
 			// 
 			// labelZone05RealTemp
 			// 
@@ -1493,51 +1794,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone05RealTemp->Location = System::Drawing::Point(130, 41);
 			this->labelZone05RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone05RealTemp->Name = L"labelZone05RealTemp";
-			this->labelZone05RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone05RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone05RealTemp->TabIndex = 5;
-			this->labelZone05RealTemp->Text = L"0.0";
+			this->labelZone05RealTemp->Text = L"0";
+			this->labelZone05RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone05RealTemp_Click);
 			// 
 			// buttonZone05Switch
 			// 
-			this->buttonZone05Switch->Location = System::Drawing::Point(29, 121);
+			this->buttonZone05Switch->Location = System::Drawing::Point(28, 123);
 			this->buttonZone05Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone05Switch->Name = L"buttonZone05Switch";
-			this->buttonZone05Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone05Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone05Switch->TabIndex = 3;
 			this->buttonZone05Switch->Text = L"打开";
 			this->buttonZone05Switch->UseVisualStyleBackColor = true;
 			this->buttonZone05Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone05TempSet_Click);
 			// 
-			// label22
+			// labelSetpointPrompt05
 			// 
-			this->label22->AutoSize = true;
-			this->label22->Location = System::Drawing::Point(23, 85);
-			this->label22->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label22->Name = L"label22";
-			this->label22->Size = System::Drawing::Size(120, 22);
-			this->label22->TabIndex = 1;
-			this->label22->Text = L"设定温度: ";
+			this->labelSetpointPrompt05->AutoSize = true;
+			this->labelSetpointPrompt05->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt05->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt05->Name = L"labelSetpointPrompt05";
+			this->labelSetpointPrompt05->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt05->TabIndex = 1;
+			this->labelSetpointPrompt05->Text = L"设定温度: ";
+			this->labelSetpointPrompt05->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt05_Click);
 			// 
-			// label23
+			// labelRealTempPrompt05
 			// 
-			this->label23->AutoSize = true;
-			this->label23->Location = System::Drawing::Point(23, 41);
-			this->label23->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label23->Name = L"label23";
-			this->label23->Size = System::Drawing::Size(120, 22);
-			this->label23->TabIndex = 0;
-			this->label23->Text = L"实时温度: ";
+			this->labelRealTempPrompt05->AutoSize = true;
+			this->labelRealTempPrompt05->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt05->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt05->Name = L"labelRealTempPrompt05";
+			this->labelRealTempPrompt05->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt05->TabIndex = 0;
+			this->labelRealTempPrompt05->Text = L"实时温度: ";
+			this->labelRealTempPrompt05->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt05_Click);
 			// 
 			// groupBoxZone02
 			// 
 			this->groupBoxZone02->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone02->Controls->Add(this->labelZone02Setpoint);
-			this->groupBoxZone02->Controls->Add(this->label4);
-			this->groupBoxZone02->Controls->Add(this->label5);
+			this->groupBoxZone02->Controls->Add(this->labelSetpointUnits02);
+			this->groupBoxZone02->Controls->Add(this->labelRealTempUnits02);
 			this->groupBoxZone02->Controls->Add(this->labelZone02RealTemp);
 			this->groupBoxZone02->Controls->Add(this->buttonZone02Switch);
-			this->groupBoxZone02->Controls->Add(this->label7);
-			this->groupBoxZone02->Controls->Add(this->label8);
+			this->groupBoxZone02->Controls->Add(this->labelSetpointPrompt02);
+			this->groupBoxZone02->Controls->Add(this->labelRealTempPrompt02);
 			this->groupBoxZone02->Location = System::Drawing::Point(259, 22);
 			this->groupBoxZone02->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone02->Name = L"groupBoxZone02";
@@ -1546,36 +1850,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone02->TabIndex = 0;
 			this->groupBoxZone02->TabStop = false;
 			this->groupBoxZone02->Text = L"Zone02";
+			this->groupBoxZone02->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone02_Click);
 			// 
 			// labelZone02Setpoint
 			// 
 			this->labelZone02Setpoint->AutoSize = true;
-			this->labelZone02Setpoint->Location = System::Drawing::Point(128, 85);
+			this->labelZone02Setpoint->Location = System::Drawing::Point(128, 82);
 			this->labelZone02Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone02Setpoint->Name = L"labelZone02Setpoint";
-			this->labelZone02Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone02Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone02Setpoint->TabIndex = 7;
-			this->labelZone02Setpoint->Text = L"0.0";
+			this->labelZone02Setpoint->Text = L"0";
+			this->labelZone02Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone02Setpoint_Click);
 			// 
-			// label4
+			// labelSetpointUnits02
 			// 
-			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(196, 85);
-			this->label4->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label4->Name = L"label4";
-			this->label4->Size = System::Drawing::Size(32, 22);
-			this->label4->TabIndex = 6;
-			this->label4->Text = L"℃";
+			this->labelSetpointUnits02->AutoSize = true;
+			this->labelSetpointUnits02->Location = System::Drawing::Point(188, 82);
+			this->labelSetpointUnits02->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits02->Name = L"labelSetpointUnits02";
+			this->labelSetpointUnits02->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits02->TabIndex = 6;
+			this->labelSetpointUnits02->Text = L"℃";
+			this->labelSetpointUnits02->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits02_Click);
 			// 
-			// label5
+			// labelRealTempUnits02
 			// 
-			this->label5->AutoSize = true;
-			this->label5->Location = System::Drawing::Point(196, 42);
-			this->label5->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(32, 22);
-			this->label5->TabIndex = 6;
-			this->label5->Text = L"℃";
+			this->labelRealTempUnits02->AutoSize = true;
+			this->labelRealTempUnits02->Location = System::Drawing::Point(188, 42);
+			this->labelRealTempUnits02->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits02->Name = L"labelRealTempUnits02";
+			this->labelRealTempUnits02->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits02->TabIndex = 6;
+			this->labelRealTempUnits02->Text = L"℃";
+			this->labelRealTempUnits02->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits02_Click);
 			// 
 			// labelZone02RealTemp
 			// 
@@ -1583,51 +1891,54 @@ namespace HuskyNeo2Tool {
 			this->labelZone02RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone02RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone02RealTemp->Name = L"labelZone02RealTemp";
-			this->labelZone02RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone02RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone02RealTemp->TabIndex = 5;
-			this->labelZone02RealTemp->Text = L"0.0";
+			this->labelZone02RealTemp->Text = L"0";
+			this->labelZone02RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone02RealTemp_Click);
 			// 
 			// buttonZone02Switch
 			// 
-			this->buttonZone02Switch->Location = System::Drawing::Point(29, 120);
+			this->buttonZone02Switch->Location = System::Drawing::Point(28, 122);
 			this->buttonZone02Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone02Switch->Name = L"buttonZone02Switch";
-			this->buttonZone02Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone02Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone02Switch->TabIndex = 3;
 			this->buttonZone02Switch->Text = L"打开";
 			this->buttonZone02Switch->UseVisualStyleBackColor = true;
 			this->buttonZone02Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone02TempSet_Click);
 			// 
-			// label7
+			// labelSetpointPrompt02
 			// 
-			this->label7->AutoSize = true;
-			this->label7->Location = System::Drawing::Point(23, 85);
-			this->label7->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label7->Name = L"label7";
-			this->label7->Size = System::Drawing::Size(120, 22);
-			this->label7->TabIndex = 1;
-			this->label7->Text = L"设定温度: ";
+			this->labelSetpointPrompt02->AutoSize = true;
+			this->labelSetpointPrompt02->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt02->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt02->Name = L"labelSetpointPrompt02";
+			this->labelSetpointPrompt02->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt02->TabIndex = 1;
+			this->labelSetpointPrompt02->Text = L"设定温度: ";
+			this->labelSetpointPrompt02->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt02_Click);
 			// 
-			// label8
+			// labelRealTempPrompt02
 			// 
-			this->label8->AutoSize = true;
-			this->label8->Location = System::Drawing::Point(23, 41);
-			this->label8->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label8->Name = L"label8";
-			this->label8->Size = System::Drawing::Size(120, 22);
-			this->label8->TabIndex = 0;
-			this->label8->Text = L"实时温度: ";
+			this->labelRealTempPrompt02->AutoSize = true;
+			this->labelRealTempPrompt02->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt02->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt02->Name = L"labelRealTempPrompt02";
+			this->labelRealTempPrompt02->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt02->TabIndex = 0;
+			this->labelRealTempPrompt02->Text = L"实时温度: ";
+			this->labelRealTempPrompt02->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt02_Click);
 			// 
 			// groupBoxZone01
 			// 
 			this->groupBoxZone01->BackColor = System::Drawing::SystemColors::Window;
 			this->groupBoxZone01->Controls->Add(this->labelZone01Setpoint);
-			this->groupBoxZone01->Controls->Add(this->label28);
-			this->groupBoxZone01->Controls->Add(this->label27);
+			this->groupBoxZone01->Controls->Add(this->labelSetpointUnits01);
+			this->groupBoxZone01->Controls->Add(this->labelRealTempUnits01);
 			this->groupBoxZone01->Controls->Add(this->labelZone01RealTemp);
 			this->groupBoxZone01->Controls->Add(this->buttonZone01Switch);
-			this->groupBoxZone01->Controls->Add(this->label3);
-			this->groupBoxZone01->Controls->Add(this->label2);
+			this->groupBoxZone01->Controls->Add(this->labelSetpointPrompt01);
+			this->groupBoxZone01->Controls->Add(this->labelRealTempPrompt01);
 			this->groupBoxZone01->Location = System::Drawing::Point(13, 22);
 			this->groupBoxZone01->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->groupBoxZone01->Name = L"groupBoxZone01";
@@ -1636,36 +1947,40 @@ namespace HuskyNeo2Tool {
 			this->groupBoxZone01->TabIndex = 0;
 			this->groupBoxZone01->TabStop = false;
 			this->groupBoxZone01->Text = L"Zone01";
+			this->groupBoxZone01->Click += gcnew System::EventHandler(this, &Form1::groupBoxZone01_Click);
 			// 
 			// labelZone01Setpoint
 			// 
 			this->labelZone01Setpoint->AutoSize = true;
-			this->labelZone01Setpoint->Location = System::Drawing::Point(130, 85);
+			this->labelZone01Setpoint->Location = System::Drawing::Point(128, 82);
 			this->labelZone01Setpoint->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->labelZone01Setpoint->Name = L"labelZone01Setpoint";
-			this->labelZone01Setpoint->Size = System::Drawing::Size(43, 22);
+			this->labelZone01Setpoint->Size = System::Drawing::Size(21, 22);
 			this->labelZone01Setpoint->TabIndex = 7;
-			this->labelZone01Setpoint->Text = L"0.0";
+			this->labelZone01Setpoint->Text = L"0";
+			this->labelZone01Setpoint->Click += gcnew System::EventHandler(this, &Form1::labelZone01Setpoint_Click);
 			// 
-			// label28
+			// labelSetpointUnits01
 			// 
-			this->label28->AutoSize = true;
-			this->label28->Location = System::Drawing::Point(196, 85);
-			this->label28->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label28->Name = L"label28";
-			this->label28->Size = System::Drawing::Size(32, 22);
-			this->label28->TabIndex = 6;
-			this->label28->Text = L"℃";
+			this->labelSetpointUnits01->AutoSize = true;
+			this->labelSetpointUnits01->Location = System::Drawing::Point(188, 82);
+			this->labelSetpointUnits01->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointUnits01->Name = L"labelSetpointUnits01";
+			this->labelSetpointUnits01->Size = System::Drawing::Size(32, 22);
+			this->labelSetpointUnits01->TabIndex = 6;
+			this->labelSetpointUnits01->Text = L"℃";
+			this->labelSetpointUnits01->Click += gcnew System::EventHandler(this, &Form1::labelSetpointUnits01_Click);
 			// 
-			// label27
+			// labelRealTempUnits01
 			// 
-			this->label27->AutoSize = true;
-			this->label27->Location = System::Drawing::Point(196, 42);
-			this->label27->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label27->Name = L"label27";
-			this->label27->Size = System::Drawing::Size(32, 22);
-			this->label27->TabIndex = 6;
-			this->label27->Text = L"℃";
+			this->labelRealTempUnits01->AutoSize = true;
+			this->labelRealTempUnits01->Location = System::Drawing::Point(188, 42);
+			this->labelRealTempUnits01->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempUnits01->Name = L"labelRealTempUnits01";
+			this->labelRealTempUnits01->Size = System::Drawing::Size(32, 22);
+			this->labelRealTempUnits01->TabIndex = 6;
+			this->labelRealTempUnits01->Text = L"℃";
+			this->labelRealTempUnits01->Click += gcnew System::EventHandler(this, &Form1::labelRealTempUnits01_Click);
 			// 
 			// labelZone01RealTemp
 			// 
@@ -1673,53 +1988,55 @@ namespace HuskyNeo2Tool {
 			this->labelZone01RealTemp->Location = System::Drawing::Point(128, 41);
 			this->labelZone01RealTemp->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
 			this->labelZone01RealTemp->Name = L"labelZone01RealTemp";
-			this->labelZone01RealTemp->Size = System::Drawing::Size(43, 22);
+			this->labelZone01RealTemp->Size = System::Drawing::Size(21, 22);
 			this->labelZone01RealTemp->TabIndex = 5;
-			this->labelZone01RealTemp->Text = L"0.0";
+			this->labelZone01RealTemp->Text = L"0";
+			this->labelZone01RealTemp->Click += gcnew System::EventHandler(this, &Form1::labelZone01RealTemp_Click);
 			// 
 			// buttonZone01Switch
 			// 
-			this->buttonZone01Switch->Location = System::Drawing::Point(29, 120);
+			this->buttonZone01Switch->Location = System::Drawing::Point(28, 122);
 			this->buttonZone01Switch->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonZone01Switch->Name = L"buttonZone01Switch";
-			this->buttonZone01Switch->Size = System::Drawing::Size(121, 41);
+			this->buttonZone01Switch->Size = System::Drawing::Size(185, 41);
 			this->buttonZone01Switch->TabIndex = 3;
 			this->buttonZone01Switch->Text = L"打开";
 			this->buttonZone01Switch->UseVisualStyleBackColor = true;
 			this->buttonZone01Switch->Click += gcnew System::EventHandler(this, &Form1::buttonZone01TempSet_Click);
 			// 
-			// label3
+			// labelSetpointPrompt01
 			// 
-			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(23, 85);
-			this->label3->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(120, 22);
-			this->label3->TabIndex = 1;
-			this->label3->Text = L"设定温度: ";
+			this->labelSetpointPrompt01->AutoSize = true;
+			this->labelSetpointPrompt01->Location = System::Drawing::Point(23, 82);
+			this->labelSetpointPrompt01->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelSetpointPrompt01->Name = L"labelSetpointPrompt01";
+			this->labelSetpointPrompt01->Size = System::Drawing::Size(120, 22);
+			this->labelSetpointPrompt01->TabIndex = 1;
+			this->labelSetpointPrompt01->Text = L"设定温度: ";
+			this->labelSetpointPrompt01->Click += gcnew System::EventHandler(this, &Form1::labelSetpointPrompt01_Click);
 			// 
-			// label2
+			// labelRealTempPrompt01
 			// 
-			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(23, 41);
-			this->label2->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
-			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(120, 22);
-			this->label2->TabIndex = 0;
-			this->label2->Text = L"实时温度: ";
+			this->labelRealTempPrompt01->AutoSize = true;
+			this->labelRealTempPrompt01->Location = System::Drawing::Point(23, 41);
+			this->labelRealTempPrompt01->Margin = System::Windows::Forms::Padding(6, 0, 6, 0);
+			this->labelRealTempPrompt01->Name = L"labelRealTempPrompt01";
+			this->labelRealTempPrompt01->Size = System::Drawing::Size(120, 22);
+			this->labelRealTempPrompt01->TabIndex = 0;
+			this->labelRealTempPrompt01->Text = L"实时温度: ";
+			this->labelRealTempPrompt01->Click += gcnew System::EventHandler(this, &Form1::labelRealTempPrompt01_Click);
 			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(11, 21);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1026, 733);
+			this->ClientSize = System::Drawing::Size(1024, 715);
 			this->Controls->Add(this->groupBoxZones);
 			this->Controls->Add(this->groupBox1);
 			this->Font = (gcnew System::Drawing::Font(L"宋体", 16, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(134)));
-			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedToolWindow;
+			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
 			this->KeyPreview = true;
 			this->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
-			this->MaximizeBox = false;
 			this->Name = L"Form1";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"HuskyNeo2Tool";
@@ -1970,6 +2287,8 @@ private: System::Void buttonZone12TempSet_Click(System::Object^  sender, System:
 
 
 private: System::Void buttonConnect_Click(System::Object^  sender, System::EventArgs^  e) {
+
+	//labelZone01Setpoint->Text = L"666";
 	if (currentHusky == NULL) {
 		MessageBox::Show("请选择机台号！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 		return;
@@ -2007,6 +2326,7 @@ private: System::Void buttonIpConfig_Click(System::Object^  sender, System::Even
 	}
 */
 private: System::Void button27_Click(System::Object^  sender, System::EventArgs^  e) {
+
 		if (currentHusky == NULL) {
 			MessageBox::Show("请选择机台号！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 			return;
@@ -2015,7 +2335,12 @@ private: System::Void button27_Click(System::Object^  sender, System::EventArgs^
 			MessageBox::Show("当前设备未连接！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 			return;
 		}
-
+		if (!readTemperatureButtonThread || !readTemperatureButtonThread->IsAlive) {
+			readTemperatureButtonThread = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::ReadTemperatureButtonThread));
+			readTemperatureButtonThread->IsBackground = true;
+			readTemperatureButtonThread->Start();
+		}
+/*
 		for (int i = 0; i < 12; i++) {
 			float temperature = currentHusky->getTemperature(i + 1);
 			// C = (F - 32) / 1.8
@@ -2024,6 +2349,7 @@ private: System::Void button27_Click(System::Object^  sender, System::EventArgs^
 			temperature = (float)tmp / 10;
 			this->labelZonesSetpoint[i]->Text = temperature.ToString();
 		}
+*/
 	}
 private: System::Void button28_Click(System::Object^  sender, System::EventArgs^  e) {
 
@@ -2036,6 +2362,18 @@ private: System::Void button28_Click(System::Object^  sender, System::EventArgs^
 			return;
 		}
 
+		System::Windows::Forms::DialogResult result = setAllZonesTemperatureForm->ShowDialog();
+		if (result == ::DialogResult::OK) {
+			if (setTemperatureButtonThread && setTemperatureButtonThread->IsAlive) {
+				setTemperatureButtonThread->Abort();
+				//setTemperatureButtonThread = (Thread ^)NULL;
+			}
+			setTemperatureButtonThread = gcnew Thread(gcnew ThreadStart(this, &HuskyNeo2Tool::Form1::SetTemperatureButtonThread));
+			setTemperatureButtonThread->IsBackground = true;
+			setTemperatureButtonThread->Start();
+			setTempInProgressForm->ShowDialog();
+		}
+/*
 		SetAllZonesTemperatureForm^ setAllZonesTemperatureForm = gcnew SetAllZonesTemperatureForm();
 		System::Windows::Forms::DialogResult result = setAllZonesTemperatureForm->ShowDialog();
 		if (result == ::DialogResult::OK) {
@@ -2051,6 +2389,7 @@ private: System::Void button28_Click(System::Object^  sender, System::EventArgs^
 				}
 			}
 		}
+*/
 	}
 private: System::Void comboBox1_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
 /*
@@ -2061,6 +2400,322 @@ private: System::Void comboBox1_SelectedIndexChanged(System::Object^  sender, Sy
 */
 		currentHusky->setSerialPortNum(this->comboBox1->SelectedIndex + 1);
 	}
+private: System::Void buttonLock_Click(System::Object^  sender, System::EventArgs^  e) {
+			 if (opLock) {
+				buttonConnect->Enabled = true;
+				comboBox1->Enabled = true;
+				button27->Enabled = true;
+				button28->Enabled = true;
+				labelComNumPrompt->Enabled = true;
+				groupBoxZones->Enabled = true;
+				this->buttonLock->Text = L"锁定";
+				opLock = FALSE;
+				
+			 } else {
+				
+				buttonConnect->Enabled = false;
+				comboBox1->Enabled = false;
+				button27->Enabled = false;
+				button28->Enabled = false;
+				labelComNumPrompt->Enabled = false;
+
+				groupBoxZones->Enabled = false;
+				this->buttonLock->Text = L"解锁";
+				opLock = TRUE;
+			 }
+		 }
+private:
+	void zoneSetpoint_Click(int zoneNum) {
+		//fix me: check zoneNum.
+
+		if (currentHusky == NULL) {
+			MessageBox::Show("请选择机台号！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+			return;
+		}
+		if (!currentHusky->isConnected()) {
+			MessageBox::Show("当前设备未连接！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+			return;
+		}
+
+		SetOneZoneTemperatureForm ^temperatureSetting = gcnew SetOneZoneTemperatureForm();
+		if (zoneNum < 10)
+			temperatureSetting->Text = "Zone0" + zoneNum + " 温度设置";
+		else
+			temperatureSetting->Text = "Zone" + zoneNum + " 温度设置";
+		System::Windows::Forms::DialogResult result = temperatureSetting->ShowDialog();
+		if (result == ::DialogResult::OK && temperatureSetting->textBox1->Text != "") {
+			float temperature = (float)Convert::ToDouble(temperatureSetting->textBox1->Text);
+			// F -> C: F = 32 + C * 1.8;
+			float Fahrenheit = 32 + temperature * (float)1.8;
+			if (currentHusky->setTemperature(Fahrenheit, zoneNum) == FALSE) //*
+				MessageBox::Show("Zone" + zoneNum + "温度设置失败！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);//*
+			else
+				this->labelZonesSetpoint[zoneNum - 1]->Text = temperatureSetting->textBox1->Text; //*
+		}
+	}
+
+/******************************* label Zone Setpoint Click Event ********************************/
+private: System::Void labelZone01Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(1);
+	}
+private: System::Void labelZone02Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(2);
+	}
+private: System::Void labelZone03Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(3);
+	}
+private: System::Void labelZone04Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(4);
+	}
+private: System::Void labelZone05Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(5);
+	}
+private: System::Void labelZone06Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(6);
+	}
+private: System::Void labelZone07Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(7);
+	}
+private: System::Void labelZone08Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(8);
+	}
+private: System::Void labelZone09Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(9);
+	}
+private: System::Void labelZone10Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(10);
+	}
+private: System::Void labelZone11Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(11);
+	}
+private: System::Void labelZone12Setpoint_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(12);
+	}
+
+/******************************* GroupBox Click Event *****************************************/
+private: System::Void groupBoxZone01_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(1);
+	}
+private: System::Void groupBoxZone02_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(2);
+	}
+private: System::Void groupBoxZone03_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(3);
+	}
+private: System::Void groupBoxZone04_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(4);
+	}
+private: System::Void groupBoxZone05_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(5);
+	}
+private: System::Void groupBoxZone06_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(6);
+	}
+private: System::Void groupBoxZone07_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(7);
+	}
+private: System::Void groupBoxZone08_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(8);
+	}
+private: System::Void groupBoxZone09_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(9);
+	}
+private: System::Void groupBoxZone10_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(10);
+	}
+private: System::Void groupBoxZone11_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(11);
+	}
+private: System::Void groupBoxZone12_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(12);
+	}
+
+/******************************* labelRealTempPrompt Click Event ***********************************/
+private: System::Void labelRealTempPrompt01_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(1);
+	}
+private: System::Void labelRealTempPrompt02_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(2);
+	}
+private: System::Void labelRealTempPrompt03_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(3);
+	}
+private: System::Void labelRealTempPrompt04_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(4);
+	}
+private: System::Void labelRealTempPrompt05_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(5);
+	}
+private: System::Void labelRealTempPrompt06_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(6);
+	}
+private: System::Void labelRealTempPrompt07_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(7);
+	}
+private: System::Void labelRealTempPrompt08_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(8);
+	}
+private: System::Void labelRealTempPrompt09_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(9);
+	}
+private: System::Void labelRealTempPrompt10_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(10);
+	}
+private: System::Void labelRealTempPrompt11_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(11);
+	}
+private: System::Void labelRealTempPrompt12_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(12);
+	}
+/******************************* labelSetpointPrompt Click Event ***********************************/
+private: System::Void labelSetpointPrompt01_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(1);
+	}
+private: System::Void labelSetpointPrompt02_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(2);
+	}
+private: System::Void labelSetpointPrompt03_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(3);
+	}
+private: System::Void labelSetpointPrompt04_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(4);
+	}
+private: System::Void labelSetpointPrompt05_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(5);
+	}
+private: System::Void labelSetpointPrompt06_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(6);
+	}
+private: System::Void labelSetpointPrompt07_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(7);
+	}
+private: System::Void labelSetpointPrompt08_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(8);
+	}
+private: System::Void labelSetpointPrompt09_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(9);
+	}
+private: System::Void labelSetpointPrompt10_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(10);
+	}
+private: System::Void labelSetpointPrompt11_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(11);
+	}
+private: System::Void labelSetpointPrompt12_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(12);
+	}
+
+/******************************* labelSetpointPrompt Click Event ***********************************/
+private: System::Void labelZone01RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(1);
+	}
+private: System::Void labelZone02RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(2);
+	}
+private: System::Void labelZone03RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(3);
+	}
+private: System::Void labelZone04RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(4);
+	}
+private: System::Void labelZone05RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(5);
+	}
+private: System::Void labelZone06RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(6);
+	}
+private: System::Void labelZone07RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(7);
+	}
+private: System::Void labelZone08RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(8);
+	}
+private: System::Void labelZone09RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(9);
+	}
+private: System::Void labelZone10RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(10);
+	}
+private: System::Void labelZone11RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(11);
+	}
+private: System::Void labelZone12RealTemp_Click(System::Object^  sender, System::EventArgs^  e) {
+		zoneSetpoint_Click(12);
+	}
+/******************************* labelRealTempUnits Click Event ***********************************/
+private: System::Void labelRealTempUnits01_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(1);
+		 }
+private: System::Void labelRealTempUnits02_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(2);
+		 }
+private: System::Void labelRealTempUnits03_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(3);
+		 }
+private: System::Void labelRealTempUnits04_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(4);
+		 }
+private: System::Void labelRealTempUnits05_Click(System::Object^  sender, System::EventArgs^  e) {
+			zoneSetpoint_Click(5);
+		 }
+private: System::Void labelRealTempUnits06_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(6);
+		 }
+private: System::Void labelRealTempUnits07_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(7);
+		 }
+private: System::Void labelRealTempUnits08_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(8);
+		 }
+private: System::Void labelRealTempUnits09_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(9);
+		 }
+private: System::Void labelRealTempUnits10_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(10);
+		 }
+private: System::Void labelRealTempUnits11_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(11);
+		 }
+private: System::Void labelRealTempUnits12_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(12);
+		 }
+/******************************* labelSetpointUnits Click Event ***********************************/
+private: System::Void labelSetpointUnits01_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(1);
+		 }
+private: System::Void labelSetpointUnits02_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(2);
+		 }
+private: System::Void labelSetpointUnits03_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(3);
+		 }
+private: System::Void labelSetpointUnits04_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(4);
+		 }
+private: System::Void labelSetpointUnits05_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(5);
+		 }
+private: System::Void labelSetpointUnits06_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(6);
+		 }
+private: System::Void labelSetpointUnits07_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(6);
+		 }
+private: System::Void labelSetpointUnits08_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(8);
+		 }
+private: System::Void labelSetpointUnits09_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(9);
+		 }
+private: System::Void labelSetpointUnits10_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(10);
+		 }
+private: System::Void labelSetpointUnits11_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(11);
+		 }
+private: System::Void labelSetpointUnits12_Click(System::Object^  sender, System::EventArgs^  e) {
+			 zoneSetpoint_Click(12);
+		 }
 };
 }
 

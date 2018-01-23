@@ -130,8 +130,10 @@
     <ClCompile Include="Husky.cpp" />
     <ClCompile Include="HuskyNeo2Tool.cpp" />
     <ClCompile Include="IpConfigure.cpp" />
+    <ClCompile Include="NumberKeyboard.cpp" />
     <ClCompile Include="SerialPort.cpp" />
     <ClCompile Include="SetAllZonesTemperatureForm.cpp" />
+    <ClCompile Include="SetTempInProgressForm.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -141,7 +143,10 @@
     <ClInclude Include="AlarmStatusWindow.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="AllZonesTemperatureSetting.h">
+    <ClInclude Include="NumberKeyboard.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="SetOneZoneTemperatureForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Form1.h">
@@ -156,6 +161,9 @@
     <ClInclude Include="SetAllZonesTemperatureForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="SetTempInProgressForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -166,8 +174,11 @@
     <EmbeddedResource Include="AlarmStatusWindow.resx">
       <DependentUpon>AlarmStatusWindow.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AllZonesTemperatureSetting.resx">
-      <DependentUpon>AllZonesTemperatureSetting.h</DependentUpon>
+    <EmbeddedResource Include="NumberKeyboard.resx">
+      <DependentUpon>NumberKeyboard.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetOneZoneTemperatureForm.resx">
+      <DependentUpon>SetOneZoneTemperatureForm.h</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resX">
       <DependentUpon>Form1.h</DependentUpon>

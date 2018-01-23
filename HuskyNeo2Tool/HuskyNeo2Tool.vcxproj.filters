@@ -42,6 +42,12 @@
     <ClCompile Include="AlarmStatusWindow.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="SetTempInProgressForm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NumberKeyboard.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Form1.h">
@@ -59,9 +65,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="AllZonesTemperatureSetting.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="SetAllZonesTemperatureForm.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -69,6 +72,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="AlarmStatusWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SetTempInProgressForm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SetOneZoneTemperatureForm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NumberKeyboard.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -85,10 +97,13 @@
     <EmbeddedResource Include="IpConfigure.resx">
       <Filter>资源文件</Filter>
     </EmbeddedResource>
-    <EmbeddedResource Include="AllZonesTemperatureSetting.resx">
+    <EmbeddedResource Include="SetAllZonesTemperatureForm.resx">
       <Filter>资源文件</Filter>
     </EmbeddedResource>
-    <EmbeddedResource Include="SetAllZonesTemperatureForm.resx">
+    <EmbeddedResource Include="AlarmStatusWindow.resx">
+      <Filter>资源文件</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetOneZoneTemperatureForm.resx">
       <Filter>资源文件</Filter>
     </EmbeddedResource>
   </ItemGroup>

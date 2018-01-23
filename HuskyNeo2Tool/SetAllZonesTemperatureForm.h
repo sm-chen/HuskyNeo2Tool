@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include "NumberKeyboard.h"
 
 namespace HuskyNeo2Tool {
 
@@ -52,8 +53,10 @@ namespace HuskyNeo2Tool {
 	public:
 		array<System::Windows::Forms::CheckBox^, 1>^ checkBoxAllZonesArray;
 		System::Windows::Forms::CheckBox^  checkBoxAllZones;
+	private: System::Windows::Forms::Button^  buttonOK;
+	public: 
 
-	private: System::Windows::Forms::Button^  button1;
+
 	public: System::Windows::Forms::TextBox^  textBoxTemperature;
 	private: 
 	protected: 
@@ -74,6 +77,7 @@ namespace HuskyNeo2Tool {
 	private: System::Windows::Forms::CheckBox^  checkBox3;
 
 	private: System::Windows::Forms::Label^  label1;
+	private: System::Windows::Forms::Label^  label2;
 	public: 
 
 	private:
@@ -89,9 +93,10 @@ namespace HuskyNeo2Tool {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			this->button1 = (gcnew System::Windows::Forms::Button());
+			this->buttonOK = (gcnew System::Windows::Forms::Button());
 			this->textBoxTemperature = (gcnew System::Windows::Forms::TextBox());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->checkBoxAllZones = (gcnew System::Windows::Forms::CheckBox());
 			this->checkBox1 = (gcnew System::Windows::Forms::CheckBox());
@@ -111,44 +116,55 @@ namespace HuskyNeo2Tool {
 			this->groupBox2->SuspendLayout();
 			this->SuspendLayout();
 			// 
-			// button1
+			// buttonOK
 			// 
-			this->button1->Location = System::Drawing::Point(154, 20);
-			this->button1->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
-			this->button1->Name = L"button1";
-			this->button1->Size = System::Drawing::Size(95, 34);
-			this->button1->TabIndex = 0;
-			this->button1->Text = L"确认";
-			this->button1->UseVisualStyleBackColor = true;
-			this->button1->Click += gcnew System::EventHandler(this, &SetAllZonesTemperatureForm::button1_Click);
+			this->buttonOK->Location = System::Drawing::Point(219, 20);
+			this->buttonOK->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
+			this->buttonOK->Name = L"buttonOK";
+			this->buttonOK->Size = System::Drawing::Size(88, 34);
+			this->buttonOK->TabIndex = 0;
+			this->buttonOK->Text = L"确认";
+			this->buttonOK->UseVisualStyleBackColor = true;
+			this->buttonOK->Click += gcnew System::EventHandler(this, &SetAllZonesTemperatureForm::button1_Click);
 			// 
 			// textBoxTemperature
 			// 
 			this->textBoxTemperature->Font = (gcnew System::Drawing::Font(L"宋体", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
 				static_cast<System::Byte>(134)));
-			this->textBoxTemperature->Location = System::Drawing::Point(10, 25);
+			this->textBoxTemperature->Location = System::Drawing::Point(116, 24);
 			this->textBoxTemperature->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->textBoxTemperature->Name = L"textBoxTemperature";
-			this->textBoxTemperature->Size = System::Drawing::Size(95, 26);
+			this->textBoxTemperature->Size = System::Drawing::Size(61, 26);
 			this->textBoxTemperature->TabIndex = 1;
+			this->textBoxTemperature->Click += gcnew System::EventHandler(this, &SetAllZonesTemperatureForm::textBoxTemperature_Click);
 			// 
 			// groupBox1
 			// 
+			this->groupBox1->Controls->Add(this->label2);
 			this->groupBox1->Controls->Add(this->label1);
 			this->groupBox1->Controls->Add(this->textBoxTemperature);
-			this->groupBox1->Controls->Add(this->button1);
-			this->groupBox1->Location = System::Drawing::Point(214, 177);
-			this->groupBox1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->groupBox1->Controls->Add(this->buttonOK);
+			this->groupBox1->Location = System::Drawing::Point(155, 177);
+			this->groupBox1->Margin = System::Windows::Forms::Padding(4);
 			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
-			this->groupBox1->Size = System::Drawing::Size(258, 66);
+			this->groupBox1->Padding = System::Windows::Forms::Padding(4);
+			this->groupBox1->Size = System::Drawing::Size(317, 66);
 			this->groupBox1->TabIndex = 2;
 			this->groupBox1->TabStop = false;
+			// 
+			// label2
+			// 
+			this->label2->AutoSize = true;
+			this->label2->Location = System::Drawing::Point(7, 26);
+			this->label2->Name = L"label2";
+			this->label2->Size = System::Drawing::Size(109, 22);
+			this->label2->TabIndex = 3;
+			this->label2->Text = L"输入温度:";
 			// 
 			// label1
 			// 
 			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(105, 27);
+			this->label1->Location = System::Drawing::Point(177, 26);
 			this->label1->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(32, 22);
@@ -158,8 +174,10 @@ namespace HuskyNeo2Tool {
 			// checkBoxAllZones
 			// 
 			this->checkBoxAllZones->AutoSize = true;
+			this->checkBoxAllZones->Checked = true;
+			this->checkBoxAllZones->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBoxAllZones->Location = System::Drawing::Point(25, 202);
-			this->checkBoxAllZones->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBoxAllZones->Margin = System::Windows::Forms::Padding(4);
 			this->checkBoxAllZones->Name = L"checkBoxAllZones";
 			this->checkBoxAllZones->Size = System::Drawing::Size(73, 26);
 			this->checkBoxAllZones->TabIndex = 3;
@@ -170,8 +188,10 @@ namespace HuskyNeo2Tool {
 			// checkBox1
 			// 
 			this->checkBox1->AutoSize = true;
+			this->checkBox1->Checked = true;
+			this->checkBox1->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox1->Location = System::Drawing::Point(8, 20);
-			this->checkBox1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox1->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox1->Name = L"checkBox1";
 			this->checkBox1->Size = System::Drawing::Size(95, 26);
 			this->checkBox1->TabIndex = 3;
@@ -181,8 +201,10 @@ namespace HuskyNeo2Tool {
 			// checkBox2
 			// 
 			this->checkBox2->AutoSize = true;
+			this->checkBox2->Checked = true;
+			this->checkBox2->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox2->Location = System::Drawing::Point(120, 20);
-			this->checkBox2->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox2->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox2->Name = L"checkBox2";
 			this->checkBox2->Size = System::Drawing::Size(95, 26);
 			this->checkBox2->TabIndex = 4;
@@ -204,9 +226,9 @@ namespace HuskyNeo2Tool {
 			this->groupBox2->Controls->Add(this->checkBox1);
 			this->groupBox2->Controls->Add(this->checkBox2);
 			this->groupBox2->Location = System::Drawing::Point(16, 16);
-			this->groupBox2->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->groupBox2->Margin = System::Windows::Forms::Padding(4);
 			this->groupBox2->Name = L"groupBox2";
-			this->groupBox2->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->groupBox2->Padding = System::Windows::Forms::Padding(4);
 			this->groupBox2->Size = System::Drawing::Size(456, 158);
 			this->groupBox2->TabIndex = 5;
 			this->groupBox2->TabStop = false;
@@ -214,8 +236,10 @@ namespace HuskyNeo2Tool {
 			// checkBox12
 			// 
 			this->checkBox12->AutoSize = true;
+			this->checkBox12->Checked = true;
+			this->checkBox12->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox12->Location = System::Drawing::Point(338, 118);
-			this->checkBox12->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox12->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox12->Name = L"checkBox12";
 			this->checkBox12->Size = System::Drawing::Size(95, 26);
 			this->checkBox12->TabIndex = 14;
@@ -225,8 +249,10 @@ namespace HuskyNeo2Tool {
 			// checkBox11
 			// 
 			this->checkBox11->AutoSize = true;
+			this->checkBox11->Checked = true;
+			this->checkBox11->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox11->Location = System::Drawing::Point(227, 118);
-			this->checkBox11->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox11->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox11->Name = L"checkBox11";
 			this->checkBox11->Size = System::Drawing::Size(95, 26);
 			this->checkBox11->TabIndex = 13;
@@ -236,8 +262,10 @@ namespace HuskyNeo2Tool {
 			// checkBox10
 			// 
 			this->checkBox10->AutoSize = true;
+			this->checkBox10->Checked = true;
+			this->checkBox10->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox10->Location = System::Drawing::Point(120, 118);
-			this->checkBox10->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox10->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox10->Name = L"checkBox10";
 			this->checkBox10->Size = System::Drawing::Size(95, 26);
 			this->checkBox10->TabIndex = 12;
@@ -247,8 +275,10 @@ namespace HuskyNeo2Tool {
 			// checkBox9
 			// 
 			this->checkBox9->AutoSize = true;
+			this->checkBox9->Checked = true;
+			this->checkBox9->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox9->Location = System::Drawing::Point(8, 118);
-			this->checkBox9->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox9->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox9->Name = L"checkBox9";
 			this->checkBox9->Size = System::Drawing::Size(95, 26);
 			this->checkBox9->TabIndex = 11;
@@ -258,8 +288,10 @@ namespace HuskyNeo2Tool {
 			// checkBox8
 			// 
 			this->checkBox8->AutoSize = true;
+			this->checkBox8->Checked = true;
+			this->checkBox8->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox8->Location = System::Drawing::Point(338, 70);
-			this->checkBox8->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox8->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox8->Name = L"checkBox8";
 			this->checkBox8->Size = System::Drawing::Size(95, 26);
 			this->checkBox8->TabIndex = 10;
@@ -269,8 +301,10 @@ namespace HuskyNeo2Tool {
 			// checkBox7
 			// 
 			this->checkBox7->AutoSize = true;
+			this->checkBox7->Checked = true;
+			this->checkBox7->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox7->Location = System::Drawing::Point(227, 70);
-			this->checkBox7->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox7->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox7->Name = L"checkBox7";
 			this->checkBox7->Size = System::Drawing::Size(95, 26);
 			this->checkBox7->TabIndex = 9;
@@ -280,8 +314,10 @@ namespace HuskyNeo2Tool {
 			// checkBox6
 			// 
 			this->checkBox6->AutoSize = true;
+			this->checkBox6->Checked = true;
+			this->checkBox6->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox6->Location = System::Drawing::Point(120, 70);
-			this->checkBox6->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox6->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox6->Name = L"checkBox6";
 			this->checkBox6->Size = System::Drawing::Size(95, 26);
 			this->checkBox6->TabIndex = 8;
@@ -291,8 +327,10 @@ namespace HuskyNeo2Tool {
 			// checkBox5
 			// 
 			this->checkBox5->AutoSize = true;
+			this->checkBox5->Checked = true;
+			this->checkBox5->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox5->Location = System::Drawing::Point(8, 70);
-			this->checkBox5->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox5->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox5->Name = L"checkBox5";
 			this->checkBox5->Size = System::Drawing::Size(95, 26);
 			this->checkBox5->TabIndex = 7;
@@ -302,8 +340,10 @@ namespace HuskyNeo2Tool {
 			// checkBox4
 			// 
 			this->checkBox4->AutoSize = true;
+			this->checkBox4->Checked = true;
+			this->checkBox4->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox4->Location = System::Drawing::Point(338, 20);
-			this->checkBox4->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox4->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox4->Name = L"checkBox4";
 			this->checkBox4->Size = System::Drawing::Size(95, 26);
 			this->checkBox4->TabIndex = 6;
@@ -314,8 +354,10 @@ namespace HuskyNeo2Tool {
 			// checkBox3
 			// 
 			this->checkBox3->AutoSize = true;
+			this->checkBox3->Checked = true;
+			this->checkBox3->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->checkBox3->Location = System::Drawing::Point(227, 20);
-			this->checkBox3->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->checkBox3->Margin = System::Windows::Forms::Padding(4);
 			this->checkBox3->Name = L"checkBox3";
 			this->checkBox3->Size = System::Drawing::Size(95, 26);
 			this->checkBox3->TabIndex = 5;
@@ -350,6 +392,9 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 	if (this->textBoxTemperature->Text == "") {
 		MessageBox::Show("请输入温度！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 		return;
+	}else if (Convert::ToDouble(this->textBoxTemperature->Text) < 0 || Convert::ToDouble(this->textBoxTemperature->Text) > 500) {
+		MessageBox::Show("温控器温度设置范围为 0~500 ℃！", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
+		return;
 	} else {
 		this->DialogResult = System::Windows::Forms::DialogResult::OK;
 		this->Close();
@@ -368,5 +413,18 @@ private: System::Void checkBoxAllZones_CheckedChanged(System::Object^  sender, S
 				 }
 			 }
 }
+private: System::Void textBoxTemperature_Click(System::Object^  sender, System::EventArgs^  e) {
+			 NumberKeyboard^ nb = gcnew NumberKeyboard();
+			 nb->parentTextBox = textBoxTemperature;
+			 Point p;
+			 p.X = this->Location.X;
+			 p.Y = this->Location.Y + this->Height;
+
+			 nb->Location = p;
+			 System::Windows::Forms::DialogResult result = nb->ShowDialog();
+			 if (result == System::Windows::Forms::DialogResult::OK) {
+			 	InvokeOnClick(this->buttonOK, e);
+			 }
+		 }
 };
 }

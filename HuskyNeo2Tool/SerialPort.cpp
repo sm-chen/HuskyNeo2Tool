@@ -326,7 +326,7 @@ int CSerialPort::ReadData(unsigned char* pData)
 		//Sleep(SLEEP_TIME_INTERVAL);
 		return 0;
 	}
-	for (int i = 0; i < BytesInQue; i++) {
+	for (UINT i = 0; i < BytesInQue; i++) {
 		unsigned char cRecved = 0x00;
 		if (this->ReadChar(cRecved) == true)
 			pData[i] = cRecved;

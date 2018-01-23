@@ -1,5 +1,6 @@
   HuskyNeo2Tool.AlarmStatusWindow.resources - Embedded, ContainedInManifestFile, 
-  HuskyNeo2Tool.AllZonesTemperatureSetting.resources - Embedded, ContainedInManifestFile, 
+  HuskyNeo2Tool.NumberKeyboard.resources - Embedded, ContainedInManifestFile, 
+  HuskyNeo2Tool.SetOneZoneTemperatureForm.resources - Embedded, ContainedInManifestFile, 
   HuskyNeo2Tool.Form1.resources - Embedded, ContainedInManifestFile, 
   HuskyNeo2Tool.IpConfigure.resources - Embedded, ContainedInManifestFile, 
   HuskyNeo2Tool.SetAllZonesTemperatureForm.resources - Embedded, ContainedInManifestFile, 
@@ -23,9 +24,6 @@ Class HuskyNeo2Tool.AlarmStatusWindow: AutoLayout, AnsiClass, Class, Public, Bef
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Fields:
     System.Windows.Forms.Label[] labelZoneAlarmMsgArray : Public
-Class HuskyNeo2Tool.AllZonesTemperatureSetting: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
-  :System.Windows.Forms.Form
-    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
 Class HuskyNeo2Tool.IpConfigure: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
@@ -42,6 +40,16 @@ Class HuskyNeo2Tool.IpConfigure: AutoLayout, AnsiClass, Class, Public, BeforeFie
     System.Windows.Forms.TextBox textBox10 : Public
     System.Windows.Forms.TextBox textBox11 : Public
     System.Windows.Forms.TextBox textBox12 : Public
+Class HuskyNeo2Tool.NumberKeyboard: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    System.Windows.Forms.TextBox parentTextBox : Public
+Class HuskyNeo2Tool.SetOneZoneTemperatureForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Fields:
+    System.Windows.Forms.TextBox textBox1 : Public
 Class HuskyNeo2Tool.SetAllZonesTemperatureForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
@@ -49,6 +57,9 @@ Class HuskyNeo2Tool.SetAllZonesTemperatureForm: AutoLayout, AnsiClass, Class, Pu
     System.Windows.Forms.CheckBox[] checkBoxAllZonesArray : Public
     System.Windows.Forms.CheckBox checkBoxAllZones : Public
     System.Windows.Forms.TextBox textBoxTemperature : Public
+Class HuskyNeo2Tool.SetTempInProgressForm: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+  :System.Windows.Forms.Form
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
 Class HuskyNeo2Tool.Form1: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
