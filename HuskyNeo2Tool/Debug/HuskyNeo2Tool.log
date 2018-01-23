@@ -1,12 +1,7 @@
-﻿生成启动时间为 2018/1/2 9:41:45。
-     1>项目“D:\HUSKY\HuskyNeo2Tool\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”在节点 2 上(Build 个目标)。
+﻿生成启动时间为 2017/12/28 14:03:11。
+     1>项目“D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr:pure /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _UNICODE /D UNICODE /EHa /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"Debug\HuskyNeo2Tool.pch" /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib stdafx.cpp
-         stdafx.cpp
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr:pure /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _UNICODE /D UNICODE /EHa /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\HuskyNeo2Tool.pch" /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib AlarmStatusWindow.cpp AllZonesTemperatureSetting.cpp AssemblyInfo.cpp Husky.cpp HuskyNeo2Tool.cpp IpConfigure.cpp SerialPort.cpp SetAllZonesTemperatureForm.cpp
-         AlarmStatusWindow.cpp
-         AllZonesTemperatureSetting.cpp
-         AssemblyInfo.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /AI"C:\Program Files (x86)\Windows Kits\8.0\References\CommonConfiguration\Neutral" /Zi /clr:pure /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _UNICODE /D UNICODE /EHa /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\HuskyNeo2Tool.pch" /Fo"Debug\\" /Fd"Debug\vc110.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib Husky.cpp
          Husky.cpp
      1>Husky.cpp(2): warning C4627: “#include <Windows.h>”: 在查找预编译头使用时跳过
                  将指令添加到“stdafx.h”或重新生成预编译头
@@ -17,35 +12,8 @@
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\string.h(191) : 参见“strncpy”的声明
      1>Husky.cpp(455): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\string.h(191) : 参见“strncpy”的声明
-         HuskyNeo2Tool.cpp
-     1>d:\husky\huskyneo2tool\huskyneo2tool\IpConfigure.h(435): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\string.h(110) : 参见“strcpy”的声明
-     1>d:\husky\huskyneo2tool\huskyneo2tool\IpConfigure.h(437): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218) : 参见“fopen”的声明
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(103): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\string.h(110) : 参见“strcpy”的声明
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(104): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218) : 参见“fopen”的声明
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(213): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(214): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(222): warning C4965: 整数 0 的隐式装箱；请使用 nullptr 或显式转换
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(233): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(234): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(248): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(249): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(2067): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-     1>d:\husky\huskyneo2tool\huskyneo2tool\Form1.h(2069): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-         IpConfigure.cpp
-     1>d:\husky\huskyneo2tool\huskyneo2tool\IpConfigure.h(435): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\string.h(110) : 参见“strcpy”的声明
-     1>d:\husky\huskyneo2tool\huskyneo2tool\IpConfigure.h(437): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218) : 参见“fopen”的声明
-         SerialPort.cpp
-     1>SerialPort.cpp(329): warning C4018: “<”: 有符号/无符号不匹配
-         SetAllZonesTemperatureForm.cpp
-         正在生成代码...
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\HUSKY\HuskyNeo2Tool\Debug\HuskyNeo2Tool.exe" /INCREMENTAL /NOLOGO /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.AlarmStatusWindow.resources /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.AllZonesTemperatureSetting.resources /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.Form1.resources /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.IpConfigure.resources /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.SetAllZonesTemperatureForm.resources /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\HUSKY\HuskyNeo2Tool\Debug\HuskyNeo2Tool.pdb" /ASSEMBLYDEBUG /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"main" /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X86 /SAFESEH Debug\AlarmStatusWindow.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\Debug\HuskyNeo2Tool.exe" /INCREMENTAL /NOLOGO /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.AlarmStatusWindow.resources /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.AllZonesTemperatureSetting.resources /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.Form1.resources /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.IpConfigure.resources /ASSEMBLYRESOURCE:Debug\HuskyNeo2Tool.SetAllZonesTemperatureForm.resources /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\Debug\HuskyNeo2Tool.pdb" /ASSEMBLYDEBUG /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"main" /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X86 /SAFESEH Debug\AlarmStatusWindow.obj
          Debug\AllZonesTemperatureSetting.obj
          Debug\AssemblyInfo.obj
          Debug\Husky.obj
@@ -84,8 +52,8 @@
      1>LINK : fatal error LNK1215: 元数据操作失败(80004005): 未指定的错误
          
          
-     1>已完成生成项目“D:\HUSKY\HuskyNeo2Tool\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”(Build 个目标)的操作 - 失败。
+     1>已完成生成项目“D:\HUSKY\HuskyNeo2Tool_DEBUG_20171227ok\HuskyNeo2Tool\HuskyNeo2Tool.vcxproj”(Build 个目标)的操作 - 失败。
 
 生成失败。
 
-已用时间 00:00:03.51
+已用时间 00:00:01.09

@@ -350,9 +350,6 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 	if (this->textBoxTemperature->Text == "") {
 		MessageBox::Show("ÇëÊäÈëÎÂ¶È£¡", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
 		return;
-	}else if (Convert::ToDouble(this->textBoxTemperature->Text) < 0 || Convert::ToDouble(this->textBoxTemperature->Text) > 500) {
-		MessageBox::Show("ÎÂ¿ØÆ÷ÎÂ¶ÈÉèÖÃ·¶Î§Îª 0~500 ¡æ£¡", "Error", MessageBoxButtons::OK, MessageBoxIcon::Exclamation);
-		return;
 	} else {
 		this->DialogResult = System::Windows::Forms::DialogResult::OK;
 		this->Close();

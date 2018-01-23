@@ -11,8 +11,8 @@ Husky::Husky(void)
 	mIsConnected = FALSE;
 	mServPort = 4002;
 	mServIpAddr[0] = '\0';
+	mMutex = CreateMutex(NULL, FALSE, NULL);
 
-	InitializeCriticalSection(&mCommunicationSync);
 }
 
 Husky::Husky(char *ipAddr)
@@ -24,15 +24,12 @@ Husky::Husky(char *ipAddr)
 
 Husky::~Husky(void)
 {
-	//DeleteCriticalSection(&mCommunicationSync);
 }
 uint16_t Husky::modbus_crc16(unsigned char *data, int length) {
 	uint16_t crc_reg = 0x0;
 	uint16_t *p_crc_reg = &crc_reg;
 	unsigned char * p_crc_reg_l = (unsigned char *)p_crc_reg;
 	unsigned char * p_crc_reg_h = (unsigned char *)p_crc_reg + 1;
-	if (length <= 0)
-		return crc_reg;
 
 	while (length--) {
 		*p_crc_reg = *(a_crctable + ((*p_crc_reg_l)^*data++))^*(p_crc_reg_h);
@@ -118,25 +115,14 @@ BOOLEAN Husky::connect()
 		return FALSE;
 	}
 */
-	BOOLEAN ret = FALSE;
-
-	//EnterCriticalSection(&mCommunicationSync);
-	if (this->serialPort.InitPort(getSerialPortNum())) {
-		if (checkHuskyVersion()) {
-			mIsConnected = TRUE;
-			ret = TRUE;
-		} else {
-			this->serialPort.ClosePort();
-			mIsConnected = FALSE;
-			ret = FALSE;
-		}
+	if (this->serialPort.InitPort(getSerialPortNum()) && checkHuskyVersion()) {
+		this->setConnected();
+		mIsConnected = TRUE;
+		return TRUE;
 	} else {
-		mIsConnected = FALSE;
-		ret = FALSE;
+		return FALSE;
 	}
-
-	//LeaveCriticalSection(&mCommunicationSync);
-	return ret;
+	
 }
 
 void Husky::disconnect()
@@ -146,7 +132,6 @@ void Husky::disconnect()
 	WSACleanup();
 	mIsConnected = FALSE;
 */
-
 	this->serialPort.ClosePort();
 	mIsConnected = FALSE;
 }
@@ -175,7 +160,6 @@ float bytetof(unsigned char *p_data)
 
 	return cvnlesscast.value ;
 }
-
 unsigned char *ftobyte(float value, unsigned char *p_data)
 {
 	union cvnlesscast {
@@ -192,37 +176,18 @@ unsigned char *ftobyte(float value, unsigned char *p_data)
 	return p_data ;
 }
 
-/* read n bytes from husky:
- * bytes: the bytes receive from husky until timeout. 1 will return immediately when receive any bytes until timeout.
- * receivDataBuf: reveived data buffer.
- */
-int Husky::readBytes(unsigned char *receivDataBuf, int bytes)
-{
-	int len = 0;
-	int times = 0;
-	while (len < bytes && times < UDP_RECVFROM_TIMEOUT_TIMES) {
-		len = len + serialPort.ReadData(receivDataBuf + len);
-		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
-		times++;
-	}
-
-	return len;
-}
-
 float Husky::getTemperature(int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return 0;
-	int tryTimes = TRY_TIMES;
 
-	EnterCriticalSection(&mCommunicationSync);
+	WaitForSingleObject(mMutex, INFINITE);
 
-tryagain:
 	float temperature;
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x20;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
-	unsigned char AckMsg[] = {DLE, ACK1};
+
 	unsigned char receivData[BUF_SIZE];
 	int len = 0;
 	//this->receivData((char *)receivData); // clear current udp buffer!
@@ -230,42 +195,43 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// read temperature data from husky is 18 bytes
-	len = readBytes(receivData, 18);
-
+	//len = this->receivData((char *)receivData);
+	len = serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 	unsigned char temperData[4] = {receivData[10], receivData[11], receivData[12], receivData[13]};
 	
-	if (len <= 0 || !checkCrc(receivData, len)) {
+	if (!checkCrc(receivData, len)) {
 		printf("CRC Check failed!");
-/************************************************************************************/
-		len = readBytes(receivData, 1);
 
-		if (len <= 0) {
-			Sleep(1000); // ???
-		} else if (len > 0 && receivData[0] == ENQ) {
-			this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-			Sleep(100);
-		} else if (len > 0 && receivData[0] == EOT) {
-			;
-		}
-/*************************************************************************************/
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
 
-		temperature = 32; // 0¡æ
-
-		if (--tryTimes)
-			goto tryagain;
+		temperature = 0;
 		goto error;
 	}
 
+	unsigned char AckMsg[] = {DLE, ACK1};
 	//this->sendData((char *)AckMsg, sizeof(AckMsg));
 	this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
 
-	len = readBytes(receivData, 1); // EOT
+	//len = this->receivData((char *)receivData);
+	len = serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIMES);
+	}
 
 	temperature = bytetof(temperData);
 
 error:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return temperature;
 }
 
@@ -274,11 +240,9 @@ BOOLEAN Husky::setTemperature(float temperature, int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return FALSE;
-	int tryTimes = TRY_TIMES;
 
-	EnterCriticalSection(&mCommunicationSync);
+	WaitForSingleObject(mMutex, INFINITE);
 
-tryagain:
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x21;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
@@ -289,8 +253,13 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// Controller allow to set Temperature data from husky is 7 bytes
-	int len = readBytes(receivData, 7);
+	//int len = this->receivData((char *)receivData);
+	int len = serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 
 	// Controller allow to do
 	if (receivData[2] == CMD1 && receivData[3] == CMD2 && receivData[5] == DLE && receivData[6] == ACK0) {
@@ -308,8 +277,13 @@ tryagain:
 		//this->sendData((char *)crcData, sizeof(crcData));
 		serialPort.WriteData(crcData, sizeof(crcData));
 
-		// read 2 bytes ACK MSG
-		len = readBytes(receivData, 2);
+		//len = this->receivData((char *)receivData);
+		len = serialPort.ReadData(receivData);
+		for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+			//len = this->receivData((char *)receivData);
+			len = serialPort.ReadData(receivData);
+			Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+		}
 		if (len == 2 && receivData[0] == DLE && receivData[1] == ACK1) {
 			unsigned char endTrans[] = {EOT};
 			//this->sendData((char *)endTrans, sizeof(endTrans));
@@ -318,29 +292,18 @@ tryagain:
 		} else
 			goto error;
 	} else {
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
+
 		goto error;
 	}
 ok:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return TRUE;
 error:
-/************************************************************************************/
-	len = readBytes(receivData, 1);
-	if (len > 0 && receivData[0] == ENQ) {
-		unsigned char AckMsg[] = {DLE, ACK1};
-		this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-		Sleep(100);
-	} else if (len > 0 && receivData[0] == EOT) {
-		;
-	} else {
-		Sleep(1000);
-	}
-/*************************************************************************************/
-
-	if (--tryTimes)
-		goto tryagain;
-
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return FALSE;
 }
 
@@ -362,16 +325,14 @@ float Husky::getRealtimeTemperature(int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return 0;
-	int tryTimes = TRY_TIMES;
 
-	EnterCriticalSection(&mCommunicationSync);
+	WaitForSingleObject(mMutex, INFINITE);
 
-tryagain:
 	float temperature;
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x22;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
-	unsigned char AckMsg[] = {DLE, ACK1};
+
 	unsigned char receivData[BUF_SIZE];
 	int len = 0;
 	//this->receivData((char *)receivData); // clear current udp buffer!
@@ -379,39 +340,43 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// read temperature data from husky is 18 bytes
-	len = readBytes(receivData, 18);
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 	unsigned char temperData[4] = {receivData[10], receivData[11], receivData[12], receivData[13]};
-
-	if (len <= 0 || !checkCrc(receivData, len)) {
+	
+	if (!checkCrc(receivData, len)) {
 		printf("CRC Check failed!");
-/************************************************************************************/
-		len = readBytes(receivData, 1);
 
-		if (len <= 0) {
-			Sleep(1000); // ???
-		} else if (len > 0 && receivData[0] == ENQ) {
-			this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-			Sleep(100);
-		} else if (len > 0 && receivData[0] == EOT) {
-			;
-		}
-/*************************************************************************************/
-		temperature = 32; // 0¡æ
-		if (--tryTimes)
-			goto tryagain;
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
+
+		temperature = 0;
 		goto error;
 	}
 
+	unsigned char AckMsg[] = {DLE, ACK1};
+	//this->sendData((char *)AckMsg, sizeof(AckMsg));
 	this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
 
-	len = readBytes(receivData, 1); // EOT
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 
 	temperature = bytetof(temperData);
 
 error:
-
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return temperature;
 }
 
@@ -425,12 +390,12 @@ BOOLEAN Husky::setAllZonesTemperature(float temperature)
 
 BOOLEAN Husky::checkHuskyVersion()
 {
-	EnterCriticalSection(&mCommunicationSync);
+	WaitForSingleObject(mMutex, INFINITE);
 
 	unsigned char CMD1 = 0x20;
 	unsigned char CMD2 = 0x22;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
-	unsigned char AckMsg[] = {DLE, ACK1};
+
 	unsigned char receivData[BUF_SIZE];
 	int len = 0;
 	//this->receivData((char *)receivData); // clear current udp buffer!
@@ -438,40 +403,44 @@ BOOLEAN Husky::checkHuskyVersion()
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// read version data from husky is 18 bytes
-	len = readBytes(receivData, 18);
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 
 	// current Husky Neo2 Version
-	unsigned char versionData[4] = {receivData[10], receivData[11], receivData[12], receivData[13]};
+	if (!(receivData[10] == 0x32 && receivData[11] == 0x36 && receivData[12] == 0x30 && receivData[13] == 0x31))
+		return FALSE;
 	
-	if (len <= 0 || !checkCrc(receivData, len)) {
+	if (!checkCrc(receivData, len)) {
 		printf("CRC Check failed!");
 
-/************************************************************************************/
-		len = readBytes(receivData, 1);
-
-		if (len <= 0) {
-			Sleep(1000); // ???
-		} else if (len > 0 && receivData[0] == ENQ) {
-			this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-			Sleep(100);
-		} else if (len > 0 && receivData[0] == EOT) {
-			;
-		}
-/*************************************************************************************/
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
 
 		goto error;
-	} else if (!(versionData[0] == 0x32 && receivData[1] == 0x36 && receivData[2] == 0x30 && receivData[3] == 0x31))
-		goto error;
+	}
 
+	unsigned char AckMsg[] = {DLE, ACK1};
+	//this->sendData((char *)AckMsg, sizeof(AckMsg));
 	this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
 
-	len = readBytes(receivData, 1); // EOT
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	//for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+	//	len = this->receivData((char *)receivData);
+	//	Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	//}
 
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return TRUE;
 error:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return FALSE;
 }
 
@@ -491,16 +460,14 @@ float Husky::getManualPercentOutput(int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return 0;
-	int tryTimes = TRY_TIMES;
 
-	EnterCriticalSection(&mCommunicationSync);
+	WaitForSingleObject(mMutex, INFINITE);
 
-tryagain:
 	float percent;
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x6A;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
-	unsigned char AckMsg[] = {DLE, ACK1};
+
 	unsigned char receivData[BUF_SIZE];
 	int len = 0;
 	//this->receivData((char *)receivData); // clear current udp buffer!
@@ -508,49 +475,52 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// read percent data from husky is 18 bytes
-	len = readBytes(receivData, 18);
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 	unsigned char percentData[4] = {receivData[10], receivData[11], receivData[12], receivData[13]};
 	
-	if (len <= 0 || !checkCrc(receivData, len)) {
+	if (!checkCrc(receivData, len)) {
 		printf("CRC Check failed!");
-/************************************************************************************/
-		len = readBytes(receivData, 1);
 
-		if (len <= 0) {
-			Sleep(1000); // ???
-		} else if (len > 0 && receivData[0] == ENQ) {
-			this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-			Sleep(100);
-		} else if (len > 0 && receivData[0] == EOT) {
-			;
-		}
-/*************************************************************************************/
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
 
 		percent = -1;
-		if (--tryTimes)
-			goto tryagain;
 		goto error;
 	}
 
+	unsigned char AckMsg[] = {DLE, ACK1};
 	//this->sendData((char *)AckMsg, sizeof(AckMsg));
 	this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
 
-	len = readBytes(receivData, 1); // EOT
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIMES);
+	}
 
 	percent = bytetof(percentData);
 
 error:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return percent;
 }
 BOOLEAN Husky::setManualPercentOutput(int zone, float percent)
 {
 	if (zone <= 0 || zone > 12)
 		return FALSE;
-	int tryTimes = TRY_TIMES;
-	EnterCriticalSection(&mCommunicationSync);
-tryagain:
+
+	WaitForSingleObject(mMutex, INFINITE);
+
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x6b;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
@@ -561,8 +531,13 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// Controller allow to set PercentOutput data from husky is 7 bytes
-	int len = readBytes(receivData, 7);
+	//int len = this->receivData((char *)receivData);
+	int len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 
 	// Controller allow to do
 	if (receivData[2] == CMD1 && receivData[3] == CMD2 && receivData[5] == DLE && receivData[6] == ACK0) {
@@ -580,8 +555,13 @@ tryagain:
 		//this->sendData((char *)crcData, sizeof(crcData));
 		this->serialPort.WriteData(crcData, sizeof(crcData));
 
-		// read 2 bytes ACK MSG
-		len = readBytes(receivData, 2);
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+			//len = this->receivData((char *)receivData);
+			len = this->serialPort.ReadData(receivData);
+			Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+		}
 		if (len == 2 && receivData[0] == DLE && receivData[1] == ACK1) {
 			unsigned char endTrans[] = {EOT};
 			//this->sendData((char *)endTrans, sizeof(endTrans));
@@ -590,27 +570,18 @@ tryagain:
 		} else
 			goto error;
 	} else {
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
+
 		goto error;
 	}
 ok:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return TRUE;
 error:
-/************************************************************************************/
-	len = readBytes(receivData, 1);
-	if (len > 0 && receivData[0] == ENQ) {
-		unsigned char AckMsg[] = {DLE, ACK1};
-		this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-		Sleep(100);
-	} else if (len > 0 && receivData[0] == EOT) {
-		;
-	} else {
-		Sleep(1000);
-	}
-/*************************************************************************************/
-	if (--tryTimes)
-		goto tryagain;
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return FALSE;
 }
 
@@ -618,14 +589,13 @@ uint16_t Husky::getRegulationMode(int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return 0;
-	int tryTimes = TRY_TIMES;
-	EnterCriticalSection(&mCommunicationSync);
 
-tryagain:
+	WaitForSingleObject(mMutex, INFINITE);
+
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x8E;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
-	unsigned char AckMsg[] = {DLE, ACK1};
+
 	unsigned char receivData[BUF_SIZE];
 	int len = 0;
 	//this->receivData((char *)receivData); // clear current udp buffer!
@@ -633,47 +603,53 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// read temperature data from husky is 18 bytes
-	len = readBytes(receivData, 16);
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
+	//unsigned char temperData[2] = {receivData[10], receivData[11]};
 	uint16_t mode = (receivData[10] << 8) | receivData[11];
 	
-	if (len <= 0 || !checkCrc(receivData, len)) {
+	if (!checkCrc(receivData, len)) {
 		printf("CRC Check failed!");
-/************************************************************************************/
-		len = readBytes(receivData, 1);
 
-		if (len <= 0) {
-			Sleep(1000); // ???
-		} else if (len > 0 && receivData[0] == ENQ) {
-			this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-			Sleep(100);
-		} else if (len > 0 && receivData[0] == EOT) {
-			;
-		}
-/*************************************************************************************/
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
+
 		mode = -1;
-		if (--tryTimes)
-			goto tryagain;
 		goto error;
 	}
 
+	unsigned char AckMsg[] = {DLE, ACK1};
 	//this->sendData((char *)AckMsg, sizeof(AckMsg));
 	this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
 
-	len = readBytes(receivData, 1); // EOT
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIMES);
+	}
+
+	//temperature = bytetof(temperData);
 
 error:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return mode;
 }
-
 BOOLEAN Husky::setRegulationMode(int zone, uint16_t mode)
 {
 	if (zone <= 0 || zone > 12)
 		return FALSE;
-	int tryTimes = TRY_TIMES;
-	EnterCriticalSection(&mCommunicationSync);
-tryagain:
+
+	WaitForSingleObject(mMutex, INFINITE);
+
 	unsigned char CMD1 = 0x30 | zone;
 	unsigned char CMD2 = 0x8f;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
@@ -684,11 +660,18 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// Controller allow to set Regulation Mode data from husky is 7 bytes
-	int len = readBytes(receivData, 7);
+	//int len = this->receivData((char *)receivData);
+	int len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 
 	// Controller allow to do
 	if (receivData[2] == CMD1 && receivData[3] == CMD2 && receivData[5] == DLE && receivData[6] == ACK0) {
+		//unsigned char temperData[4];
+		//ftobyte(temperature, temperData);
 		unsigned char data1 = mode > 8;
 		unsigned char data2 = (unsigned char)mode;
 		unsigned char data[] = {DLE, STX, data1, data2, DLE, ETX};
@@ -701,8 +684,13 @@ tryagain:
 		crcData[sizeof(crcData) - 2] = *((unsigned char *)(&crcValue) + 1);
 		this->serialPort.WriteData(crcData, sizeof(crcData));
 
-		// read 2 bytes ACK MSG
-		len = readBytes(receivData, 2);
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+			//len = this->receivData((char *)receivData);
+			len = this->serialPort.ReadData(receivData);
+			Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+		}
 		if (len == 2 && receivData[0] == DLE && receivData[1] == ACK1) {
 			unsigned char endTrans[] = {EOT};
 			//this->sendData((char *)endTrans, sizeof(endTrans));
@@ -711,28 +699,18 @@ tryagain:
 		} else
 			goto error;
 	} else {
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
+
 		goto error;
 	}
 ok:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return TRUE;
 error:
-/************************************************************************************/
-	len = readBytes(receivData, 1);
-	if (len > 0 && receivData[0] == ENQ) {
-		unsigned char AckMsg[] = {DLE, ACK1};
-		this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-		Sleep(100);
-	} else if (len > 0 && receivData[0] == EOT) {
-		;
-	} else {
-		Sleep(1000);
-	}
-/*************************************************************************************/
-	if (--tryTimes)
-		goto tryagain;
-
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return FALSE;
 }
 
@@ -742,7 +720,7 @@ BOOLEAN Husky::getZoneOnOff(int zone)
 	float manualPercentOutput;
 
 	mode = getRegulationMode(zone);
-	//manualPercentOutput = getManualPercentOutput(zone);
+	manualPercentOutput = getManualPercentOutput(zone);
 
 	if (mode == MANUAL_REGULATION_MODE /*&& manualPercentOutput == 0*/)
 		return FALSE;
@@ -767,14 +745,13 @@ uint16_t Husky::getControlerStatus(int zone)
 {
 	if (zone <= 0 || zone > 12)
 		return 0;
-	int tryTimes = TRY_TIMES;
-	EnterCriticalSection(&mCommunicationSync);
 
-tryagain:
+	WaitForSingleObject(mMutex, INFINITE);
+
 	unsigned char CMD1 = 0x30 | zone;
-	unsigned char CMD2 = 0x44; // 0x44: controler status;  0x2E: Alarm Active Status
+	unsigned char CMD2 = 0x2E;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
-	unsigned char AckMsg[] = {DLE, ACK1};
+
 	unsigned char receivData[BUF_SIZE];
 	int len = 0;
 	//this->receivData((char *)receivData); // clear current udp buffer!
@@ -782,48 +759,52 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// Alarm Active Status data from husky is 16 bytes
-	len = readBytes(receivData, 16);
-
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
+	//unsigned char temperData[2] = {receivData[10], receivData[11]};
 	uint16_t alarmStatus = (receivData[10] << 8) | receivData[11];
 	
-	if (len <= 0 || !checkCrc(receivData, len)) {
+	if (!checkCrc(receivData, len)) {
 		printf("CRC Check failed!");
-/************************************************************************************/
-		len = readBytes(receivData, 1);
 
-		if (len <= 0) {
-			Sleep(1000); // ???
-		} else if (len > 0 && receivData[0] == ENQ) {
-			this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-			Sleep(100);
-		} else if (len > 0 && receivData[0] == EOT) {
-			;
-		}
-/*************************************************************************************/
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
+
 		alarmStatus = 0;
-		if (--tryTimes)
-			goto tryagain;
 		goto error;
 	}
 
+	unsigned char AckMsg[] = {DLE, ACK1};
 	//this->sendData((char *)AckMsg, sizeof(AckMsg));
 	this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
 
-	len = readBytes(receivData, 1); // EOT
+	//len = this->receivData((char *)receivData);
+	len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIMES);
+	}
+
+	//temperature = bytetof(temperData);
 
 error:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return alarmStatus;
 }
-
 BOOLEAN Husky::controlerReset()
 {
-	int tryTimes = TRY_TIMES;
-	EnterCriticalSection(&mCommunicationSync);
-tryagain:
+	WaitForSingleObject(mMutex, INFINITE);
+
 	unsigned char CMD1 = 0x31;
-	unsigned char CMD2 = 0x35;
+	unsigned char CMD2 = 0x85;
 	unsigned char data[] = {EOT, DEVID, ADD, CMD1, CMD2, RES, ENQ};
 	unsigned char receivData[BUF_SIZE];
 
@@ -832,11 +813,18 @@ tryagain:
 	//this->sendData((char *)data, sizeof(data));
 	this->serialPort.WriteData(data, sizeof(data));
 
-	// Controller allow to reset data from husky is 7 bytes
-	int len = readBytes(receivData, 7);
+	//int len = this->receivData((char *)receivData);
+	int len = this->serialPort.ReadData(receivData);
+	for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+	}
 
 	// Controller allow to do
 	if (receivData[2] == CMD1 && receivData[3] == CMD2 && receivData[5] == DLE && receivData[6] == ACK0) {
+		//unsigned char temperData[4];
+		//ftobyte(temperature, temperData);
 		unsigned char data1 = 0x00;
 		unsigned char data2 = 0x01;
 		unsigned char data[] = {DLE, STX, data1, data2, DLE, ETX};
@@ -849,8 +837,13 @@ tryagain:
 		crcData[sizeof(crcData) - 2] = *((unsigned char *)(&crcValue) + 1);
 		this->serialPort.WriteData(crcData, sizeof(crcData));
 
-		// read 2 bytes ACK MSG
-		len = readBytes(receivData, 2);
+		//len = this->receivData((char *)receivData);
+		len = this->serialPort.ReadData(receivData);
+		for (int times = 0; len <= 0 && times < UDP_RECVFROM_TIMEOUT_TIMES; times++) {
+			//len = this->receivData((char *)receivData);
+			len = this->serialPort.ReadData(receivData);
+			Sleep(UDP_RECVFROM_TIMEOUT_TIME);
+		}
 		if (len == 2 && receivData[0] == DLE && receivData[1] == ACK1) {
 			unsigned char endTrans[] = {EOT};
 			//this->sendData((char *)endTrans, sizeof(endTrans));
@@ -859,28 +852,18 @@ tryagain:
 		} else
 			goto error;
 	} else {
+		// end of transmission ???????????????
+		unsigned char EndOfTransMsg[] = {EOT};
+		//this->sendData((char *)EndOfTransMsg, sizeof(EndOfTransMsg));
+		this->serialPort.WriteData(EndOfTransMsg, sizeof(EndOfTransMsg));
+
 		goto error;
 	}
 ok:
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return TRUE;
 error:
-/************************************************************************************/
-	len = readBytes(receivData, 1);
-	if (len > 0 && receivData[0] == ENQ) {
-		unsigned char AckMsg[] = {DLE, ACK1};
-		this->serialPort.WriteData(AckMsg, sizeof(AckMsg));
-		Sleep(100);
-	} else if (len > 0 && receivData[0] == EOT) {
-		;
-	} else {
-		Sleep(1000);
-	}
-/*************************************************************************************/
-	if (--tryTimes)
-		goto tryagain;
-
-	LeaveCriticalSection(&mCommunicationSync);
+	ReleaseMutex(mMutex);
 	return FALSE;
 }
 
