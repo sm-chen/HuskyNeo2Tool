@@ -2039,7 +2039,7 @@ private: System::Windows::Forms::Label^  labelRealTempPrompt02;
 			this->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->Name = L"Form1";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
-			this->Text = L"HuskyNeo2Tool";
+			this->Text = L"FOXCONN";
 			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->groupBox1->ResumeLayout(false);
 			this->groupBox1->PerformLayout();

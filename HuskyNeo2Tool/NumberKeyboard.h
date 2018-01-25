@@ -78,7 +78,7 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum1
 			// 
-			this->buttonNum1->Location = System::Drawing::Point(20, 120);
+			this->buttonNum1->Location = System::Drawing::Point(20, 104);
 			this->buttonNum1->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum1->Name = L"buttonNum1";
 			this->buttonNum1->Size = System::Drawing::Size(59, 40);
@@ -89,7 +89,7 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum2
 			// 
-			this->buttonNum2->Location = System::Drawing::Point(90, 120);
+			this->buttonNum2->Location = System::Drawing::Point(90, 104);
 			this->buttonNum2->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum2->Name = L"buttonNum2";
 			this->buttonNum2->Size = System::Drawing::Size(64, 40);
@@ -100,7 +100,7 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum3
 			// 
-			this->buttonNum3->Location = System::Drawing::Point(165, 120);
+			this->buttonNum3->Location = System::Drawing::Point(165, 104);
 			this->buttonNum3->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum3->Name = L"buttonNum3";
 			this->buttonNum3->Size = System::Drawing::Size(61, 40);
@@ -111,7 +111,7 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum4
 			// 
-			this->buttonNum4->Location = System::Drawing::Point(20, 69);
+			this->buttonNum4->Location = System::Drawing::Point(20, 56);
 			this->buttonNum4->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum4->Name = L"buttonNum4";
 			this->buttonNum4->Size = System::Drawing::Size(59, 40);
@@ -122,7 +122,7 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum5
 			// 
-			this->buttonNum5->Location = System::Drawing::Point(90, 69);
+			this->buttonNum5->Location = System::Drawing::Point(90, 56);
 			this->buttonNum5->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum5->Name = L"buttonNum5";
 			this->buttonNum5->Size = System::Drawing::Size(64, 40);
@@ -133,10 +133,10 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum6
 			// 
-			this->buttonNum6->Location = System::Drawing::Point(166, 67);
+			this->buttonNum6->Location = System::Drawing::Point(165, 56);
 			this->buttonNum6->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum6->Name = L"buttonNum6";
-			this->buttonNum6->Size = System::Drawing::Size(59, 40);
+			this->buttonNum6->Size = System::Drawing::Size(61, 40);
 			this->buttonNum6->TabIndex = 5;
 			this->buttonNum6->Text = L"6";
 			this->buttonNum6->UseVisualStyleBackColor = true;
@@ -144,10 +144,10 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum7
 			// 
-			this->buttonNum7->Location = System::Drawing::Point(20, 14);
+			this->buttonNum7->Location = System::Drawing::Point(20, 8);
 			this->buttonNum7->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum7->Name = L"buttonNum7";
-			this->buttonNum7->Size = System::Drawing::Size(60, 40);
+			this->buttonNum7->Size = System::Drawing::Size(59, 40);
 			this->buttonNum7->TabIndex = 6;
 			this->buttonNum7->Text = L"7";
 			this->buttonNum7->UseVisualStyleBackColor = true;
@@ -155,7 +155,7 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum8
 			// 
-			this->buttonNum8->Location = System::Drawing::Point(90, 14);
+			this->buttonNum8->Location = System::Drawing::Point(90, 8);
 			this->buttonNum8->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum8->Name = L"buttonNum8";
 			this->buttonNum8->Size = System::Drawing::Size(64, 40);
@@ -166,7 +166,7 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum9
 			// 
-			this->buttonNum9->Location = System::Drawing::Point(165, 14);
+			this->buttonNum9->Location = System::Drawing::Point(165, 8);
 			this->buttonNum9->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum9->Name = L"buttonNum9";
 			this->buttonNum9->Size = System::Drawing::Size(61, 40);
@@ -177,7 +177,7 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonNum0
 			// 
-			this->buttonNum0->Location = System::Drawing::Point(90, 172);
+			this->buttonNum0->Location = System::Drawing::Point(90, 153);
 			this->buttonNum0->Margin = System::Windows::Forms::Padding(6, 5, 6, 5);
 			this->buttonNum0->Name = L"buttonNum0";
 			this->buttonNum0->Size = System::Drawing::Size(64, 40);
@@ -188,9 +188,9 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonDelete
 			// 
-			this->buttonDelete->Location = System::Drawing::Point(20, 172);
+			this->buttonDelete->Location = System::Drawing::Point(20, 153);
 			this->buttonDelete->Name = L"buttonDelete";
-			this->buttonDelete->Size = System::Drawing::Size(60, 40);
+			this->buttonDelete->Size = System::Drawing::Size(59, 40);
 			this->buttonDelete->TabIndex = 10;
 			this->buttonDelete->Text = L"←";
 			this->buttonDelete->UseVisualStyleBackColor = true;
@@ -198,11 +198,13 @@ namespace HuskyNeo2Tool {
 			// 
 			// buttonEnter
 			// 
-			this->buttonEnter->Location = System::Drawing::Point(166, 172);
+			this->buttonEnter->Font = (gcnew System::Drawing::Font(L"宋体", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+				static_cast<System::Byte>(134)));
+			this->buttonEnter->Location = System::Drawing::Point(165, 153);
 			this->buttonEnter->Name = L"buttonEnter";
-			this->buttonEnter->Size = System::Drawing::Size(60, 40);
+			this->buttonEnter->Size = System::Drawing::Size(61, 40);
 			this->buttonEnter->TabIndex = 11;
-			this->buttonEnter->Text = L"↩";
+			this->buttonEnter->Text = L"确认";
 			this->buttonEnter->UseVisualStyleBackColor = true;
 			this->buttonEnter->Click += gcnew System::EventHandler(this, &NumberKeyboard::buttonEnter_Click);
 			// 
@@ -210,7 +212,7 @@ namespace HuskyNeo2Tool {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(11, 21);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(246, 224);
+			this->ClientSize = System::Drawing::Size(246, 201);
 			this->Controls->Add(this->buttonEnter);
 			this->Controls->Add(this->buttonDelete);
 			this->Controls->Add(this->buttonNum0);
